@@ -238,7 +238,7 @@ export default function AdminEvents() {
       type: 'text',
       required: false
     };
-    setFormData({ ...formData, formFields: [...(formData.formFields || []), newField] });
+    setFormData({ ...formData, form_fields: [...(formData.form_fields || []), newField] });
   };
 
   const addPresetField = (preset: 'grade' | 'class' | 'name' | 'surname') => {
@@ -261,17 +261,17 @@ export default function AdminEvents() {
       };
     }
     
-    setFormData({ ...formData, formFields: [...(formData.formFields || []), newField] });
+    setFormData({ ...formData, form_fields: [...(formData.form_fields || []), newField] });
   };
 
   const removeFormField = (id: string) => {
-    setFormData({ ...formData, formFields: formData.formFields?.filter(f => f.id !== id) });
+    setFormData({ ...formData, form_fields: formData.form_fields?.filter(f => f.id !== id) });
   };
 
   const updateFormField = (id: string, updates: Partial<FormField>) => {
     setFormData({
       ...formData,
-      formFields: formData.formFields?.map(f => f.id === id ? { ...f, ...updates } : f)
+      form_fields: formData.form_fields?.map(f => f.id === id ? { ...f, ...updates } : f)
     });
   };
 

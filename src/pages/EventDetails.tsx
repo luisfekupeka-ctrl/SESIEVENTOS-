@@ -255,24 +255,24 @@ export default function EventDetails() {
                     <h3 className="text-2xl font-black text-slate-900 mb-2">Inscrever-se</h3>
                     <p className="text-slate-500 font-medium mb-4">Preencha os dados abaixo para participar.</p>
 
-                    {event.maxCapacity && event.maxCapacity > 0 && (
+                    {event.max_capacity && event.max_capacity > 0 && (
                       <div className="mb-6 space-y-2">
                         <div className="flex justify-between text-xs font-bold text-slate-500">
                           <span>Vagas Preenchidas</span>
-                          <span>{event.registrationCount || 0} / {event.maxCapacity}</span>
+                          <span>{event.registration_count || 0} / {event.max_capacity}</span>
                         </div>
                         <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                           <div 
                             className={`h-full transition-all duration-500 ${
-                              (event.registrationCount || 0) >= event.maxCapacity ? 'bg-red-500' : 'bg-[#0054A6]'
+                              (event.registration_count || 0) >= event.max_capacity ? 'bg-red-500' : 'bg-[#0054A6]'
                             }`}
-                            style={{ width: `${Math.min(((event.registrationCount || 0) / event.maxCapacity) * 100, 100)}%` }}
+                            style={{ width: `${Math.min(((event.registration_count || 0) / event.max_capacity) * 100, 100)}%` }}
                           />
                         </div>
                       </div>
                     )}
 
-                    {event.maxCapacity && event.maxCapacity > 0 && (event.registrationCount || 0) >= event.maxCapacity ? (
+                    {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity ? (
                       <div className="text-center py-6">
                         <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                           <AlertTriangle size={32} />

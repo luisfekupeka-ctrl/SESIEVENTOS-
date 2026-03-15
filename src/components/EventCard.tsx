@@ -57,8 +57,8 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
           <div className="flex items-center gap-3 text-slate-600">
             <Users size={18} className="text-[#0054A6]" />
             <span className="text-sm font-medium">
-              {event.registrationCount || 0} {event.maxCapacity && event.maxCapacity > 0 ? `/ ${event.maxCapacity}` : ''} inscritos
-              {event.maxCapacity && event.maxCapacity > 0 && (event.registrationCount || 0) >= event.maxCapacity && (
+              {event.registration_count || 0} {event.max_capacity && event.max_capacity > 0 ? `/ ${event.max_capacity}` : ''} inscritos
+              {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity && (
                 <span className="ml-2 text-red-500 font-black uppercase text-[10px]">Esgotado</span>
               )}
             </span>

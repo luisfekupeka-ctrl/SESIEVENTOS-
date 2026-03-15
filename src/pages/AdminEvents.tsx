@@ -238,7 +238,8 @@ export default function AdminEvents() {
       type: 'text',
       required: false
     };
-    setFormData({ ...formData, form_fields: [...(formData.form_fields || []), newField] });
+    console.log('Adding form field:', newField);
+    setFormData(prev => ({ ...prev, form_fields: [...(prev.form_fields || []), newField] }));
   };
 
   const addPresetField = (preset: 'grade' | 'class' | 'name' | 'surname') => {
@@ -261,18 +262,19 @@ export default function AdminEvents() {
       };
     }
     
-    setFormData({ ...formData, form_fields: [...(formData.form_fields || []), newField] });
+    console.log('Adding preset field:', preset, newField);
+    setFormData(prev => ({ ...prev, form_fields: [...(prev.form_fields || []), newField] }));
   };
 
   const removeFormField = (id: string) => {
-    setFormData({ ...formData, form_fields: formData.form_fields?.filter(f => f.id !== id) });
+    setFormData(prev => ({ ...prev, form_fields: prev.form_fields?.filter(f => f.id !== id) || [] }));
   };
 
   const updateFormField = (id: string, updates: Partial<FormField>) => {
-    setFormData({
-      ...formData,
-      form_fields: formData.form_fields?.map(f => f.id === id ? { ...f, ...updates } : f)
-    });
+    setFormData(prev => ({
+      ...prev,
+      form_fields: prev.form_fields?.map(f => f.id === id ? { ...f, ...updates } : f) || []
+    }));
   };
 
   if (loading) return <div>Carregando...</div>;

@@ -525,8 +525,9 @@ export default function AdminEvents() {
                     <input
                       type="date"
                       required
+                      placeholder="dd/mm/aaaa"
                       className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0054A6]/20 focus:border-[#0054A6] transition-all"
-                      value={formData.start_date}
+                      value={formData.start_date || ''}
                       onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                     />
                   </div>
@@ -544,8 +545,9 @@ export default function AdminEvents() {
                     <label className="text-sm font-bold text-slate-700">Data Final</label>
                     <input
                       type="date"
+                      placeholder="dd/mm/aaaa"
                       className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0054A6]/20 focus:border-[#0054A6] transition-all"
-                      value={formData.end_date}
+                      value={formData.end_date || ''}
                       onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                     />
                   </div>

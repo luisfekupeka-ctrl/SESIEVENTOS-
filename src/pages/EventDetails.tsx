@@ -95,77 +95,25 @@ export default function EventDetails() {
     setRestrictionError(null);
 
     try {
-      // 0. Check capacity
-      if (event.maxCapacity && event.maxCapacity > 0) {
-        if ((event.registrationCount || 0) >= event.maxCapacity) {
-          setError("Desculpe, as vagas para este evento esgotaram.");
-          setIsRegistering(false);
-          return;
-        }
-      }
+      // Use the atomic RPC to handle registration in one go
+      // This is much safer for high concurrency
+      const { data, error: rpcError } = await supabase.rpc('register_participant', {
+        p_event_id: id,
+        p_student_name: sName,
+        p_student_surname: sSurname,
+        p_student_grade: sGrade,
+        p_student_class: sClass,
+        p_participant_type: participantType,
+        p_form_data: formData
+      });
 
-      // 1. Find or create student
-      let studentId = '';
-      const { data: existingStudents, error: studentLookupError } = await supabase
-        .from('students')
-        .select('id')
-        .eq('name', sName)
-        .eq('surname', sSurname)
-        .eq('grade', sGrade)
-        .eq('class', sClass)
-        .eq('type', participantType);
+      if (rpcError) throw rpcError;
 
-      if (studentLookupError) throw studentLookupError;
-
-      if (existingStudents && existingStudents.length > 0) {
-        studentId = existingStudents[0].id;
-      } else {
-        // Create student record
-        const { data: newStudent, error: createStudentError } = await supabase
-          .from('students')
-          .insert({
-            name: sName,
-            surname: sSurname,
-            grade: sGrade,
-            class: sClass,
-            type: participantType
-          })
-          .select()
-          .single();
-
-        if (createStudentError) throw createStudentError;
-        studentId = newStudent.id;
-      }
-
-      // 2. Check if already registered
-      const { data: existingRegs, error: regLookupError } = await supabase
-        .from('registrations')
-        .select('id')
-        .eq('event_id', id)
-        .eq('student_id', studentId);
-
-      if (regLookupError) throw regLookupError;
-
-      if (existingRegs && existingRegs.length > 0) {
-        setError("Você já está inscrito neste evento.");
+      if (!data.success) {
+        setError(data.error);
         setIsRegistering(false);
         return;
       }
-
-      // 3. Create registration
-      const { error: regError } = await supabase
-        .from('registrations')
-        .insert({
-          event_id: id,
-          student_id: studentId,
-          form_data: formData,
-          timestamp: new Date().toISOString()
-        });
-
-      if (regError) throw regError;
-
-      // 4. Update event registration count
-      await supabase.rpc('increment_registration_count', { row_id: id, increment_by: 1 });
 
       setRegistrationSuccess(true);
     } catch (err: any) {

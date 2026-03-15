@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Student } from '../types';
-import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle, Download, RefreshCw } from 'lucide-react';
 import { GRADES, CLASSES } from '../constants';
 
 interface AdminParticipantsListProps {
@@ -17,6 +17,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingParticipant, setEditingParticipant] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
@@ -48,19 +49,56 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     };
   }, [type]);
 
-  const fetchParticipants = async () => {
-    const { data, error } = await supabase
-      .from('students')
-      .select('*')
-      .eq('type', type)
-      .order('name', { ascending: true });
+  const fetchParticipants = async (silent = false) => {
+    if (!silent) setLoading(true);
+    else setIsRefreshing(true);
+    
+    try {
+      const { data, error } = await supabase
+        .from('students')
+        .select('*')
+        .eq('type', type)
+        .order('name', { ascending: true });
 
-    if (error) {
-      console.error(`Erro ao carregar ${title}:`, error);
-    } else {
-      setParticipants(data || []);
+      if (error) {
+        console.error(`Erro ao carregar ${title}:`, error);
+        setFeedback({ type: 'error', message: 'Erro ao carregar dados do banco.' });
+      } else {
+        setParticipants(data || []);
+      }
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
     }
-    setLoading(false);
+  };
+
+  const exportToCSV = () => {
+    if (participants.length === 0) return;
+    
+    const headers = type === 'student' 
+      ? ['Nome', 'Sobrenome', 'Série', 'Turma'] 
+      : ['Nome', 'Sobrenome'];
+    
+    const rows = participants.map(p => {
+      return type === 'student'
+        ? [p.name, p.surname, p.grade, p.class]
+        : [p.name, p.surname];
+    });
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => r.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `lista_${type}_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleOpenModal = (participant?: Student) => {
@@ -127,12 +165,28 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           <h1 className="text-3xl font-black text-slate-900 mb-2">{title}</h1>
           <p className="text-slate-500 font-medium">{description}</p>
         </div>
-        <button
-          onClick={() => handleOpenModal()}
-          className="bg-[#0054A6] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#004080] transition-all shadow-lg flex items-center gap-2"
-        >
-          <Plus size={20} /> Adicionar {labelSingular}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => fetchParticipants(true)}
+            disabled={isRefreshing}
+            className="p-3 text-slate-500 hover:text-[#0054A6] hover:bg-slate-100 rounded-xl transition-all"
+            title="Atualizar"
+          >
+            <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
+          </button>
+          <button
+            onClick={exportToCSV}
+            className="bg-white text-slate-700 border border-slate-200 px-6 py-3 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2"
+          >
+            <Download size={20} /> Exportar CSV
+          </button>
+          <button
+            onClick={() => handleOpenModal()}
+            className="bg-[#0054A6] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#004080] transition-all shadow-lg flex items-center gap-2"
+          >
+            <Plus size={20} /> Adicionar {labelSingular}
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">

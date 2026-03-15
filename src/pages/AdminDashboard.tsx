@@ -92,14 +92,37 @@ export default function AdminDashboard() {
   const seedData = async () => {
     setIsResetting(true);
     try {
-      // 1. Create Categories
-      const { data: catData, error: catError } = await supabase
-        .from('categories')
-        .insert([{ name: 'Esporte' }, { name: 'Cultura' }, { name: 'Oficina' }])
-        .select();
+      // 1. Create Categories (or fetch if they exist)
+      const defaultCategories = ['Esporte', 'Cultura', 'Oficina'];
+      let catIds: string[] = [];
 
-      if (catError) throw catError;
-      const catIds = catData.map(c => c.id);
+      for (const catName of defaultCategories) {
+        // Try finding existing first
+        const { data: existingCat } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('name', catName)
+          .limit(1)
+          .single();
+
+        if (existingCat) {
+          catIds.push(existingCat.id);
+        } else {
+          const { data: newCat, error: catError } = await supabase
+            .from('categories')
+            .insert([{ name: catName }])
+            .select()
+            .single();
+            
+          if (catError) {
+            console.error("Erro Seed Categoria:", catError);
+            throw catError;
+          }
+          if (newCat) catIds.push(newCat.id);
+        }
+      }
+
+      if (catIds.length < 3) throw new Error("Não foi possível carregar as categorias.");
 
       // 2. Create Events
       const eventsToInsert = [
@@ -155,9 +178,9 @@ export default function AdminDashboard() {
 
       // 3. Create Students and Registrations
       const studentsToInsert = [
-        { name: 'Lucas', surname: 'Oliveira', grade: '9º Ano EF', class: 'A', type: 'student' },
-        { name: 'Mariana', surname: 'Santos', grade: '6º Ano EF', class: 'B', type: 'student' },
-        { name: 'Pedro', surname: 'Souza', grade: '1º Ano EM', class: 'C', type: 'student' }
+        { name: 'Lucas', surname: 'Oliveira', type: 'student' },
+        { name: 'Mariana', surname: 'Santos', type: 'student' },
+        { name: 'Pedro', surname: 'Souza', type: 'student' }
       ];
 
       const { data: createdStudents, error: studentError } = await supabase
@@ -165,7 +188,10 @@ export default function AdminDashboard() {
         .insert(studentsToInsert)
         .select();
 
-      if (studentError) throw studentError;
+      if (studentError) {
+        console.error("Student Seed Error:", studentError);
+        throw studentError;
+      }
 
       // Create Registrations
       const regsToInsert = [
@@ -190,7 +216,10 @@ export default function AdminDashboard() {
       ];
 
       const { error: regError } = await supabase.from('registrations').insert(regsToInsert);
-      if (regError) throw regError;
+      if (regError) {
+        console.error("Registration Seed Error:", regError);
+        throw regError;
+      }
 
       // Update registration totals
       await supabase.rpc('increment_registration_count', { row_id: createdEvents[0].id, increment_by: 2 });

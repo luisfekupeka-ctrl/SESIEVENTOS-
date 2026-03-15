@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Event, Category, FormField, EventRestrictions, EventTemplate } from '../types';
-import { Plus, Trash2, Edit2, X, Check, Calendar, Clock, Image, FileText, ShieldCheck, List, Settings, ChevronDown, ChevronUp, Users, Lock, Eye, EyeOff, Copy, Bookmark, Save, Sparkles, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Check, Calendar, Clock, Image, FileText, ShieldCheck, List, Settings, ChevronDown, ChevronUp, Users, Lock, Eye, EyeOff, Copy, Bookmark, Save, Sparkles, TrendingUp, AlertTriangle, QrCode, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { GRADES, CLASSES } from '../constants';
@@ -28,6 +29,7 @@ export default function AdminEvents() {
     onConfirm: () => {},
   });
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [qrEvent, setQrEvent] = useState<Event | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<Partial<Event>>({
@@ -361,6 +363,13 @@ export default function AdminEvents() {
                   title="Duplicar Evento"
                 >
                   <Copy size={20} />
+                </button>
+                <button
+                  onClick={() => setQrEvent(event)}
+                  className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all"
+                  title="Gerar QR Code"
+                >
+                  <QrCode size={20} />
                 </button>
                 <button
                   onClick={() => handleOpenModal(event)}
@@ -854,6 +863,60 @@ export default function AdminEvents() {
           </div>
         </div>
       )}
+      {/* QR Code Modal */}
+      {qrEvent && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0F172A] w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">QR Code do Evento</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 line-clamp-2">{qrEvent.name}</p>
+            
+            <div className="bg-white p-6 rounded-2xl inline-block shadow-sm border border-slate-100 mb-6">
+              <QRCodeSVG 
+                id="event-qrcode"
+                value={`${window.location.origin}/event/${qrEvent.id}`} 
+                size={200}
+                level="H"
+                includeMargin={true}
+              />
+            </div>
+            
+            <div className="flex gap-4">
+              <button
+                onClick={() => setQrEvent(null)}
+                className="flex-grow py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+              >
+                Fechar
+              </button>
+              <button
+                onClick={() => {
+                  const svg = document.getElementById('event-qrcode');
+                  if (!svg) return;
+                  const svgData = new XMLSerializer().serializeToString(svg);
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const img = new window.Image();
+                  img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx?.drawImage(img, 0, 0);
+                    const pngFile = canvas.toDataURL('image/png');
+                    const downloadLink = document.createElement('a');
+                    downloadLink.download = `qrcode-${qrEvent.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+                    downloadLink.href = `${pngFile}`;
+                    downloadLink.click();
+                  };
+                  img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                }}
+                className="flex-grow py-3 bg-[#0054A6] hover:bg-[#004080] dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg"
+              >
+                <Download size={18} />
+                Baixar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -7,13 +7,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
+import autoTable from 'jspdf-autotable';
 
 export default function AdminEventRegistrations() {
   const { id } = useParams<{ id: string }>();
@@ -104,37 +98,42 @@ export default function AdminEventRegistrations() {
 
   const exportToPDF = () => {
     if (!event) return;
-    const pdfDoc = new jsPDF();
-    pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
-    pdfDoc.setFontSize(10);
-    pdfDoc.text(`Data: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 14, 22);
+    try {
+      const pdfDoc = new jsPDF();
+      pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
+      pdfDoc.setFontSize(10);
+      pdfDoc.text(`Data: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 14, 22);
 
-    const tableData = registrations.map(reg => {
-      const row = [
-        format(new Date(reg.timestamp), "dd/MM/yyyy")
-      ];
+      const tableData = registrations.map(reg => {
+        const row = [
+          format(new Date(reg.timestamp), "dd/MM/yyyy")
+        ];
 
-      // Add custom fields
-      event.form_fields.forEach(field => {
-        row.push(reg.form_data[field.label.toLowerCase()] || '-');
+        // Add custom fields
+        event.form_fields.forEach(field => {
+          row.push(reg.form_data[field.label.toLowerCase()] || '-');
+        });
+
+        return row;
       });
 
-      return row;
-    });
+      const headers = ['Inscrição'];
+      event.form_fields.forEach(field => headers.push(field.label));
 
-    const headers = ['Inscrição'];
-    event.form_fields.forEach(field => headers.push(field.label));
+      autoTable(pdfDoc, {
+        startY: 30,
+        head: [headers],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 84, 166] }, // SESI Blue
+        styles: { fontSize: 8 }
+      });
 
-    pdfDoc.autoTable({
-      startY: 30,
-      head: [headers],
-      body: tableData,
-      theme: 'grid',
-      headStyles: { fillColor: [0, 84, 166] }, // SESI Blue
-      styles: { fontSize: 8 }
-    });
-
-    pdfDoc.save(`Inscritos_${event.name.replace(/\s+/g, '_')}.pdf`);
+      pdfDoc.save(`Inscritos_${event.name.replace(/\s+/g, '_')}.pdf`);
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      alert("Erro ao gerar o arquivo PDF. Tente usar a exportação para Excel.");
+    }
   };
 
   const copyToClipboard = () => {

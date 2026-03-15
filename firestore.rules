@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: categories
+    // Fields: name (string)
+    //
+    // Collection: events
+    // Fields: name, categoryId, description, imageUrl, startDate, startTime, 
+    //         endDate, endTime, duration, restrictions, passwordProtected, 
+    //         password, formFields
+    //
+    // Collection: students
+    // Fields: name, surname, email, class, grade
+    //
+    // Collection: registrations
+    // Fields: eventId, studentId, formData, timestamp
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "admin@sistema.local" || 
+         request.auth.token.email == "luis.kupekasesi@gmail.com");
+    }
+
+    function isValidCategory(data) {
+      return data.keys().hasAll(['name']) && data.name is string && data.name.size() > 0;
+    }
+
+    function isValidEvent(data) {
+      return data.keys().hasAll(['name', 'categoryId', 'startDate', 'startTime']) &&
+             data.name is string && data.name.size() > 0 &&
+             data.categoryId is string &&
+             data.startDate is string &&
+             data.startTime is string;
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['name', 'surname']) &&
+             data.name is string && data.surname is string;
+    }
+
+    function isValidRegistration(data) {
+      return data.keys().hasAll(['eventId', 'studentId', 'timestamp']) &&
+             data.eventId is string && data.studentId is string;
+    }
+
+    // Rules
+    match /categories/{categoryId} {
+      allow read, write: if true;
+    }
+
+    match /events/{eventId} {
+      allow read, write: if true;
+    }
+
+    match /event_templates/{templateId} {
+      allow read, write: if true;
+    }
+
+    match /students/{studentId} {
+      allow read, write: if true;
+    }
+
+    match /registrations/{registrationId} {
+      allow read, write: if true;
+    }
+  }
+}

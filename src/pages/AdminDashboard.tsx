@@ -337,7 +337,15 @@ export default function AdminDashboard() {
                   <div>
                     <p className="text-lg font-black text-white mb-1">{event.name}</p>
                     <div className="flex items-center gap-3">
-                      <p className="text-xs font-bold text-slate-500">{format(new Date(event.start_date), "dd/MM/yyyy")}</p>
+                      <p className="text-xs font-bold text-slate-500">
+                        {(() => {
+                          try {
+                            return format(new Date(event.start_date), "dd/MM/yyyy");
+                          } catch (e) {
+                            return '-';
+                          }
+                        })()}
+                      </p>
                       <span className="text-[10px] font-black px-2.5 py-1 bg-blue-500/10 text-blue-400 rounded-lg uppercase tracking-widest">
                         {event.registration_count || 0} inscritos
                       </span>
@@ -373,10 +381,22 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-black text-white uppercase tracking-widest">
-                      {format(new Date(reg.timestamp), "HH:mm", { locale: ptBR })}
+                      {(() => {
+                        try {
+                          return format(new Date(reg.timestamp), "HH:mm", { locale: ptBR });
+                        } catch (e) {
+                          return '-';
+                        }
+                      })()}
                     </p>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
-                      {format(new Date(reg.timestamp), "dd/MM", { locale: ptBR })}
+                      {(() => {
+                        try {
+                          return format(new Date(reg.timestamp), "dd/MM", { locale: ptBR });
+                        } catch (e) {
+                          return '-';
+                        }
+                      })()}
                     </p>
                   </div>
                 </div>

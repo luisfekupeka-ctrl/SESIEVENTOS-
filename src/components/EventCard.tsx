@@ -46,7 +46,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
               <Calendar size={20} />
             </div>
             <span className="text-sm font-black uppercase tracking-widest">
-              {format(new Date(event.start_date), "dd 'de' MMMM", { locale: ptBR })}
+              {(() => {
+                try {
+                  return format(new Date(event.start_date), "dd 'de' MMMM", { locale: ptBR });
+                } catch (e) {
+                  return event.start_date || '-';
+                }
+              })()}
             </span>
           </div>
           

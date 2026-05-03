@@ -134,7 +134,7 @@ export default function AdminCategories() {
       </div>
 
       <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
-        <div className="p-10 border-b border-white/5 bg-white/[0.01]">
+        <div className="p-6 md:p-10 border-b border-white/5 bg-black">
           <form onSubmit={handleAdd} className="flex flex-col gap-6">
             <div className="flex gap-4">
               <input
@@ -148,7 +148,7 @@ export default function AdminCategories() {
               <button
                 type="submit"
                 disabled={isAdding || !newCategory.trim()}
-                className="bg-sky-500 text-black px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)] flex items-center gap-3 disabled:opacity-50"
+                className="bg-sky-500 text-black px-6 md:px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)] flex items-center gap-3 disabled:opacity-50"
               >
                 {isAdding ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />} 
                 {isAdding ? 'Sincronizando...' : 'Adicionar'}
@@ -164,7 +164,7 @@ export default function AdminCategories() {
 
         <div className="divide-y divide-white/5">
           {categories.map(cat => (
-            <div key={cat.id} className="p-8 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
+            <div key={cat.id} className="p-6 md:p-8 flex items-center justify-between hover:bg-black transition-colors group">
               {editingId === cat.id ? (
                 <div className="flex-grow flex gap-4 mr-4 animate-in fade-in slide-in-from-left-4 duration-300">
                   <input
@@ -177,8 +177,8 @@ export default function AdminCategories() {
                   <button onClick={handleSaveEdit} className="w-12 h-12 bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white rounded-xl flex items-center justify-center transition-all">
                     <Check size={24} />
                   </button>
-                  <button onClick={() => setEditingId(null)} className="w-12 h-12 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl flex items-center justify-center transition-all">
-                    <X size={24} />
+                  <button onClick={() => setEditingId(null)} className="w-10 h-10 md:w-12 md:h-12 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl flex items-center justify-center transition-all">
+                    <X size={20} className="md:w-6 md:h-6" />
                   </button>
                 </div>
               ) : (

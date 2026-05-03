@@ -343,8 +343,8 @@ export default function AdminEvents() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Gerenciar Eventos</h1>
-          <p className="text-slate-500 font-bold">Crie, edite e acompanhe todos os eventos escolares.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Gerenciar Eventos</h1>
+          <p className="text-sm md:text-base text-slate-500 font-bold">Crie, edite e acompanhe todos os eventos escolares.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <button
@@ -369,7 +369,7 @@ export default function AdminEvents() {
               <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" referrerPolicy="no-referrer" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent md:hidden"></div>
             </div>
-            <div className="p-10 flex-grow flex flex-col justify-between relative">
+            <div className="p-6 md:p-10 flex-grow flex flex-col justify-between relative">
               <div>
                 <div className="flex items-center gap-4 mb-4">
                   <span className="bg-sky-500/10 text-sky-500 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] border border-sky-500/20">
@@ -381,7 +381,7 @@ export default function AdminEvents() {
                     </div>
                   )}
                 </div>
-                <h3 className="text-3xl font-black text-white mb-6 group-hover:text-sky-500 transition-colors tracking-tight">{event.name}</h3>
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-6 group-hover:text-sky-500 transition-colors tracking-tight leading-tight">{event.name}</h3>
 
                 <div className="flex flex-wrap gap-8 text-sm font-bold">
                   <div className="flex items-center gap-3 text-slate-400">
@@ -469,7 +469,7 @@ export default function AdminEvents() {
       {showTemplates && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div className="bg-[#0A0A0A] w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col border border-white/10">
-            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-black">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-sky-500/10 text-sky-500 rounded-2xl flex items-center justify-center">
                   <Bookmark size={24} />
@@ -489,7 +489,7 @@ export default function AdminEvents() {
                 </div>
               ) : (
                 templates.map(template => (
-                  <div key={template.id} className="flex items-center justify-between p-6 bg-white/[0.02] rounded-3xl border border-white/5 hover:border-sky-500/30 transition-all group">
+                  <div key={template.id} className="flex items-center justify-between p-6 bg-black rounded-3xl border border-white/5 hover:border-sky-500/30 transition-all group">
                     <div className="flex items-center gap-5">
                       <div className="w-16 h-16 rounded-2xl overflow-hidden bg-black flex-shrink-0">
                         <img src={template.image_url || undefined} alt="" className="w-full h-full object-cover" />
@@ -523,9 +523,9 @@ export default function AdminEvents() {
 
       {/* Modal Form */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#0A0A0A] w-full max-w-4xl max-h-[90vh] rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/10">
-            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#0A0A0A] w-full max-w-4xl max-h-[95vh] rounded-[2rem] md:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/10">
+            <div className="p-6 md:p-8 border-b border-white/5 flex items-center justify-between bg-black">
               <h2 className="text-3xl font-black text-white tracking-tight">
                 {editingEvent ? 'Editar Evento' : 'Criar Novo Evento'}
               </h2>
@@ -534,7 +534,7 @@ export default function AdminEvents() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-10 space-y-12 custom-scrollbar">
+            <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-6 md:p-10 space-y-8 md:space-y-12 custom-scrollbar">
               {/* Basic Info */}
               <section className="space-y-8">
                 <div className="flex items-center gap-4 mb-8">
@@ -673,7 +673,7 @@ export default function AdminEvents() {
 
                 <div className="space-y-4">
                   {formData.form_fields?.map((field) => (
-                    <div key={field.id} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex flex-col md:flex-row gap-6 items-center">
+                    <div key={field.id} className="p-6 bg-black border border-white/5 rounded-3xl flex flex-col md:flex-row gap-6 items-center">
                       <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                         <input type="text" placeholder="Nome do Campo" className="px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none" value={field.label} onChange={(e) => updateFormField(field.id, { label: e.target.value })} />
                         <select className="px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none appearance-none" value={field.type} onChange={(e) => updateFormField(field.id, { type: e.target.value as any })}>
@@ -689,7 +689,7 @@ export default function AdminEvents() {
                 </div>
               </section>
 
-              <div className="pt-10 flex justify-end gap-6">
+              <div className="pt-8 md:pt-10 flex flex-col md:flex-row justify-end gap-4 md:gap-6">
                 <button type="button" onClick={() => { setIsModalOpen(false); setSelectedImageFile(null); }} className="px-8 py-4 text-slate-500 font-black uppercase tracking-widest text-xs hover:text-white transition-colors">Cancelar</button>
                 <button
                   type="submit"

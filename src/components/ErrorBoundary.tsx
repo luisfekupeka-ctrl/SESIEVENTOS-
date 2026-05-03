@@ -40,7 +40,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Nossa equipe já foi notificada.
             </p>
             
-            <div className="text-left bg-white/[0.02] p-8 rounded-3xl mb-10 overflow-auto max-h-48 border border-white/5">
+            <div className="text-left bg-black p-8 rounded-3xl mb-10 overflow-auto max-h-48 border border-white/5">
               <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-3">Detalhes do Erro:</p>
               <code className="text-xs font-mono text-slate-500 break-words leading-relaxed">
                 {this.state.error?.toString()}

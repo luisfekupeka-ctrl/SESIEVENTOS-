@@ -166,8 +166,8 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black text-white mb-2 tracking-tight">{title}</h1>
-          <p className="text-slate-500 font-bold">{description}</p>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">{title}</h1>
+          <p className="text-sm md:text-base text-slate-500 font-bold">{description}</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <button
@@ -194,7 +194,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
       </div>
 
       <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
-        <div className="p-8 border-b border-white/5 bg-white/[0.01] flex flex-col md:flex-row gap-6">
+        <div className="p-8 border-b border-white/5 bg-black flex flex-col md:flex-row gap-6">
           <div className="relative flex-grow">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500" size={24} />
             <input
@@ -210,18 +210,18 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/[0.02] border-b border-white/5">
-                <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Identificação</th>
+              <tr className="bg-black border-b border-white/5">
+                <th className="px-4 md:px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Identificação</th>
                 {type === 'student' && (
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Série/Turma</th>
+                  <th className="px-4 md:px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Série/Turma</th>
                 )}
-                <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Controle</th>
+                <th className="px-4 md:px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Controle</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {filteredParticipants.map(participant => (
-                <tr key={participant.id} className="hover:bg-white/[0.02] transition-colors group">
-                  <td className="px-8 py-5">
+                <tr key={participant.id} className="hover:bg-black transition-colors group">
+                  <td className="px-4 md:px-8 py-5">
                     <div className="flex items-center gap-5">
                       <div className="w-12 h-12 bg-sky-500/5 text-sky-500 rounded-2xl flex items-center justify-center font-black text-lg border border-sky-500/10 group-hover:scale-110 transition-transform">
                         {participant.name[0]}{participant.surname[0]}
@@ -230,14 +230,14 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                     </div>
                   </td>
                   {type === 'student' && (
-                    <td className="px-8 py-5">
+                    <td className="px-4 md:px-8 py-5">
                       <div className="flex flex-col">
                         <span className="text-base font-black text-white">{participant.grade}</span>
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{participant.class}</span>
                       </div>
                     </td>
                   )}
-                  <td className="px-8 py-5 text-right">
+                  <td className="px-4 md:px-8 py-5 text-right">
                     <div className="flex items-center justify-end gap-3">
                       <button
                         onClick={() => handleOpenModal(participant)}
@@ -267,9 +267,9 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
 
       {/* Modal Form */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#0A0A0A] w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10">
-            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#0A0A0A] w-full max-w-lg rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10">
+            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-black">
               <h2 className="text-3xl font-black text-white tracking-tight">
                 {editingParticipant ? `Editar ${labelSingular}` : `Novo ${labelSingular}`}
               </h2>
@@ -278,7 +278,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-10 space-y-8">
+            <form onSubmit={handleSubmit} className="p-6 md:p-10 space-y-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Nome</label>
@@ -335,7 +335,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 </div>
               )}
 
-              <div className="pt-8 flex justify-end gap-5">
+              <div className="pt-8 flex flex-col md:flex-row justify-end gap-4 md:gap-5">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}

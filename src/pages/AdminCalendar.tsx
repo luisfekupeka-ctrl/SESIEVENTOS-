@@ -64,30 +64,30 @@ export default function AdminCalendar() {
   const renderHeader = () => {
     return (
       <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-        <div>
-          <h1 className="text-4xl font-black text-white mb-2 text-center md:text-left tracking-tight">Calendário de Eventos</h1>
-          <p className="text-yellow-500 font-black uppercase tracking-[0.3em] text-xs text-center md:text-left">
+        <div className="text-center md:text-left">
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Calendário de Eventos</h1>
+          <p className="text-yellow-500 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs">
             {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
           </p>
         </div>
-        <div className="flex items-center gap-4 bg-black p-2 rounded-[2rem] border border-white/5">
+        <div className="flex items-center gap-2 md:gap-4 bg-black p-1.5 md:p-2 rounded-[2rem] border border-white/5">
           <button
             onClick={prevMonth}
-            className="w-12 h-12 bg-black text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
+            className="w-10 h-10 md:w-12 md:h-12 bg-black text-slate-400 hover:text-white rounded-xl md:rounded-2xl flex items-center justify-center transition-all border border-white/5"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={20} className="md:w-6 md:h-6" />
           </button>
           <button
             onClick={() => setCurrentMonth(new Date())}
-            className="px-8 py-3 bg-yellow-500 text-black rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)]"
+            className="px-4 md:px-8 py-2.5 md:py-3 bg-yellow-500 text-black rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)]"
           >
             Hoje
           </button>
           <button
             onClick={nextMonth}
-            className="w-12 h-12 bg-black text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
+            className="w-10 h-10 md:w-12 md:h-12 bg-black text-slate-400 hover:text-white rounded-xl md:rounded-2xl flex items-center justify-center transition-all border border-white/5"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={20} className="md:w-6 md:h-6" />
           </button>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function AdminCalendar() {
   const renderDays = () => {
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     return (
-      <div className="grid grid-cols-7 mb-4 bg-white/[0.02] rounded-2xl overflow-hidden border border-white/5">
+      <div className="grid grid-cols-7 mb-4 bg-black rounded-2xl overflow-hidden border border-white/5">
         {days.map((day, i) => (
           <div key={i} className="text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] py-5">
             {day}
@@ -158,7 +158,7 @@ export default function AdminCalendar() {
                   <div className="hidden md:flex flex-col gap-2">
                     {dayEvents.map(event => (
                       <Link key={event.id} to={`/admin/events`} className="group">
-                        <div className="px-3 py-2 bg-white/[0.03] border-l-2 border-sky-500 rounded-lg flex flex-col gap-1 hover:bg-white/[0.06] transition-all group-hover:translate-x-1">
+                        <div className="px-3 py-2 bg-black border-l-2 border-sky-500 rounded-lg flex flex-col gap-1 hover:bg-black transition-all group-hover:translate-x-1">
                           <p className="text-[10px] font-black text-white truncate leading-tight uppercase tracking-tight group-hover:text-sky-500 transition-colors">
                             {event.name}
                           </p>
@@ -183,7 +183,7 @@ export default function AdminCalendar() {
           <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-2xl flex items-center justify-center border border-yellow-500/10">
             <CalendarIcon size={24} />
           </div>
-          <h3 className="text-2xl font-black text-white tracking-tight uppercase">
+          <h3 className="text-xl md:text-2xl font-black text-white tracking-tight uppercase">
             Radar de Eventos
           </h3>
           <div className="h-px flex-grow bg-black"></div>
@@ -217,7 +217,7 @@ export default function AdminCalendar() {
               </div>
             ))}
           {events.length === 0 && (
-            <div className="col-span-full py-24 text-center bg-white/[0.01] rounded-[3rem] border border-dashed border-white/10">
+            <div className="col-span-full py-24 text-center bg-black rounded-[3rem] border border-dashed border-white/10">
               <CalendarIcon size={48} className="mx-auto text-slate-800 mb-6 opacity-20" />
               <p className="text-slate-600 font-black uppercase tracking-[0.2em]">Sem eventos detectados.</p>
             </div>

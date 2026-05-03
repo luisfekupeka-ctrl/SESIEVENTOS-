@@ -239,31 +239,31 @@ export default function AdminDashboard() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Painel de Controle</h1>
-          <p className="text-slate-500 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel de Controle</h1>
+          <p className="text-sm md:text-base text-slate-500 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-black text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-[#0F0F0F] transition-all border border-white/5 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-black text-slate-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-[#0F0F0F] transition-all border border-white/5 disabled:opacity-50"
           >
-            <Clock size={18} className="text-sky-500" />
+            <Clock size={16} className="text-sky-500" />
             Atualizar
           </button>
           <button
             onClick={seedData}
             disabled={isResetting || loading}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-500/10 text-blue-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-blue-500/20 transition-all border border-blue-500/20 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-blue-500/10 text-blue-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-blue-500/20 transition-all border border-blue-500/20 disabled:opacity-50"
           >
-            <TrendingUp size={18} />
+            <TrendingUp size={16} />
             Gerar Dados
           </button>
           <button
             onClick={() => setShowResetConfirm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-red-500/10 text-red-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-500/20 transition-all border border-red-500/20"
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-red-500/10 text-red-500 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-red-500/20 transition-all border border-red-500/20"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
             Resetar
           </button>
         </div>
@@ -329,7 +329,7 @@ export default function AdminDashboard() {
           </div>
           <div className="divide-y divide-white/5">
             {events.slice(0, 5).map(event => (
-              <div key={event.id} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+              <div key={event.id} className="p-6 flex items-center justify-between hover:bg-black transition-colors">
                 <div className="flex items-center gap-5">
                   <div className="w-14 h-14 rounded-2xl overflow-hidden bg-black border border-white/10">
                     <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
             {recentRegistrations.map(reg => {
               const student = (reg as any).students;
               return (
-                <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-black transition-colors">
                   <div className="flex items-center gap-5">
                     <div className="w-14 h-14 rounded-full bg-sky-500/5 flex items-center justify-center text-sky-500 border border-sky-500/10">
                       <Users size={24} />

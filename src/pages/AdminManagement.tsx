@@ -94,18 +94,18 @@ export default function AdminManagement() {
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/[0.02] border-b border-white/5">
-                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Usuário</th>
-                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Função</th>
-                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Status</th>
-                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Solicitação</th>
-                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
+              <tr className="bg-black border-b border-white/5">
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Usuário</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Função</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Solicitação</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {profiles.map((profile) => (
-                <tr key={profile.id} className="hover:bg-white/[0.01] transition-colors group">
-                  <td className="px-8 py-5">
+                <tr key={profile.id} className="hover:bg-black transition-colors group">
+                  <td className="px-4 md:px-8 py-5">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-sky-500 text-black flex items-center justify-center font-black text-lg shadow-[0_0_20px_rgba(14,165,233,0.2)]">
                         {profile.full_name?.charAt(0) || 'U'}
@@ -119,7 +119,7 @@ export default function AdminManagement() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-4 md:px-8 py-5">
                     <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.1em] border ${
                       profile.role === 'super_admin' 
                         ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
@@ -128,7 +128,7 @@ export default function AdminManagement() {
                       {profile.role === 'super_admin' ? 'Master' : 'Admin'}
                     </span>
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-4 md:px-8 py-5">
                     <div className="flex items-center gap-3">
                        <span className={`w-2 h-2 rounded-full ${
                          profile.status === 'approved' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' :
@@ -142,13 +142,13 @@ export default function AdminManagement() {
                        </span>
                     </div>
                   </td>
-                  <td className="px-8 py-5 text-xs text-slate-500 font-bold uppercase tracking-widest">
+                  <td className="px-4 md:px-8 py-5 text-xs text-slate-500 font-bold uppercase tracking-widest">
                     <div className="flex items-center gap-2">
                       <Clock size={14} className="text-slate-700" />
                       {new Date(profile.created_at).toLocaleDateString('pt-BR')}
                     </div>
                   </td>
-                  <td className="px-8 py-5 text-right">
+                  <td className="px-4 md:px-8 py-5 text-right">
                     <div className="flex items-center justify-end gap-3">
                       {profile.status === 'pending' && (
                         <button

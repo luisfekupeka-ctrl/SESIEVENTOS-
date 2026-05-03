@@ -219,27 +219,27 @@ export default function AdminEventRegistrations() {
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/[0.02] border-b border-white/5">
-                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Data</th>
+              <tr className="bg-black border-b border-white/5">
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Data</th>
                 {event.form_fields.map(field => (
-                  <th key={field.id} className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{field.label}</th>
+                  <th key={field.id} className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{field.label}</th>
                 ))}
-                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {registrations.map(reg => {
                 return (
-                  <tr key={reg.id} className="hover:bg-white/[0.01] transition-colors group">
-                    <td className="px-8 py-5 text-xs text-slate-500 font-bold whitespace-nowrap uppercase tracking-widest">
+                  <tr key={reg.id} className="hover:bg-black transition-colors group">
+                    <td className="px-4 md:px-8 py-5 text-xs text-slate-500 font-bold whitespace-nowrap uppercase tracking-widest">
                       {formatRegDate(reg.timestamp)}
                     </td>
                     {event.form_fields.map(field => (
-                      <td key={field.id} className="px-8 py-5 text-sm text-white font-bold truncate max-w-[200px]">
+                      <td key={field.id} className="px-4 md:px-8 py-5 text-sm text-white font-bold truncate max-w-[200px]">
                         {reg.form_data[field.label.toLowerCase()] || '-'}
                       </td>
                     ))}
-                    <td className="px-8 py-5 text-right">
+                    <td className="px-4 md:px-8 py-5 text-right">
                       <button
                         onClick={() => setDeleteId(reg.id)}
                         className="w-10 h-10 bg-red-500/5 text-slate-600 hover:text-red-500 rounded-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
@@ -267,8 +267,8 @@ export default function AdminEventRegistrations() {
       {deleteId && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div className="bg-[#0A0A0A] w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in fade-in zoom-in duration-300 border border-white/10 text-center">
-            <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-8 mx-auto">
-              <Trash2 size={40} />
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-red-500/10 text-red-500 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 mx-auto">
+              <Trash2 size={32} className="md:w-10 md:h-10" />
             </div>
             <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Remoção</h3>
             <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">

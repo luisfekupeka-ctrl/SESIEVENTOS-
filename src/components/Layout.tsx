@@ -81,9 +81,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {isAdmin && (
               <button 
                 onClick={toggleMobileMenu}
-                className="md:hidden p-2.5 text-slate-400 hover:text-sky-500 hover:bg-black rounded-xl transition-all"
+                className="md:hidden p-3 bg-black text-sky-500 rounded-xl transition-all border border-sky-500/20 active:scale-90"
               >
-                <LayoutDashboard size={20} />
+                <LayoutDashboard size={24} />
               </button>
             )}
           </div>
@@ -168,10 +168,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   );
 };
 
-const AdminNavItem: React.FC<{ to: string; icon: React.ReactNode; label: string; active: boolean }> = ({ to, icon, label, active }) => (
+const AdminNavItem: React.FC<{ to: string; icon: React.ReactNode; label: string; active: boolean; onClick?: () => void }> = ({ to, icon, label, active, onClick }) => (
   <Link
     to={to}
-    className={`flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-all ${
+    onClick={onClick}
+    className={`flex items-center gap-3 px-4 py-4 text-sm font-bold rounded-xl transition-all ${
       active
         ? 'bg-sky-500 text-black shadow-[0_0_20px_rgba(14,165,233,0.3)]'
         : 'text-slate-400 hover:text-white hover:bg-black'

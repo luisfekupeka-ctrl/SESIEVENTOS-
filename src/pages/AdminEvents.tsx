@@ -552,7 +552,7 @@ export default function AdminEvents() {
                     <input
                       type="text"
                       required
-                      className="w-full px-6 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-white font-bold"
+                      className="w-full px-6 py-4 bg-[#111111] border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-white font-bold placeholder:text-slate-500"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
@@ -561,7 +561,7 @@ export default function AdminEvents() {
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Categoria</label>
                     <select
                       required
-                      className="w-full px-6 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-white font-bold appearance-none"
+                      className="w-full px-6 py-4 bg-[#111111] border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-white font-bold appearance-none placeholder:text-slate-500"
                       value={formData.category_id}
                       onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                     >
@@ -577,7 +577,7 @@ export default function AdminEvents() {
                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Descrição Completa</label>
                   <textarea
                     rows={4}
-                    className="w-full px-6 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
+                    className="w-full px-6 py-4 bg-[#111111] border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-white font-bold placeholder:text-slate-500"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
@@ -610,7 +610,7 @@ export default function AdminEvents() {
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Ou Cole o Link</label>
                       <input
                         type="url"
-                        className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
+                        className="w-full px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
                         placeholder="https://..."
                         value={formData.image_url}
                         onChange={(e) => {
@@ -635,19 +635,19 @@ export default function AdminEvents() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Início</label>
-                    <input type="date" required className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none" value={formData.start_date || ''} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} />
+                    <input type="date" required className="w-full px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all" value={formData.start_date || ''} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Hora</label>
-                    <input type="time" required className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} />
+                    <input type="time" required className="w-full px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Término</label>
-                    <input type="date" className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none" value={formData.end_date || ''} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} />
+                    <input type="date" className="w-full px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all" value={formData.end_date || ''} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Vagas</label>
-                    <input type="number" placeholder="0 = Ilimitado" className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none" value={formData.max_capacity || ''} onChange={(e) => setFormData({ ...formData, max_capacity: parseInt(e.target.value) || 0 })} />
+                    <input type="number" placeholder="0 = Ilimitado" className="w-full px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all placeholder:text-slate-500" value={formData.max_capacity || ''} onChange={(e) => setFormData({ ...formData, max_capacity: parseInt(e.target.value) || 0 })} />
                   </div>
                 </div>
               </section>
@@ -677,8 +677,8 @@ export default function AdminEvents() {
                   {formData.form_fields?.map((field) => (
                     <div key={field.id} className="p-6 bg-black border border-white/5 rounded-3xl flex flex-col md:flex-row gap-6 items-center">
                       <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                        <input type="text" placeholder="Nome do Campo" className="px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none" value={field.label} onChange={(e) => updateFormField(field.id, { label: e.target.value })} />
-                        <select className="px-5 py-4 bg-black border border-white/10 rounded-2xl text-white font-bold focus:outline-none appearance-none" value={field.type} onChange={(e) => updateFormField(field.id, { type: e.target.value as any })}>
+                        <input type="text" placeholder="Nome do Campo (ex: CPF, Turma...)" className="px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all placeholder:text-slate-500" value={field.label} onChange={(e) => updateFormField(field.id, { label: e.target.value })} />
+                        <select className="px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all appearance-none" value={field.type} onChange={(e) => updateFormField(field.id, { type: e.target.value as any })}>
                           <option value="text" className="bg-black">Texto</option>
                           <option value="select" className="bg-black">Lista</option>
                         </select>

@@ -228,9 +228,9 @@ export default function AdminEventRegistrations() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-black border-b border-white/5">
-                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Data</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Data</th>
                 {event.form_fields.map(field => (
-                  <th key={field.id} className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{field.label}</th>
+                  <th key={field.id} className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{field.label}</th>
                 ))}
                 <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
               </tr>
@@ -239,7 +239,7 @@ export default function AdminEventRegistrations() {
               {registrations.map(reg => {
                 return (
                   <tr key={reg.id} className="hover:bg-black transition-colors group">
-                    <td className="px-4 md:px-8 py-5 text-xs text-slate-500 font-bold whitespace-nowrap uppercase tracking-widest">
+                    <td className="px-4 md:px-8 py-5 text-xs text-slate-400 font-bold whitespace-nowrap uppercase tracking-widest">
                       {formatRegDate(reg.timestamp)}
                     </td>
                     {event.form_fields.map(field => (

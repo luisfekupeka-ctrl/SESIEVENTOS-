@@ -89,6 +89,44 @@ export default function AdminDashboard() {
     }
   };
 
+  const recountAllRegistrations = async () => {
+    setLoading(true);
+    try {
+      // 1. Get all events
+      const { data: allEvents, error: eventsError } = await supabase
+        .from('events')
+        .select('id');
+      
+      if (eventsError) throw eventsError;
+
+      if (allEvents) {
+        for (const ev of allEvents) {
+          // 2. Count registrations for each event
+          const { count, error: countError } = await supabase
+            .from('registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', ev.id);
+          
+          if (countError) throw countError;
+
+          // 3. Update the event with the correct count
+          await supabase
+            .from('events')
+            .update({ registration_count: count || 0 })
+            .eq('id', ev.id);
+        }
+      }
+      
+      setFeedback({ type: 'success', message: 'Contagens sincronizadas com sucesso!' });
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      setFeedback({ type: 'error', message: 'Erro ao sincronizar contagens.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const seedData = async () => {
     setIsResetting(true);
     try {
@@ -265,6 +303,14 @@ export default function AdminDashboard() {
           >
             <Trash2 size={16} />
             Resetar
+          </button>
+          <button
+            onClick={recountAllRegistrations}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-yellow-500/10 text-yellow-500 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-yellow-500/20 transition-all border border-yellow-500/20 disabled:opacity-50"
+          >
+            <Users size={16} />
+            Sincronizar Contagens
           </button>
         </div>
       </div>

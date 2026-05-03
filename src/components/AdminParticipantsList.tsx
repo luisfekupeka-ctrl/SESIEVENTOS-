@@ -139,11 +139,35 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
+      // 1. Get student's registrations before deletion to know which events to update
+      const { data: regs } = await supabase
+        .from('registrations')
+        .select('event_id')
+        .eq('student_id', deleteId);
+
+      // 2. Delete student
       const { error } = await supabase
         .from('students')
         .delete()
         .eq('id', deleteId);
       if (error) throw error;
+
+      // 3. Update registration counts for affected events
+      if (regs && regs.length > 0) {
+        const eventIds = [...new Set(regs.map(r => r.event_id))];
+        for (const eid of eventIds) {
+          // Count remaining registrations for this event
+          const { count } = await supabase
+            .from('registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', eid);
+          
+          await supabase
+            .from('events')
+            .update({ registration_count: count || 0 })
+            .eq('id', eid);
+        }
+      }
       
       // Update local state immediately
       setParticipants(prev => prev.filter(p => p.id !== deleteId));

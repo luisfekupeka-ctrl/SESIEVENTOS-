@@ -71,6 +71,16 @@ export default function AdminEventRegistrations() {
       
       if (error) throw error;
       
+      // Update registration_count in events table
+      if (event) {
+        await supabase
+          .from('events')
+          .update({ registration_count: Math.max(0, (event.registration_count || 0) - 1) })
+          .eq('id', id);
+        
+        setEvent(prev => prev ? { ...prev, registration_count: Math.max(0, (prev.registration_count || 0) - 1) } : null);
+      }
+      
       // Update local state immediately for better UX
       setRegistrations(prev => prev.filter(reg => reg.id !== deleteId));
       setDeleteId(null);

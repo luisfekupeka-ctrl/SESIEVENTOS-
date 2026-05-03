@@ -1,7 +1,20 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, LayoutDashboard, Calendar, Users, Tags, LogIn, GraduationCap, School, Shield } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  Calendar, 
+  Users, 
+  LogOut, 
+  Tags, 
+  GraduationCap, 
+  School, 
+  Shield, 
+  Menu, 
+  X,
+  Plus
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ThemeToggle } from './ThemeToggle';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -72,7 +85,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 to="/login"
                 className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-bold text-black bg-sky-500 hover:bg-sky-400 rounded-xl transition-all shadow-[0_0_15px_rgba(14,165,233,0.2)]"
               >
-                <LogIn size={18} />
+                <LogOut size={18} />
                 <span className="hidden sm:inline">Admin</span>
               </Link>
             )}
@@ -83,48 +96,72 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 onClick={toggleMobileMenu}
                 className="md:hidden p-3 bg-black text-sky-500 rounded-xl transition-all border border-sky-500/20 active:scale-90"
               >
-                <LayoutDashboard size={24} />
+                <Menu size={24} />
               </button>
             )}
           </div>
         </div>
 
-        {/* Mobile Sidebar Overlay */}
-        {isAdmin && isMobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl animate-in fade-in duration-300">
-            <div className="p-6 flex flex-col h-full">
-              <div className="flex items-center justify-between mb-10">
-                <span className="text-xl font-black text-white">Menu <span className="text-sky-500">Admin</span></span>
-                <button onClick={toggleMobileMenu} className="p-3 bg-black rounded-2xl text-slate-400">
-                  <LogOut size={20} className="rotate-180" />
-                </button>
-              </div>
+        <AnimatePresence>
+          {isMobileMenuOpen && isAdmin && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={toggleMobileMenu}
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] md:hidden"
+              />
               
-              <nav className="space-y-3 flex-grow overflow-y-auto custom-scrollbar">
-                <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label="Dashboard" active={location.pathname === '/admin'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label="Calendário" active={location.pathname === '/admin/calendar'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/events" icon={<Calendar size={18} />} label="Eventos" active={location.pathname === '/admin/events'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label="Categorias" active={location.pathname === '/admin/categories'} onClick={toggleMobileMenu} />
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Participantes</div>
-                <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label="Alunos" active={location.pathname === '/admin/students'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label="Colaboradores" active={location.pathname === '/admin/collaborators'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label="Responsáveis" active={location.pathname === '/admin/responsible'} onClick={toggleMobileMenu} />
+              {/* Sidebar */}
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="fixed inset-y-0 left-0 w-[280px] bg-[#0A0A0A] z-[101] shadow-2xl border-r border-white/5 md:hidden flex flex-col"
+              >
+                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(234,179,8,0.3)]">
+                      <LayoutDashboard size={20} />
+                    </div>
+                    <span className="text-lg font-black text-white tracking-tighter uppercase italic">SESI <span className="text-yellow-500">Eventos</span></span>
+                  </div>
+                  <button onClick={toggleMobileMenu} className="w-10 h-10 bg-black text-slate-500 rounded-xl flex items-center justify-center">
+                    <X size={20} />
+                  </button>
+                </div>
                 
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Segurança</div>
-                <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label="Administradores" active={location.pathname === '/admin/management'} onClick={toggleMobileMenu} />
-              </nav>
+                <nav className="p-4 space-y-2 flex-grow overflow-y-auto custom-scrollbar">
+                  <div className="px-4 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Painel Principal</div>
+                  <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label="Dashboard" active={location.pathname === '/admin'} onClick={toggleMobileMenu} />
+                  <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label="Calendário" active={location.pathname === '/admin/calendar'} onClick={toggleMobileMenu} />
+                  <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label="Meus Eventos" active={location.pathname === '/admin/events'} onClick={toggleMobileMenu} />
+                  <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label="Categorias" active={location.pathname === '/admin/categories'} onClick={toggleMobileMenu} />
+                  
+                  <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Participantes</div>
+                  <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label="Alunos" active={location.pathname === '/admin/students'} onClick={toggleMobileMenu} />
+                  <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label="Colaboradores" active={location.pathname === '/admin/collaborators'} onClick={toggleMobileMenu} />
+                  <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label="Responsáveis" active={location.pathname === '/admin/responsible'} onClick={toggleMobileMenu} />
+                  
+                  <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Segurança</div>
+                  <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label="Administradores" active={location.pathname === '/admin/management'} onClick={toggleMobileMenu} />
+                </nav>
 
-              <div className="pt-6 mt-6 border-t border-white/5">
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-3 py-4 bg-red-500/10 text-red-500 font-black uppercase text-xs tracking-widest rounded-2xl"
-                >
-                  <LogOut size={18} /> Sair do Sistema
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+                <div className="p-6 border-t border-white/5 bg-black/40">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-3 py-4 bg-red-500/10 text-red-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-500 hover:text-white transition-all"
+                  >
+                    <LogOut size={18} /> Sair do Sistema
+                  </button>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Main Content */}

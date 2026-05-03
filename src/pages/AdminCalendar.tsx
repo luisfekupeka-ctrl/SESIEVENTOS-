@@ -106,12 +106,14 @@ export default function AdminCalendar() {
       </div>
     );
   };
-
-    <div className="flex flex-col items-center justify-center py-40">
-      <div className="w-16 h-16 border-4 border-sky-400 border-t-transparent rounded-full animate-spin mb-8 shadow-[0_0_20px_rgba(56,189,248,0.2)]"></div>
-      <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Sincronizando Agenda...</p>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40">
+        <div className="w-16 h-16 border-4 border-sky-400 border-t-transparent rounded-full animate-spin mb-8 shadow-[0_0_20px_rgba(56,189,248,0.2)]"></div>
+        <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Sincronizando Agenda...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-0 md:p-0">

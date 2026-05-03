@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Category } from '../types';
-import { Plus, Trash2, Edit2, X, Check, Tags } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Check, Tags, Loader2, AlertTriangle } from 'lucide-react';
 import { DEFAULT_CATEGORIES } from '../constants';
 
 export default function AdminCategories() {

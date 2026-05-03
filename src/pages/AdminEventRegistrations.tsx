@@ -166,7 +166,17 @@ export default function AdminEventRegistrations() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (loading) return <div className="p-8 text-center text-[#0054A6] dark:text-blue-400 font-black animate-pulse">Carregando...</div>;
+  const formatRegDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return '-';
+      return format(date, "dd/MM HH:mm");
+    } catch (e) {
+      return '-';
+    }
+  };
+
+  if (loading) return <div className="p-8 text-center text-yellow-500 font-black animate-pulse uppercase tracking-widest">Sincronizando...</div>;
   if (!event) return <div className="p-8 text-center text-red-500 font-bold">Evento não encontrado.</div>;
 
   return (
@@ -222,7 +232,7 @@ export default function AdminEventRegistrations() {
                 return (
                   <tr key={reg.id} className="hover:bg-white/[0.01] transition-colors group">
                     <td className="px-8 py-5 text-xs text-slate-500 font-bold whitespace-nowrap uppercase tracking-widest">
-                      {reg.timestamp ? format(new Date(reg.timestamp), "dd/MM HH:mm") : '-'}
+                      {formatRegDate(reg.timestamp)}
                     </td>
                     {event.form_fields.map(field => (
                       <td key={field.id} className="px-8 py-5 text-sm text-white font-bold truncate max-w-[200px]">

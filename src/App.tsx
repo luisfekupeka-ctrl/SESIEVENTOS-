@@ -20,17 +20,27 @@ import AdminManagement from './pages/AdminManagement';
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { loading, isAdmin } = useAuth();
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(234,179,8,0.3)]"></div>
+    </div>
+  );
+  
   if (!isAdmin) return <Navigate to="/login" />;
 
   return <>{children}</>;
 };
 
 const SuperProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { loading, isAdmin } = useAuth();
+  const { loading, isAdmin, profile } = useAuth();
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
-  if (!isAdmin) return <Navigate to="/admin" />;
+  if (loading) return (
+    <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(234,179,8,0.3)]"></div>
+    </div>
+  );
+  
+  if (!isAdmin || profile?.role !== 'super_admin') return <Navigate to="/admin" />;
 
   return <>{children}</>;
 };

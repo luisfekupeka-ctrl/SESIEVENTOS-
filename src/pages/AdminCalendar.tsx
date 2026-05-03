@@ -211,7 +211,13 @@ export default function AdminCalendar() {
                   <div className="overflow-hidden">
                     <h4 className="text-base font-black text-white group-hover:text-yellow-500 transition-colors truncate tracking-tight">{event.name}</h4>
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
-                      {format(parseISO(event.start_date), "dd 'DE' MMMM", { locale: ptBR })}
+                      {(() => {
+                        try {
+                          return format(parseISO(event.start_date), "dd 'DE' MMMM", { locale: ptBR });
+                        } catch (e) {
+                          return event.start_date;
+                        }
+                      })()}
                     </p>
                   </div>
                 </div>

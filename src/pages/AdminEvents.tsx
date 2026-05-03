@@ -388,7 +388,15 @@ export default function AdminEvents() {
                     <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-yellow-500">
                       <Calendar size={18} />
                     </div>
-                    <span className="uppercase tracking-widest">{format(new Date(event.start_date), "dd/MM/yyyy")}</span>
+                    <span className="uppercase tracking-widest">
+                      {(() => {
+                        try {
+                          return format(new Date(event.start_date), "dd/MM/yyyy");
+                        } catch (e) {
+                          return event.start_date;
+                        }
+                      })()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-400">
                     <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-blue-500">

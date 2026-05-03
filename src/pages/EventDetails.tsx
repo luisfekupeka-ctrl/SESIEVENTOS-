@@ -217,7 +217,13 @@ export default function EventDetails() {
                 <div>
                   <h4 className="text-xs font-black text-yellow-500/50 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
                   <p className="text-white text-2xl font-black">
-                    {format(new Date(event.start_date), "dd 'de' MMMM", { locale: ptBR })}
+                    {(() => {
+                      try {
+                        return format(new Date(event.start_date), "dd 'de' MMMM", { locale: ptBR });
+                      } catch (e) {
+                        return event.start_date;
+                      }
+                    })()}
                   </p>
                   <p className="text-slate-400 text-lg font-bold mt-1">
                     {event.start_time} às {event.end_time}

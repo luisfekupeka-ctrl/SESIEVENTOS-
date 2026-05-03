@@ -352,7 +352,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {stats.map((stat, i) => (
           <div key={i} className="bg-[#0A0A0A] p-8 rounded-[2rem] border border-white/5 shadow-xl flex flex-col gap-6 transition-all hover:border-sky-400/20 group">
             <div className={`w-14 h-14 ${stat.color} text-black rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>

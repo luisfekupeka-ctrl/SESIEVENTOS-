@@ -66,7 +66,7 @@ export default function AdminCalendar() {
       <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
         <div className="text-center md:text-left">
           <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Calendário de Eventos</h1>
-          <p className="text-yellow-500 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs">
+          <p className="text-sky-400 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs">
             {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function AdminCalendar() {
           </button>
           <button
             onClick={() => setCurrentMonth(new Date())}
-            className="px-4 md:px-8 py-2.5 md:py-3 bg-yellow-500 text-black rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)]"
+            className="px-4 md:px-8 py-2.5 md:py-3 bg-sky-400 text-black rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-sky-300 transition-all shadow-[0_0_20px_rgba(56,189,248,0.4)]"
           >
             Hoje
           </button>
@@ -107,9 +107,8 @@ export default function AdminCalendar() {
     );
   };
 
-  if (loading) return (
     <div className="flex flex-col items-center justify-center py-40">
-      <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-8 shadow-[0_0_20px_rgba(234,179,8,0.2)]"></div>
+      <div className="w-16 h-16 border-4 border-sky-400 border-t-transparent rounded-full animate-spin mb-8 shadow-[0_0_20px_rgba(56,189,248,0.2)]"></div>
       <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Sincronizando Agenda...</p>
     </div>
   );
@@ -180,7 +179,7 @@ export default function AdminCalendar() {
       {/* Upcoming Events List */}
       <div className="mt-20">
         <div className="flex items-center gap-6 mb-12">
-          <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-2xl flex items-center justify-center border border-yellow-500/10">
+          <div className="w-12 h-12 bg-sky-400/10 text-sky-400 rounded-2xl flex items-center justify-center border border-sky-400/10">
             <CalendarIcon size={24} />
           </div>
           <h3 className="text-xl md:text-2xl font-black text-white tracking-tight uppercase">

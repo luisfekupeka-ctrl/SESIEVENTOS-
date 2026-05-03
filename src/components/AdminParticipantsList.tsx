@@ -189,25 +189,25 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">{title}</h1>
           <p className="text-sm md:text-base text-slate-500 font-bold">{description}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-4">
+        </div>        
+        <div className="grid grid-cols-2 sm:flex items-center gap-2 md:gap-4">
           <button
             onClick={() => fetchParticipants(true)}
             disabled={isRefreshing}
-            className="p-4 bg-black text-slate-400 hover:text-yellow-500 hover:bg-[#0F0F0F] rounded-2xl transition-all border border-white/5"
-            title="Atualizar"
+            className="w-full sm:w-12 h-12 bg-black text-slate-400 hover:text-sky-400 rounded-xl flex items-center justify-center transition-all border border-white/5 disabled:opacity-50"
+            title="Atualizar Lista"
           >
             <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={exportToExcel}
-            className="bg-black text-white border border-white/10 px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-[#0F0F0F] transition-all shadow-xl flex items-center gap-3"
+            className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-black text-white border border-white/10 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#0F0F0F] transition-all shadow-xl"
           >
-            <FileSpreadsheet size={20} className="text-sky-400" /> Exportar
+            <FileSpreadsheet size={18} className="text-sky-400" /> Exportar
           </button>
           <button
             onClick={() => handleOpenModal()}
-            className="bg-sky-500 text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)] flex items-center gap-3"
+            className="col-span-2 sm:flex-grow flex items-center justify-center gap-3 px-8 py-4 bg-sky-400 text-black rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-300 transition-all shadow-[0_0_20px_rgba(56,189,248,0.4)]"
           >
             <Plus size={20} /> Novo {labelSingular}
           </button>

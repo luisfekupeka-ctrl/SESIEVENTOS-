@@ -189,7 +189,7 @@ export default function AdminEventRegistrations() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-black text-slate-400 hover:text-yellow-500 rounded-2xl flex items-center justify-center transition-all border border-white/5">
+          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-black text-slate-400 hover:text-sky-400 rounded-2xl flex items-center justify-center transition-all border border-white/5">
             <ChevronLeft size={28} />
           </button>
           <div>
@@ -198,26 +198,28 @@ export default function AdminEventRegistrations() {
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="grid grid-cols-1 sm:flex items-center gap-2 md:gap-4">
           <button
             onClick={copyToClipboard}
-            className="flex items-center gap-2 px-6 py-3 bg-black border border-white/5 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-[#0F0F0F] transition-all"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-black border border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-[#0F0F0F] transition-all"
           >
-            {copied ? <CheckCircle2 size={18} className="text-green-500" /> : <Copy size={18} />}
+            {copied ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
             {copied ? 'Copiado!' : 'Copiar'}
           </button>
-          <button
-            onClick={exportToExcel}
-            className="flex items-center gap-2 px-6 py-3 bg-green-500/10 border border-green-500/10 rounded-2xl text-xs font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all"
-          >
-            <FileSpreadsheet size={18} /> Excel
-          </button>
-          <button
-            onClick={exportToPDF}
-            className="flex items-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/10 rounded-2xl text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all"
-          >
-            <FileText size={18} /> PDF
-          </button>
+          <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
+            <button
+              onClick={exportToExcel}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500/10 border border-green-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all"
+            >
+              <FileSpreadsheet size={16} /> Excel
+            </button>
+            <button
+              onClick={exportToPDF}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all"
+            >
+              <FileText size={16} /> PDF
+            </button>
+          </div>
         </div>
       </div>
 

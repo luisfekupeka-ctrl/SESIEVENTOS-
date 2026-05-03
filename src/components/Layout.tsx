@@ -125,10 +125,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               >
                 <div className="p-6 border-b border-white/5 flex items-center justify-between bg-black">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(234,179,8,0.3)]">
+                    <div className="w-10 h-10 bg-sky-400 rounded-xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(56,189,248,0.4)]">
                       <LayoutDashboard size={20} />
                     </div>
-                    <span className="text-lg font-black text-white tracking-tighter uppercase italic">SESI <span className="text-yellow-500">Eventos</span></span>
+                    <span className="text-lg font-black text-white tracking-tighter uppercase italic">SESI <span className="text-sky-400">Eventos</span></span>
                   </div>
                   <button onClick={toggleMobileMenu} className="w-10 h-10 bg-black text-slate-500 rounded-xl flex items-center justify-center">
                     <X size={20} />
@@ -142,12 +142,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label="Meus Eventos" active={location.pathname === '/admin/events'} onClick={toggleMobileMenu} />
                   <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label="Categorias" active={location.pathname === '/admin/categories'} onClick={toggleMobileMenu} />
                   
-                  <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Participantes</div>
+                  <div className="pt-6 pb-2 px-4 text-[10px] font-black text-sky-400/50 uppercase tracking-[0.2em]">Participantes</div>
                   <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label="Alunos" active={location.pathname === '/admin/students'} onClick={toggleMobileMenu} />
                   <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label="Colaboradores" active={location.pathname === '/admin/collaborators'} onClick={toggleMobileMenu} />
                   <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label="Responsáveis" active={location.pathname === '/admin/responsible'} onClick={toggleMobileMenu} />
                   
-                  <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Segurança</div>
+                  <div className="pt-6 pb-2 px-4 text-[10px] font-black text-sky-400/50 uppercase tracking-[0.2em]">Segurança</div>
                   <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label="Administradores" active={location.pathname === '/admin/management'} onClick={toggleMobileMenu} />
                 </nav>
 

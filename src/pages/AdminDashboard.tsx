@@ -63,8 +63,8 @@ export default function AdminDashboard() {
   const totalRegistrations = events.reduce((sum, event) => sum + (event.registration_count || 0), 0);
 
   const stats = [
-    { label: 'Total de Eventos', value: events.length, icon: <Calendar size={24} />, color: 'bg-blue-500 shadow-blue-500/20' },
-    { label: 'Inscrições Realizadas', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-green-500 shadow-green-500/20' },
+    { label: 'Total de Eventos', value: events.length, icon: <Calendar size={24} />, color: 'bg-yellow-500 shadow-yellow-500/20' },
+    { label: 'Inscrições Realizadas', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-sky-500 shadow-sky-500/20' },
     { label: 'Alunos', value: students.filter(s => s.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-purple-500 shadow-purple-500/20' },
     { label: 'Colaboradores', value: students.filter(s => s.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-indigo-500 shadow-indigo-500/20' },
     { label: 'Responsáveis', value: students.filter(s => s.type === 'responsible').length, icon: <School size={24} />, color: 'bg-amber-500 shadow-amber-500/20' },
@@ -246,7 +246,7 @@ export default function AdminDashboard() {
           <button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all border border-white/5 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-3 bg-black text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-[#0F0F0F] transition-all border border-white/5 disabled:opacity-50"
           >
             <Clock size={18} className="text-sky-500" />
             Atualizar
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-6">
               <button
                 onClick={() => setShowResetConfirm(false)}
-                className="py-4 px-6 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
+                className="py-4 px-6 bg-black text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-[#0F0F0F] transition-all"
               >
                 Cancelar
               </button>
@@ -331,7 +331,7 @@ export default function AdminDashboard() {
             {events.slice(0, 5).map(event => (
               <div key={event.id} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
                 <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-white/5 border border-white/10">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-black border border-white/10">
                     <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </div>
                   <div>
@@ -352,7 +352,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
-                <Link to={`/admin/events`} className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500 hover:text-sky-500 transition-colors">
+                <Link to={`/admin/events`} className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-slate-500 hover:text-sky-500 transition-colors">
                   <ChevronRight size={20} />
                 </Link>
               </div>

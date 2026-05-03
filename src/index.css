@@ -16,6 +16,16 @@
     @apply bg-black text-white;
   }
 
+  /* Global Input/Select Fixes */
+  select, input, textarea {
+    @apply bg-[#0A0A0A] text-white border-white/10 focus:ring-sky-500/50 focus:border-sky-500 transition-all;
+  }
+  
+  option {
+    background-color: #000000 !important;
+    color: white !important;
+  }
+
   /* Custom Scrollbar Utility */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;

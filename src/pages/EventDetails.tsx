@@ -95,6 +95,19 @@ export default function EventDetails() {
       return;
     }
 
+    // Time check: Only allow if it's the right day AND the right hour (unless it's a test)
+    const now = new Date();
+    const eventDate = new Date(event.start_date);
+    const isTestEvent = category?.name?.toLowerCase().includes('teste');
+    const [eventHour] = event.start_time.split(':').map(Number);
+    const currentHour = now.getHours();
+    const isSameDay = now.toDateString() === eventDate.toDateString();
+
+    if (!isTestEvent && (!isSameDay || currentHour !== eventHour)) {
+      setRestrictionError(`A inscrição para este evento só será liberada às ${event.start_time} no dia ${format(eventDate, "dd/MM")}.`);
+      return;
+    }
+
     // Check password if protected
     if (event.password_protected && event.password !== eventPassword) {
       setPasswordError(true);
@@ -165,8 +178,7 @@ export default function EventDetails() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               onClick={() => navigate('/')}
-              className="mb-8 flex items-center gap-2 text-white/60 hover:text-yellow-500 font-bold transition-all"
-              className="mb-8 flex items-center gap-2 text-white/60 hover:text-sky-500 font-bold transition-all"
+              className="mb-8 flex items-center gap-2 text-white/60 hover:text-yellow-500 font-black transition-all"
             >
               <ChevronLeft size={20} /> Voltar para o início
             </motion.button>
@@ -175,11 +187,11 @@ export default function EventDetails() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-wrap gap-3 mb-6"
             >
-              <span className="bg-sky-500 text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(14,165,233,0.4)]">
+              <span className="bg-yellow-500 text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(234,179,8,0.4)]">
                 {category?.name || 'Evento'}
               </span>
               {event.password_protected && (
-                <span className="bg-white/10 backdrop-blur-md text-white text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 border border-white/10">
+                <span className="bg-[#0F0F0F] backdrop-blur-md text-white text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 border border-white/10">
                   <Lock size={12} className="text-sky-500" /> Protegido
                 </span>
               )}
@@ -202,7 +214,7 @@ export default function EventDetails() {
           <div className="lg:col-span-2 space-y-16">
             <section className="bg-[#0A0A0A]/80 backdrop-blur-xl p-10 rounded-[2.5rem] border border-white/5 shadow-2xl">
               <h2 className="text-3xl font-black text-white mb-8 flex items-center gap-4">
-                <div className="w-2 h-10 bg-sky-500 rounded-full shadow-[0_0_15px_rgba(14,165,233,0.5)]"></div>
+                <div className="w-2 h-10 bg-yellow-500 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.5)]"></div>
                 Sobre o Evento
               </h2>
               <div className="prose prose-invert max-w-none text-slate-400 leading-relaxed text-xl font-medium">
@@ -211,12 +223,12 @@ export default function EventDetails() {
             </section>
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-sky-500/20 group">
-                <div className="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-500 group-hover:scale-110 transition-transform">
+              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-yellow-500/20 group">
+                <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
                   <Calendar size={32} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-sky-500/50 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
+                  <h4 className="text-xs font-black text-yellow-500/50 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
                   <p className="text-white text-2xl font-black">
                     {(() => {
                       try {
@@ -237,9 +249,9 @@ export default function EventDetails() {
                   <Users size={32} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-sky-400/50 uppercase tracking-[0.2em] mb-2">Vagas</h4>
+                  <h4 className="text-xs font-black text-sky-500/50 uppercase tracking-[0.2em] mb-2">Vagas Disponíveis</h4>
                   <p className="text-3xl font-black text-white tracking-tight">
-                    {event.registration_count || 0} / {event.max_capacity}
+                    {event.max_capacity - (event.registration_count || 0)} / {event.max_capacity}
                   </p>
                 </div>
               </div>
@@ -284,7 +296,7 @@ export default function EventDetails() {
                           <span>Vagas Preenchidas</span>
                           <span className="text-sky-500">{event.registration_count || 0} / {event.max_capacity}</span>
                         </div>
-                        <div className="w-full bg-white/5 h-3 rounded-full overflow-hidden">
+                        <div className="w-full bg-black h-3 rounded-full overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(((event.registration_count || 0) / event.max_capacity) * 100, 100)}%` }}
@@ -307,7 +319,7 @@ export default function EventDetails() {
                         </p>
                         <button
                           onClick={() => navigate('/')}
-                          className="w-full bg-white/5 text-white font-black py-4 rounded-2xl hover:bg-white/10 transition-all border border-white/10"
+                          className="w-full bg-black text-white font-black py-4 rounded-2xl hover:bg-[#0F0F0F] transition-all border border-white/10"
                         >
                           Ver outros eventos
                         </button>
@@ -318,14 +330,14 @@ export default function EventDetails() {
                         <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Tipo de Participante</label>
                         <select
                           required
-                          className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
+                          className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
                           value={participantType}
                           onChange={(e) => setParticipantType(e.target.value as any)}
                         >
-                          <option value="student">Aluno</option>
-                          <option value="collaborator">Colaborador</option>
-                          <option value="responsible">Responsável</option>
-                          <option value="other">Outro</option>
+                          <option value="student" className="bg-black text-white">Aluno</option>
+                          <option value="collaborator" className="bg-black text-white">Colaborador</option>
+                          <option value="responsible" className="bg-black text-white">Responsável</option>
+                          <option value="other" className="bg-black text-white">Outro</option>
                         </select>
                       </div>
 
@@ -340,18 +352,18 @@ export default function EventDetails() {
                               type="text"
                               required={field.required}
                               placeholder={`Seu ${field.label.toLowerCase()}`}
-                              className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
+                              className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
                               onChange={(e) => setFormData({ ...formData, [field.label.toLowerCase()]: e.target.value })}
                             />
                           ) : (
                             <select
                               required={field.required}
-                              className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
+                              className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
                               onChange={(e) => setFormData({ ...formData, [field.label.toLowerCase()]: e.target.value })}
                             >
-                              <option value="">Selecione o(a) {field.label.toLowerCase()}</option>
+                              <option value="" className="bg-black text-white">Selecione o(a) {field.label.toLowerCase()}</option>
                               {field.options?.map((opt: string) => (
-                                <option key={opt} value={opt}>{opt}</option>
+                                <option key={opt} value={opt} className="bg-black text-white">{opt}</option>
                               ))}
                             </select>
                           )}
@@ -378,7 +390,7 @@ export default function EventDetails() {
                             type="password"
                             required
                             placeholder="Digite a senha do evento"
-                            className={`w-full px-5 py-4 bg-white/5 border rounded-2xl focus:outline-none focus:ring-2 transition-all font-bold ${
+                            className={`w-full px-5 py-4 bg-black border rounded-2xl focus:outline-none focus:ring-2 transition-all font-bold ${
                               passwordError ? 'border-red-500 focus:ring-red-500/50' : 'border-white/10 focus:ring-sky-500/50 focus:border-sky-500'
                             }`}
                             value={eventPassword}

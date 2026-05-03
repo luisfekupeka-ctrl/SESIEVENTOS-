@@ -72,7 +72,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
           </div>
 
           <div className="flex items-center gap-4 text-slate-400">
-            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-400">
+            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-slate-400">
               <Users size={20} />
             </div>
             <div className="flex flex-col">

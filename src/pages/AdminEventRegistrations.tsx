@@ -183,7 +183,7 @@ export default function AdminEventRegistrations() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-white/5 text-slate-400 hover:text-yellow-500 rounded-2xl flex items-center justify-center transition-all border border-white/5">
+          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-black text-slate-400 hover:text-yellow-500 rounded-2xl flex items-center justify-center transition-all border border-white/5">
             <ChevronLeft size={28} />
           </button>
           <div>
@@ -195,7 +195,7 @@ export default function AdminEventRegistrations() {
         <div className="flex flex-wrap items-center gap-4">
           <button
             onClick={copyToClipboard}
-            className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/5 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-black border border-white/5 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-[#0F0F0F] transition-all"
           >
             {copied ? <CheckCircle2 size={18} className="text-green-500" /> : <Copy size={18} />}
             {copied ? 'Copiado!' : 'Copiar'}
@@ -277,7 +277,7 @@ export default function AdminEventRegistrations() {
             <div className="flex gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-grow py-4 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
+                className="flex-grow py-4 bg-black text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-[#0F0F0F] transition-all"
               >
                 Voltar
               </button>

@@ -140,7 +140,7 @@ export default function AdminCategories() {
               <input
                 type="text"
                 placeholder="Nome da nova categoria..."
-                className="flex-grow px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
+                className="flex-grow px-6 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
                 disabled={isAdding}
@@ -169,7 +169,7 @@ export default function AdminCategories() {
                 <div className="flex-grow flex gap-4 mr-4 animate-in fade-in slide-in-from-left-4 duration-300">
                   <input
                     type="text"
-                    className="flex-grow px-6 py-3 bg-white/5 border border-sky-500 rounded-xl focus:outline-none text-white font-bold"
+                    className="flex-grow px-6 py-3 bg-black border border-sky-500 rounded-xl focus:outline-none text-white font-bold"
                     value={editingName}
                     onChange={(e) => setEditingName(e.target.value)}
                     autoFocus
@@ -192,13 +192,13 @@ export default function AdminCategories() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleEdit(cat)}
-                      className="w-12 h-12 bg-white/5 text-slate-500 hover:text-blue-400 rounded-xl flex items-center justify-center transition-all border border-white/5"
+                      className="w-12 h-12 bg-black text-slate-500 hover:text-blue-400 rounded-xl flex items-center justify-center transition-all border border-white/5"
                     >
                       <Edit2 size={20} />
                     </button>
                     <button
                       onClick={() => setDeleteId(cat.id)}
-                      className="w-12 h-12 bg-white/5 text-slate-500 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-white/5"
+                      className="w-12 h-12 bg-black text-slate-500 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-white/5"
                     >
                       <Trash2 size={20} />
                     </button>
@@ -229,7 +229,7 @@ export default function AdminCategories() {
             <div className="flex gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-grow py-4 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
+                className="flex-grow py-4 bg-black text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-[#0F0F0F] transition-all"
               >
                 Voltar
               </button>

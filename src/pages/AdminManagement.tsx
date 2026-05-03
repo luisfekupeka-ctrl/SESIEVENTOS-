@@ -123,7 +123,7 @@ export default function AdminManagement() {
                     <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.1em] border ${
                       profile.role === 'super_admin' 
                         ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
-                        : 'bg-white/5 border-white/5 text-slate-500'
+                        : 'bg-black border-white/5 text-slate-500'
                     }`}>
                       {profile.role === 'super_admin' ? 'Master' : 'Admin'}
                     </span>

@@ -70,10 +70,10 @@ export default function AdminCalendar() {
             {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
           </p>
         </div>
-        <div className="flex items-center gap-4 bg-white/5 p-2 rounded-[2rem] border border-white/5">
+        <div className="flex items-center gap-4 bg-black p-2 rounded-[2rem] border border-white/5">
           <button
             onClick={prevMonth}
-            className="w-12 h-12 bg-white/5 text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
+            className="w-12 h-12 bg-black text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
           >
             <ChevronLeft size={24} />
           </button>
@@ -85,7 +85,7 @@ export default function AdminCalendar() {
           </button>
           <button
             onClick={nextMonth}
-            className="w-12 h-12 bg-white/5 text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
+            className="w-12 h-12 bg-black text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
           >
             <ChevronRight size={24} />
           </button>
@@ -119,7 +119,7 @@ export default function AdminCalendar() {
       {renderHeader()}
       <div className="bg-[#0A0A0A] p-2 md:p-10 rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden mb-16">
         {renderDays()}
-        <div className="grid grid-cols-7 gap-px md:gap-1 bg-white/5 border border-white/5 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl">
+        <div className="grid grid-cols-7 gap-px md:gap-1 bg-black border border-white/5 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl">
           {eachDayOfInterval({
             start: startOfWeek(startOfMonth(currentMonth)),
             end: endOfWeek(endOfMonth(currentMonth)),
@@ -186,7 +186,7 @@ export default function AdminCalendar() {
           <h3 className="text-2xl font-black text-white tracking-tight uppercase">
             Radar de Eventos
           </h3>
-          <div className="h-px flex-grow bg-white/5"></div>
+          <div className="h-px flex-grow bg-black"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events
@@ -195,7 +195,7 @@ export default function AdminCalendar() {
             .map(event => (
               <div key={event.id} className="bg-[#0A0A0A] p-6 rounded-[2rem] border border-white/5 shadow-xl hover:border-yellow-500/30 transition-all flex items-center justify-between group">
                 <div className="flex items-center gap-5 overflow-hidden">
-                  <div className="w-16 h-16 bg-white/5 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 group-hover:border-yellow-500/20 transition-all">
+                  <div className="w-16 h-16 bg-black rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 group-hover:border-yellow-500/20 transition-all">
                     <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   </div>
                   <div className="overflow-hidden">
@@ -211,7 +211,7 @@ export default function AdminCalendar() {
                     </p>
                   </div>
                 </div>
-                <Link to="/admin/events" className="w-10 h-10 bg-white/5 text-slate-700 hover:text-yellow-500 rounded-xl flex items-center justify-center transition-all">
+                <Link to="/admin/events" className="w-10 h-10 bg-black text-slate-700 hover:text-yellow-500 rounded-xl flex items-center justify-center transition-all">
                   <ExternalLink size={18} />
                 </Link>
               </div>

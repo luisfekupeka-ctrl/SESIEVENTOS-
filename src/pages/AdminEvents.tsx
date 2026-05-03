@@ -677,11 +677,42 @@ export default function AdminEvents() {
                   {formData.form_fields?.map((field) => (
                     <div key={field.id} className="p-6 bg-black border border-white/5 rounded-3xl flex flex-col md:flex-row gap-6 items-center">
                       <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                        <input type="text" placeholder="Nome do Campo (ex: CPF, Turma...)" className="px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all placeholder:text-slate-500" value={field.label} onChange={(e) => updateFormField(field.id, { label: e.target.value })} />
-                        <select className="px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all appearance-none" value={field.type} onChange={(e) => updateFormField(field.id, { type: e.target.value as any })}>
-                          <option value="text" className="bg-black">Texto</option>
-                          <option value="select" className="bg-black">Lista</option>
-                        </select>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Rótulo do Campo</label>
+                          <input type="text" placeholder="Nome do Campo (ex: CPF, Turma...)" className="w-full px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all placeholder:text-slate-500" value={field.label} onChange={(e) => updateFormField(field.id, { label: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2">Tipo de Entrada</label>
+                          <select className="w-full px-5 py-4 bg-[#111111] border border-white/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all appearance-none" value={field.type} onChange={(e) => updateFormField(field.id, { type: e.target.value as any })}>
+                            <option value="text" className="bg-black">Texto Curto</option>
+                            <option value="textarea" className="bg-black">Texto Longo (Parágrafo)</option>
+                            <option value="select" className="bg-black">Lista Suspensa</option>
+                            <option value="checkbox" className="bg-black">Caixa de Seleção (Múltipla)</option>
+                            <option value="radio" className="bg-black">Escolha Única (Radio)</option>
+                          </select>
+                        </div>
+                        {(field.type === 'select' || field.type === 'checkbox' || field.type === 'radio') && (
+                          <div className="md:col-span-2 space-y-2">
+                            <label className="text-[10px] font-black text-sky-400 uppercase tracking-widest px-2">Opções (separadas por vírgula)</label>
+                            <input 
+                              type="text" 
+                              placeholder="Opção 1, Opção 2, Opção 3..." 
+                              className="w-full px-5 py-4 bg-[#111111] border border-sky-400/20 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all placeholder:text-slate-600" 
+                              value={field.options?.join(', ') || ''} 
+                              onChange={(e) => updateFormField(field.id, { options: e.target.value.split(',').map(s => s.trim()).filter(s => s !== '') })} 
+                            />
+                          </div>
+                        )}
+                        <div className="md:col-span-2 flex items-center gap-3 px-2">
+                          <input 
+                            type="checkbox" 
+                            id={`req-${field.id}`} 
+                            checked={field.required} 
+                            onChange={(e) => updateFormField(field.id, { required: e.target.checked })}
+                            className="w-4 h-4 rounded border-white/10 bg-black text-sky-400 focus:ring-sky-400/50"
+                          />
+                          <label htmlFor={`req-${field.id}`} className="text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-white transition-colors">Campo Obrigatório</label>
+                        </div>
                       </div>
                       <button type="button" onClick={() => removeFormField(field.id)} className="w-12 h-12 bg-red-500/5 text-slate-500 hover:text-red-500 rounded-xl flex items-center justify-center transition-colors">
                         <Trash2 size={20} />

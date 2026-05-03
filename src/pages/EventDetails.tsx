@@ -347,26 +347,86 @@ export default function EventDetails() {
                           <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
                             {field.label} {field.required && <span className="text-sky-500">*</span>}
                           </label>
-                          {field.type === 'text' ? (
-                            <input
-                              type="text"
-                              required={field.required}
-                              placeholder={`Seu ${field.label.toLowerCase()}`}
-                              className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
-                              onChange={(e) => setFormData({ ...formData, [field.label.toLowerCase()]: e.target.value })}
-                            />
-                          ) : (
-                            <select
-                              required={field.required}
-                              className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
-                              onChange={(e) => setFormData({ ...formData, [field.label.toLowerCase()]: e.target.value })}
-                            >
-                              <option value="" className="bg-black text-white">Selecione o(a) {field.label.toLowerCase()}</option>
-                              {field.options?.map((opt: string) => (
-                                <option key={opt} value={opt} className="bg-black text-white">{opt}</option>
-                              ))}
-                            </select>
-                          )}
+                          {(() => {
+                            const fieldKey = field.label.toLowerCase();
+                            const commonClasses = "w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700";
+                            
+                            switch (field.type) {
+                              case 'textarea':
+                                return (
+                                  <textarea
+                                    required={field.required}
+                                    rows={4}
+                                    placeholder={`Sua resposta para ${field.label.toLowerCase()}`}
+                                    className={commonClasses}
+                                    onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                  />
+                                );
+                              case 'select':
+                                return (
+                                  <select
+                                    required={field.required}
+                                    className={`${commonClasses} appearance-none`}
+                                    onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                  >
+                                    <option value="" className="bg-black text-white">Selecione...</option>
+                                    {field.options?.map((opt: string) => (
+                                      <option key={opt} value={opt} className="bg-black text-white">{opt}</option>
+                                    ))}
+                                  </select>
+                                );
+                              case 'radio':
+                                return (
+                                  <div className="space-y-3 pt-2">
+                                    {field.options?.map((opt: string) => (
+                                      <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                          type="radio"
+                                          name={fieldKey}
+                                          required={field.required}
+                                          value={opt}
+                                          onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                          className="w-5 h-5 border-white/10 bg-black text-sky-500 focus:ring-sky-500/50"
+                                        />
+                                        <span className="text-slate-400 group-hover:text-white transition-colors">{opt}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                );
+                              case 'checkbox':
+                                return (
+                                  <div className="space-y-3 pt-2">
+                                    {field.options?.map((opt: string) => (
+                                      <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                          type="checkbox"
+                                          value={opt}
+                                          onChange={(e) => {
+                                            const currentValues = formData[fieldKey] || [];
+                                            const newValues = e.target.checked
+                                              ? [...currentValues, opt]
+                                              : currentValues.filter((v: string) => v !== opt);
+                                            setFormData({ ...formData, [fieldKey]: newValues });
+                                          }}
+                                          className="w-5 h-5 rounded border-white/10 bg-black text-sky-500 focus:ring-sky-500/50"
+                                        />
+                                        <span className="text-slate-400 group-hover:text-white transition-colors">{opt}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                );
+                              default: // text
+                                return (
+                                  <input
+                                    type="text"
+                                    required={field.required}
+                                    placeholder={`Seu ${field.label.toLowerCase()}`}
+                                    className={commonClasses}
+                                    onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                  />
+                                );
+                            }
+                          })()}
                         </div>
                       ))}
 

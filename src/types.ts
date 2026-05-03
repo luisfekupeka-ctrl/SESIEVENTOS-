@@ -6,7 +6,7 @@ export interface Category {
 export interface FormField {
   id: string;
   label: string;
-  type: 'text' | 'select';
+  type: 'text' | 'select' | 'checkbox' | 'textarea' | 'radio';
   options?: string[];
   required: boolean;
 }

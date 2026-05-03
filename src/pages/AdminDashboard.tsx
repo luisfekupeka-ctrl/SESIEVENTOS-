@@ -63,11 +63,11 @@ export default function AdminDashboard() {
   const totalRegistrations = events.reduce((sum, event) => sum + (event.registration_count || 0), 0);
 
   const stats = [
-    { label: 'Total de Eventos', value: events.length, icon: <Calendar size={24} />, color: 'bg-yellow-500 shadow-yellow-500/20' },
-    { label: 'Inscrições Realizadas', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-sky-500 shadow-sky-500/20' },
-    { label: 'Alunos', value: students.filter(s => s.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-purple-500 shadow-purple-500/20' },
-    { label: 'Colaboradores', value: students.filter(s => s.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-indigo-500 shadow-indigo-500/20' },
-    { label: 'Responsáveis', value: students.filter(s => s.type === 'responsible').length, icon: <School size={24} />, color: 'bg-amber-500 shadow-amber-500/20' },
+    { label: 'Eventos', value: events.length, icon: <Calendar size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
+    { label: 'Inscrições', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-500 shadow-yellow-500/20' },
+    { label: 'Alunos', value: students.filter(s => s.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
+    { label: 'Colaboradores', value: students.filter(s => s.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
+    { label: 'Responsáveis', value: students.filter(s => s.type === 'responsible').length, icon: <School size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
   ];
 
   const handleReset = async () => {
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
             disabled={loading}
             className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-black text-slate-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-[#0F0F0F] transition-all border border-white/5 disabled:opacity-50"
           >
-            <Clock size={16} className="text-sky-500" />
+            <Clock size={16} className="text-sky-400" />
             Atualizar
           </button>
           <button
@@ -354,8 +354,8 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-[#0A0A0A] p-8 rounded-[2rem] border border-white/5 shadow-xl flex flex-col gap-6 transition-all hover:border-sky-500/20 group">
-            <div className={`w-14 h-14 ${stat.color} text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+          <div key={i} className="bg-[#0A0A0A] p-8 rounded-[2rem] border border-white/5 shadow-xl flex flex-col gap-6 transition-all hover:border-sky-400/20 group">
+            <div className={`w-14 h-14 ${stat.color} text-black rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
               {stat.icon}
             </div>
             <div>

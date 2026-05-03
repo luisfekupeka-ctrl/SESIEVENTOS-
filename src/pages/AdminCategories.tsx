@@ -131,7 +131,7 @@ export default function AdminCategories() {
         {categories.length === 0 && (
           <button
             onClick={seedCategories}
-            className="text-xs font-black text-sky-500 uppercase tracking-widest hover:underline"
+            className="text-xs font-black text-sky-400 uppercase tracking-widest hover:underline"
           >
             Carregar categorias padrão
           </button>
@@ -153,7 +153,7 @@ export default function AdminCategories() {
               <button
                 type="submit"
                 disabled={isAdding || !newCategory.trim()}
-                className="bg-sky-500 text-black px-6 md:px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)] flex items-center gap-3 disabled:opacity-50"
+                className="bg-sky-400 text-black px-6 md:px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-300 transition-all shadow-[0_0_20px_rgba(56,189,248,0.4)] flex items-center gap-3 disabled:opacity-50"
               >
                 {isAdding ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />} 
                 {isAdding ? 'Sincronizando...' : 'Adicionar'}
@@ -189,7 +189,7 @@ export default function AdminCategories() {
               ) : (
                 <>
                   <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 bg-sky-500/5 text-sky-500 rounded-2xl flex items-center justify-center border border-sky-500/10 group-hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 bg-sky-400/5 text-sky-400 rounded-2xl flex items-center justify-center border border-sky-400/10 group-hover:scale-110 transition-transform">
                       <Tags size={24} />
                     </div>
                     <span className="text-xl font-black text-white tracking-tight">{cat.name}</span>

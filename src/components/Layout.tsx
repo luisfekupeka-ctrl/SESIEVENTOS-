@@ -12,7 +12,8 @@ import {
   Shield, 
   Menu, 
   X,
-  Plus
+  Plus,
+  FileSpreadsheet
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ThemeToggle } from './ThemeToggle';
@@ -48,17 +49,17 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <header className="bg-black/80 backdrop-blur-md border-b border-sky-500/10 sticky top-0 z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-black font-black text-2xl group-hover:rotate-6 transition-transform shadow-[0_0_20px_rgba(234,179,8,0.3)]">S</div>
-            <span className="text-xl md:text-2xl font-black text-white transition-colors">SESI <span className="text-sky-500">Eventos</span></span>
+            <div className="w-10 h-10 bg-sky-400 rounded-xl flex items-center justify-center text-black font-black text-2xl group-hover:rotate-6 transition-transform shadow-[0_0_20px_rgba(56,189,248,0.4)]">S</div>
+            <span className="text-xl md:text-2xl font-black text-white transition-colors">SESI <span className="text-sky-400">Eventos</span></span>
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link to="/" className={`text-sm font-bold transition-all hover:scale-105 ${location.pathname === '/' ? 'text-sky-500' : 'text-slate-400 hover:text-white'}`}>
+            <Link to="/" className={`text-sm font-black uppercase tracking-widest transition-all hover:scale-105 ${location.pathname === '/' ? 'text-sky-400' : 'text-slate-400 hover:text-white'}`}>
               Início
             </Link>
             {isAdmin && (
-              <Link to="/admin" className={`text-sm font-bold transition-all hover:scale-105 ${isAdminPath ? 'text-sky-500' : 'text-slate-400 hover:text-white'}`}>
+              <Link to="/admin" className={`text-sm font-black uppercase tracking-widest transition-all hover:scale-105 ${isAdminPath ? 'text-sky-400' : 'text-slate-400 hover:text-white'}`}>
                 Painel Admin
               </Link>
             )}
@@ -94,7 +95,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {isAdmin && (
               <button 
                 onClick={toggleMobileMenu}
-                className="md:hidden p-3 bg-black text-sky-500 rounded-xl transition-all border border-sky-500/20 active:scale-90"
+                className="md:hidden p-3 bg-black text-sky-400 rounded-xl transition-all border border-sky-400/20 active:scale-90"
               >
                 <Menu size={24} />
               </button>
@@ -209,10 +210,10 @@ const AdminNavItem: React.FC<{ to: string; icon: React.ReactNode; label: string;
   <Link
     to={to}
     onClick={onClick}
-    className={`flex items-center gap-3 px-4 py-4 text-sm font-bold rounded-xl transition-all ${
+    className={`flex items-center gap-3 px-4 py-4 text-sm font-black uppercase tracking-widest rounded-xl transition-all ${
       active
-        ? 'bg-sky-500 text-black shadow-[0_0_20px_rgba(14,165,233,0.3)]'
-        : 'text-slate-400 hover:text-white hover:bg-black'
+        ? 'bg-sky-400 text-black shadow-[0_0_20px_rgba(56,189,248,0.4)]'
+        : 'text-slate-500 hover:text-white hover:bg-white/5'
     }`}
   >
     {icon}

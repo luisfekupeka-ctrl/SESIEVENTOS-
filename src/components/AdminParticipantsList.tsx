@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Student } from '../types';
-import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle, Download, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle, Download, RefreshCw, FileSpreadsheet } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { GRADES, CLASSES } from '../constants';
 
 interface AdminParticipantsListProps {
@@ -72,33 +73,29 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     }
   };
 
-  const exportToCSV = () => {
+  const exportToExcel = () => {
     if (participants.length === 0) return;
-    
-    const headers = type === 'student' 
-      ? ['Nome', 'Sobrenome', 'Série', 'Turma'] 
-      : ['Nome', 'Sobrenome'];
-    
-    const rows = participants.map(p => {
-      return type === 'student'
-        ? [p.name, p.surname, p.grade, p.class]
-        : [p.name, p.surname];
-    });
+    try {
+      const data = participants.map(p => {
+        const row: any = {
+          'Nome': p.name,
+          'Sobrenome': p.surname
+        };
+        if (type === 'student') {
+          row['Série'] = p.grade;
+          row['Turma'] = p.class;
+        }
+        return row;
+      });
 
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(r => r.join(','))
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `lista_${type}_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, labelPlural);
+      XLSX.writeFile(wb, `Lista_${labelPlural.toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`);
+    } catch (err) {
+      console.error("Erro ao exportar Excel:", err);
+      alert("Erro ao exportar para Excel.");
+    }
   };
 
   const handleOpenModal = (participant?: Student) => {
@@ -203,10 +200,10 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
             <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
           <button
-            onClick={exportToCSV}
+            onClick={exportToExcel}
             className="bg-black text-white border border-white/10 px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-[#0F0F0F] transition-all shadow-xl flex items-center gap-3"
           >
-            <Download size={20} className="text-blue-500" /> Exportar
+            <FileSpreadsheet size={20} className="text-sky-400" /> Exportar
           </button>
           <button
             onClick={() => handleOpenModal()}

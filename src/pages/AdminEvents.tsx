@@ -362,33 +362,36 @@ export default function AdminEvents() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {events.map(event => (
-          <div key={event.id} className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden hover:border-sky-500/20 transition-all flex flex-col md:flex-row group">
-            <div className="w-full md:w-64 h-64 md:h-auto bg-black flex-shrink-0 relative overflow-hidden">
-              <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" referrerPolicy="no-referrer" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent md:hidden"></div>
+          <div key={event.id} className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden hover:border-sky-400/20 transition-all flex flex-col group">
+            <div className="w-full h-48 md:h-56 bg-black relative overflow-hidden">
+              <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60 group-hover:opacity-100" referrerPolicy="no-referrer" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+              <div className="absolute bottom-4 left-6">
+                <span className="bg-sky-400/10 text-sky-400 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] border border-sky-400/20 backdrop-blur-md">
+                  {categories.find(c => c.id === event.category_id)?.name || 'Sem Categoria'}
+                </span>
+              </div>
             </div>
-            <div className="p-6 md:p-10 flex-grow flex flex-col justify-between relative">
+            <div className="p-6 md:p-8 flex-grow flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="bg-sky-500/10 text-sky-500 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] border border-sky-500/20">
-                    {categories.find(c => c.id === event.category_id)?.name || 'Sem Categoria'}
-                  </span>
+                <div className="flex items-center gap-4 mb-4 min-h-[1.5rem]">
                   {event.password_protected && (
                     <div className="flex items-center gap-2 text-slate-500 font-bold text-[10px] uppercase tracking-widest">
-                      <Lock size={14} className="text-blue-500" /> Protegido
+                      <Lock size={14} className="text-sky-400" /> Protegido
                     </div>
                   )}
                 </div>
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-6 group-hover:text-sky-500 transition-colors tracking-tight leading-tight">{event.name}</h3>
+                <h3 className="text-xl font-black text-white mb-6 group-hover:text-sky-400 transition-colors tracking-tight leading-tight line-clamp-2">{event.name}</h3>
 
-                <div className="flex flex-wrap gap-8 text-sm font-bold">
+                <div className="grid grid-cols-1 gap-4 text-sm font-bold">
                   <div className="flex items-center gap-3 text-slate-400">
-                    <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-sky-500">
-                      <Calendar size={18} />
+                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-sky-400">
+                      <Calendar size={16} />
                     </div>
-                    <span className="uppercase tracking-widest">
+                    <span className="uppercase tracking-widest text-xs">
                       {(() => {
                         try {
                           return format(new Date(event.start_date), "dd/MM/yyyy");
@@ -399,18 +402,18 @@ export default function AdminEvents() {
                     </span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-400">
-                    <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-blue-500">
-                      <Clock size={18} />
+                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-sky-400">
+                      <Clock size={16} />
                     </div>
-                    <span className="uppercase tracking-widest">{event.start_time} - {event.end_time}</span>
+                    <span className="uppercase tracking-widest text-xs">{event.start_time} - {event.end_time}</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-400">
-                    <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-slate-400">
-                      <Users size={18} />
+                    <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-slate-400">
+                      <Users size={16} />
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="text-white text-xs">{event.registration_count || 0}</span>
                       <span className="text-[10px] text-slate-600 uppercase tracking-widest">Inscritos</span>
-                      <span className="text-white">{event.registration_count || 0} {event.max_capacity && event.max_capacity > 0 ? `/ ${event.max_capacity}` : ''}</span>
                     </div>
                   </div>
                 </div>

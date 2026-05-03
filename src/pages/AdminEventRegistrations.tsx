@@ -90,62 +90,58 @@ export default function AdminEventRegistrations() {
   };
 
   const exportToExcel = () => {
-    if (!event) return;
-    const data = registrations.map(reg => {
-      const row: any = {
-        'Data Inscrição': format(new Date(reg.timestamp), "dd/MM/yyyy HH:mm")
-      };
-      
-      event.form_fields.forEach(field => {
-        row[field.label] = reg.form_data[field.label.toLowerCase()] || '-';
-      });
-      
-      return row;
-    });
-
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Inscritos');
-    XLSX.writeFile(wb, `Inscritos_${event.name.replace(/\s+/g, '_')}.xlsx`);
-  };
-
-  const exportToPDF = () => {
-    if (!event) return;
+    if (!event || registrations.length === 0) return;
     try {
-      const pdfDoc = new jsPDF();
-      pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
-      pdfDoc.setFontSize(10);
-      pdfDoc.text(`Data: ${format(new Date(), "dd/MM/yyyy HH:mm")}`, 14, 22);
-
-      const tableData = registrations.map(reg => {
-        const row = [
-          format(new Date(reg.timestamp), "dd/MM/yyyy")
-        ];
-
-        // Add custom fields
+      const data = registrations.map(reg => {
+        const row: any = {
+          'Data Inscrição': format(new Date(reg.timestamp), "dd/MM/yyyy HH:mm")
+        };
+        
         event.form_fields.forEach(field => {
-          row.push(reg.form_data[field.label.toLowerCase()] || '-');
+          const key = field.label.toLowerCase();
+          row[field.label] = reg.form_data[key] || reg.form_data[field.label] || '-';
         });
-
+        
         return row;
       });
 
-      const headers = ['Inscrição'];
-      event.form_fields.forEach(field => headers.push(field.label));
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Inscritos');
+      XLSX.writeFile(wb, `Inscritos_${event.name.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`);
+    } catch (err) {
+      console.error("Erro no Excel:", err);
+    }
+  };
+
+  const exportToPDF = () => {
+    if (!event || registrations.length === 0) return;
+    try {
+      const pdfDoc = new jsPDF();
+      pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
+      
+      const head = [['Data', ...event.form_fields.map(f => f.label)]];
+      const body = registrations.map(reg => [
+        format(new Date(reg.timestamp), "dd/MM/yyyy"),
+        ...event.form_fields.map(f => {
+          const key = f.label.toLowerCase();
+          return reg.form_data[key] || reg.form_data[f.label] || '-';
+        })
+      ]);
 
       autoTable(pdfDoc, {
-        startY: 30,
-        head: [headers],
-        body: tableData,
+        head,
+        body,
+        startY: 25,
         theme: 'grid',
-        headStyles: { fillColor: [0, 84, 166] }, // SESI Blue
+        headStyles: { fillColor: [14, 165, 233] },
         styles: { fontSize: 8 }
       });
 
-      pdfDoc.save(`Inscritos_${event.name.replace(/\s+/g, '_')}.pdf`);
-    } catch (error) {
-      console.error("Erro ao gerar PDF:", error);
-      alert("Erro ao gerar o arquivo PDF. Tente usar a exportação para Excel.");
+      pdfDoc.save(`Inscritos_${event.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+    } catch (err) {
+      console.error("Erro no PDF:", err);
+      alert("Erro ao exportar PDF.");
     }
   };
 

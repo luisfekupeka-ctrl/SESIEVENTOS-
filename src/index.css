@@ -18,7 +18,7 @@
 
   /* Global Input/Select Fixes */
   select, input, textarea {
-    @apply bg-[#0A0A0A] text-white border-white/10 focus:ring-sky-500/50 focus:border-sky-500 transition-all;
+    @apply bg-[#0A0A0A] text-white border-white/10 focus:ring-sky-400/50 focus:border-sky-400 transition-all;
   }
   
   option {
@@ -35,10 +35,10 @@
     @apply bg-transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-sky-500/20 rounded-full transition-colors;
+    @apply bg-sky-400/20 rounded-full transition-colors;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-sky-500/40;
+    @apply bg-sky-400/40;
   }
 }
 

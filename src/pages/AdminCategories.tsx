@@ -52,14 +52,19 @@ export default function AdminCategories() {
     setIsAdding(true);
     setError(null);
     try {
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from('categories')
-        .insert([{ name: newCategory.trim() }]);
+        .insert([{ name: newCategory.trim() }])
+        .select();
 
       if (insertError) throw insertError;
       
       setNewCategory('');
-      fetchCategories();
+      if (data) {
+        setCategories(prev => [...prev, ...data].sort((a, b) => a.name.localeCompare(b.name)));
+      } else {
+        fetchCategories();
+      }
     } catch (err: any) {
       console.error("Erro ao adicionar categoria:", err);
       setError(err.message || "Erro ao adicionar categoria.");

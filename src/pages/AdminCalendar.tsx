@@ -107,71 +107,6 @@ export default function AdminCalendar() {
     );
   };
 
-  const renderCells = () => {
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
-
-    const dateFormat = "d";
-    const allDays = eachDayOfInterval({
-      start: startDate,
-      end: endDate,
-    });
-
-    return (
-      <div className="grid grid-cols-7 gap-1 bg-white/5 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
-        {allDays.map((day, i) => {
-          const dayFormatted = format(day, dateFormat);
-          const dayEvents = events.filter(event => isSameDay(parseISO(event.start_date), day));
-          const isSelectedMonth = isSameMonth(day, monthStart);
-          const isToday = isSameDay(day, new Date());
-
-          return (
-            <div
-              key={i}
-              className={`min-h-[140px] p-4 flex flex-col gap-3 transition-colors ${
-                !isSelectedMonth ? 'bg-[#050505] opacity-20' : 'bg-[#0A0A0A]'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className={`text-sm font-black tracking-tighter ${
-                  !isSelectedMonth ? 'text-slate-800' : 
-                  isToday ? 'bg-yellow-500 text-black w-8 h-8 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.4)]' : 
-                  'text-white'
-                }`}>
-                  {dayFormatted}
-                </span>
-                {dayEvents.length > 0 && isSelectedMonth && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
-                )}
-              </div>
-              <div className="flex-grow flex flex-col gap-2 overflow-y-auto max-h-[90px] custom-scrollbar pr-1">
-                {dayEvents.map(event => (
-                  <Link
-                    key={event.id}
-                    to={`/admin/events`}
-                    className="group"
-                  >
-                    <div className="px-3 py-2 bg-white/[0.03] border-l-2 border-yellow-500 rounded-lg flex flex-col gap-1 hover:bg-white/[0.06] transition-all cursor-pointer group-hover:translate-x-1">
-                      <p className="text-[10px] font-black text-white truncate leading-tight uppercase tracking-tight group-hover:text-yellow-500 transition-colors">
-                        {event.name}
-                      </p>
-                      <div className="flex items-center gap-1.5 text-[8px] text-slate-500 font-bold uppercase tracking-widest">
-                        <Clock size={10} className="text-yellow-500/50" />
-                        {event.start_time}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
   if (loading) return (
     <div className="flex flex-col items-center justify-center py-40">
       <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-8 shadow-[0_0_20px_rgba(234,179,8,0.2)]"></div>
@@ -180,11 +115,66 @@ export default function AdminCalendar() {
   );
 
   return (
-    <div className="p-2 md:p-0">
+    <div className="p-0 md:p-0">
       {renderHeader()}
-      <div className="bg-[#0A0A0A] p-2 md:p-10 rounded-[3rem] border border-white/5 shadow-2xl overflow-hidden mb-16">
+      <div className="bg-[#0A0A0A] p-2 md:p-10 rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden mb-16">
         {renderDays()}
-        {renderCells()}
+        <div className="grid grid-cols-7 gap-px md:gap-1 bg-white/5 border border-white/5 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl">
+          {eachDayOfInterval({
+            start: startOfWeek(startOfMonth(currentMonth)),
+            end: endOfWeek(endOfMonth(currentMonth)),
+          }).map((day, i) => {
+            const dayEvents = events.filter(event => isSameDay(parseISO(event.start_date), day));
+            const isSelectedMonth = isSameMonth(day, currentMonth);
+            const isToday = isSameDay(day, new Date());
+
+            return (
+              <div
+                key={i}
+                className={`min-h-[70px] md:min-h-[140px] p-2 md:p-4 flex flex-col gap-1 md:gap-3 transition-colors ${
+                  !isSelectedMonth ? 'bg-[#050505] opacity-20' : 'bg-[#0A0A0A]'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`text-[10px] md:text-sm font-black tracking-tighter ${
+                    !isSelectedMonth ? 'text-slate-800' : 
+                    isToday ? 'bg-yellow-500 text-black w-5 h-5 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.4)]' : 
+                    'text-white'
+                  }`}>
+                    {format(day, 'd')}
+                  </span>
+                  {dayEvents.length > 0 && isSelectedMonth && (
+                    <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
+                  )}
+                </div>
+                
+                {/* Mobile: Dots only | Desktop: Event Cards */}
+                <div className="flex-grow flex flex-col gap-1 md:gap-2 overflow-y-auto max-h-[40px] md:max-h-[90px] custom-scrollbar pr-0.5">
+                  <div className="flex flex-wrap gap-0.5 md:hidden">
+                    {dayEvents.map(e => (
+                      <div key={e.id} className="w-1 h-1 rounded-full bg-yellow-500/50" />
+                    ))}
+                  </div>
+                  <div className="hidden md:flex flex-col gap-2">
+                    {dayEvents.map(event => (
+                      <Link key={event.id} to={`/admin/events`} className="group">
+                        <div className="px-3 py-2 bg-white/[0.03] border-l-2 border-yellow-500 rounded-lg flex flex-col gap-1 hover:bg-white/[0.06] transition-all group-hover:translate-x-1">
+                          <p className="text-[10px] font-black text-white truncate leading-tight uppercase tracking-tight group-hover:text-yellow-500 transition-colors">
+                            {event.name}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-[8px] text-slate-500 font-bold uppercase tracking-widest">
+                            <Clock size={10} className="text-yellow-500/50" />
+                            {event.start_time}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Upcoming Events List */}

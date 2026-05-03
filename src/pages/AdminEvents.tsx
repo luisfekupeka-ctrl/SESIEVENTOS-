@@ -416,7 +416,7 @@ export default function AdminEvents() {
                 </div>
               </div>
 
-              <div className="mt-10 flex items-center justify-end gap-3 pt-6 border-t border-white/5">
+              <div className="mt-10 flex flex-wrap items-center justify-end gap-2 md:gap-3 pt-6 border-t border-white/5">
                 <Link
                   to={`/admin/events/${event.id}/registrations`}
                   className="w-12 h-12 bg-white/5 text-slate-400 hover:text-blue-400 rounded-2xl flex items-center justify-center transition-all border border-white/5"
@@ -499,7 +499,7 @@ export default function AdminEvents() {
                         <p className="text-xs font-bold text-slate-500 line-clamp-1">{template.description}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
                       <button
                         onClick={() => handleUseTemplate(template)}
                         className="px-6 py-3 bg-yellow-500 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all flex items-center gap-2"

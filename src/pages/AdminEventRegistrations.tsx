@@ -70,6 +70,9 @@ export default function AdminEventRegistrations() {
         .eq('id', deleteId);
       
       if (error) throw error;
+      
+      // Update local state immediately for better UX
+      setRegistrations(prev => prev.filter(reg => reg.id !== deleteId));
       setDeleteId(null);
     } catch (error) {
       console.error("Erro ao excluir:", error);
@@ -167,71 +170,71 @@ export default function AdminEventRegistrations() {
   if (!event) return <div className="p-8 text-center text-red-500 font-bold">Evento não encontrado.</div>;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/admin/events')} className="p-2 text-slate-400 hover:text-[#0054A6] hover:bg-[#0054A6]/5 dark:hover:bg-blue-500/10 rounded-xl transition-all">
-            <ChevronLeft size={24} />
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center gap-6">
+          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-white/5 text-slate-400 hover:text-yellow-500 rounded-2xl flex items-center justify-center transition-all border border-white/5">
+            <ChevronLeft size={28} />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white line-clamp-1">{event.name}</h1>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Lista de Inscritos ({registrations.length})</p>
+            <h1 className="text-3xl font-black text-white line-clamp-1 tracking-tight">{event.name}</h1>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Lista de Inscritos • {registrations.length} Alunos</p>
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-4">
           <button
             onClick={copyToClipboard}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/5 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all"
           >
             {copied ? <CheckCircle2 size={18} className="text-green-500" /> : <Copy size={18} />}
-            {copied ? 'Copiado!' : 'Copiar Lista'}
+            {copied ? 'Copiado!' : 'Copiar'}
           </button>
           <button
             onClick={exportToExcel}
-            className="flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-500/10 border border-green-100 dark:border-green-500/20 rounded-xl text-sm font-bold text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-500/20 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-green-500/10 border border-green-500/10 rounded-2xl text-xs font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all"
           >
             <FileSpreadsheet size={18} /> Excel
           </button>
           <button
             onClick={exportToPDF}
-            className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl text-sm font-bold text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/10 rounded-2xl text-xs font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all"
           >
             <FileText size={18} /> PDF
           </button>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#0F172A] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
-                <th className="px-4 py-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Data</th>
+              <tr className="bg-white/[0.02] border-b border-white/5">
+                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Data</th>
                 {event.form_fields.map(field => (
-                  <th key={field.id} className="px-4 py-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{field.label}</th>
+                  <th key={field.id} className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{field.label}</th>
                 ))}
-                <th className="px-4 py-3 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Ações</th>
+                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <tbody className="divide-y divide-white/5">
               {registrations.map(reg => {
                 return (
-                  <tr key={reg.id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
-                    <td className="px-4 py-2 text-[10px] text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+                  <tr key={reg.id} className="hover:bg-white/[0.01] transition-colors group">
+                    <td className="px-8 py-5 text-xs text-slate-500 font-bold whitespace-nowrap uppercase tracking-widest">
                       {reg.timestamp ? format(new Date(reg.timestamp), "dd/MM HH:mm") : '-'}
                     </td>
                     {event.form_fields.map(field => (
-                      <td key={field.id} className="px-4 py-2 text-[10px] text-slate-600 dark:text-slate-300 truncate max-w-[150px]">
+                      <td key={field.id} className="px-8 py-5 text-sm text-white font-bold truncate max-w-[200px]">
                         {reg.form_data[field.label.toLowerCase()] || '-'}
                       </td>
                     ))}
-                    <td className="px-4 py-2 text-right">
+                    <td className="px-8 py-5 text-right">
                       <button
                         onClick={() => setDeleteId(reg.id)}
-                        className="p-1 text-slate-300 dark:text-slate-600 hover:text-red-600 dark:hover:text-red-400 transition-all"
+                        className="w-10 h-10 bg-red-500/5 text-slate-600 hover:text-red-500 rounded-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
@@ -240,8 +243,11 @@ export default function AdminEventRegistrations() {
             </tbody>
           </table>
           {registrations.length === 0 && (
-            <div className="p-12 text-center text-slate-400 dark:text-slate-500 font-medium">
-              Nenhuma inscrição realizada para este evento.
+            <div className="p-32 text-center">
+              <Users size={60} className="mx-auto text-slate-800 mb-6 opacity-20" />
+              <p className="text-slate-600 font-black text-xl uppercase tracking-widest">
+                Nenhuma inscrição catalogada.
+              </p>
             </div>
           )}
         </div>
@@ -249,22 +255,25 @@ export default function AdminEventRegistrations() {
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0F172A] w-full max-w-md rounded-3xl shadow-2xl p-8 animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Confirmar Remoção</h3>
-            <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
-              Deseja remover este aluno da lista de inscritos? Esta ação não pode ser desfeita.
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#0A0A0A] w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in fade-in zoom-in duration-300 border border-white/10 text-center">
+            <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-8 mx-auto">
+              <Trash2 size={40} />
+            </div>
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Remoção</h3>
+            <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">
+              Deseja remover este aluno da lista oficial? Esta ação é irreversível.
             </p>
             <div className="flex gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-grow py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                className="flex-grow py-4 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
               >
-                Cancelar
+                Voltar
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-grow py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                className="flex-grow py-4 bg-red-600 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
               >
                 Remover
               </button>

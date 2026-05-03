@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ShieldAlert, LogIn, Mail, Lock, Users, RefreshCw } from 'lucide-react';
+import { ShieldAlert, LogIn, Mail, Lock, Users, RefreshCw, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function AdminLogin() {
@@ -45,106 +45,109 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-160px)] flex items-center justify-center px-4 py-12 transition-colors duration-300">
+    <div className="min-h-[calc(100vh-160px)] flex items-center justify-center px-4 py-12">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white dark:bg-[#0F172A] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-8 md:p-12 transition-all"
+        transition={{ duration: 0.8, ease: "circOut" }}
+        className="max-w-md w-full bg-[#0A0A0A] rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/5 p-12 md:p-16 relative overflow-hidden group"
       >
-        <div className="text-center mb-10">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
+        
+        <div className="text-center mb-12">
           <motion.div 
-            whileHover={{ scale: 1.05, rotate: 5 }}
-            className="w-20 h-20 bg-[#0054A6] rounded-2xl flex items-center justify-center text-white font-bold text-4xl mx-auto mb-6 shadow-xl"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            className="w-24 h-24 bg-yellow-500 rounded-3xl flex items-center justify-center text-black font-black text-5xl mx-auto mb-8 shadow-[0_0_30px_rgba(234,179,8,0.3)]"
           >
             S
           </motion.div>
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
-            {isRegistering ? 'Solicitar Acesso' : 'Painel Administrativo'}
+          <h2 className="text-4xl font-black text-white mb-3 tracking-tight">
+            {isRegistering ? 'Solicitar Acesso' : 'Restrito'}
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
             {isRegistering 
-              ? 'Preencha os dados abaixo para solicitar sua conta.' 
-              : 'Entre com suas credenciais para gerenciar o sistema.'}
+              ? 'Área de Credenciamento SESI' 
+              : 'Painel de Controle Administrativo'}
           </p>
         </div>
 
         {error && (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className={`mb-8 p-4 rounded-xl flex items-start gap-3 text-sm animate-shake ${
+            className={`mb-10 p-5 rounded-2xl flex items-start gap-4 text-sm font-bold border-2 ${
               error.includes("Solicitação enviada") 
-                ? "bg-green-50 dark:bg-green-500/10 border border-green-100 dark:border-green-500/20 text-green-700 dark:text-green-400"
-                : "bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 text-red-700 dark:text-red-400"
+                ? "bg-green-500/5 border-green-500/20 text-green-500"
+                : "bg-red-500/5 border-red-500/20 text-red-500"
             }`}
           >
-            <ShieldAlert className="flex-shrink-0 mt-0.5" size={18} />
-            <p className="font-medium">{error}</p>
+            <ShieldAlert className="flex-shrink-0 mt-0.5" size={20} />
+            <p>{error}</p>
           </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {isRegistering && (
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 ml-1">
-                <Users size={16} />
-                Nome Completo
-              </label>
-              <input
-                type="text"
-                required
-                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0054A6]/20 focus:border-[#0054A6] dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white font-medium"
-                placeholder="Seu nome"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-              />
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nome Completo</label>
+              <div className="relative">
+                <Users className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
+                <input
+                  type="text"
+                  required
+                  className="w-full pl-14 pr-6 py-5 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                  placeholder="Seu nome"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </div>
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 ml-1">
-              <Mail size={16} />
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0054A6]/20 focus:border-[#0054A6] dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white font-medium"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Endereço de Email</label>
+            <div className="relative">
+              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
+              <input
+                type="email"
+                required
+                className="w-full pl-14 pr-6 py-5 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                placeholder="exemplo@sesi.com.br"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 ml-1">
-              <Lock size={16} />
-              Senha
-            </label>
-            <input
-              type="password"
-              required
-              className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0054A6]/20 focus:border-[#0054A6] dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white font-medium"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          {isRegistering && (
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 ml-1">
-                <Lock size={16} />
-                Confirmar Senha
-              </label>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Senha Secreta</label>
+            <div className="relative">
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
               <input
                 type="password"
                 required
-                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#0054A6]/20 focus:border-[#0054A6] dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white font-medium"
+                className="w-full pl-14 pr-6 py-5 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
                 placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
+            </div>
+          </div>
+
+          {isRegistering && (
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Validar Senha</label>
+              <div className="relative">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
+                <input
+                  type="password"
+                  required
+                  className="w-full pl-14 pr-6 py-5 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
             </div>
           )}
 
@@ -153,31 +156,31 @@ export default function AdminLogin() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoggingIn}
-            className="w-full flex items-center justify-center gap-3 bg-[#0054A6] hover:bg-[#004488] dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-[#0054A6]/20 dark:shadow-blue-900/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+            className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase tracking-widest text-xs py-5 px-8 rounded-2xl shadow-[0_0_30px_rgba(234,179,8,0.3)] transition-all flex items-center justify-center gap-4 disabled:opacity-50 mt-4"
           >
             {isLoggingIn ? (
-              <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+              <Loader2 className="animate-spin" size={24} />
             ) : (
               <>
                 <LogIn size={20} />
-                <span>{isRegistering ? 'Solicitar Cadastro' : 'Entrar no Painel'}</span>
+                <span>{isRegistering ? 'Solicitar Registro' : 'Autenticar'}</span>
               </>
             )}
           </motion.button>
         </form>
 
-        <div className="mt-8 text-center text-sm font-medium flex flex-col gap-4">
+        <div className="mt-12 text-center flex flex-col gap-5">
           <button 
             type="button"
             onClick={() => {
               setIsRegistering(!isRegistering);
               setError(null);
             }}
-            className="text-[#0054A6] dark:text-blue-400 hover:underline"
+            className="text-white/40 hover:text-yellow-500 font-black uppercase tracking-widest text-[10px] transition-colors"
           >
             {isRegistering 
-              ? 'Já tem uma conta? Faça login' 
-              : 'Não tem acesso? Solicitar cadastro'}
+              ? 'Já sou administrador? Logar' 
+              : 'Não possui acesso? Solicitar'}
           </button>
 
           <button
@@ -187,18 +190,11 @@ export default function AdminLogin() {
               sessionStorage.clear();
               window.location.reload();
             }}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center justify-center gap-2 transition-colors mx-auto text-xs"
-            title="Limpar dados salvos no navegador em caso de erros"
+            className="text-slate-800 hover:text-slate-600 flex items-center justify-center gap-2 transition-colors mx-auto font-black uppercase tracking-widest text-[8px]"
           >
-            <RefreshCw size={14} />
-            Limpar Cache e Recarregar
+            <RefreshCw size={12} />
+            Reinicializar Sistema
           </button>
-        </div>
-
-        <div className="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-[0.2em]">
-            Acesso Restrito SESI
-          </p>
         </div>
       </motion.div>
     </div>

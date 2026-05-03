@@ -63,31 +63,31 @@ export default function AdminCalendar() {
 
   const renderHeader = () => {
     return (
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2 text-center md:text-left">Calendário de Eventos</h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium capitalize text-center md:text-left">
+          <h1 className="text-4xl font-black text-white mb-2 text-center md:text-left tracking-tight">Calendário de Eventos</h1>
+          <p className="text-yellow-500 font-black uppercase tracking-[0.3em] text-xs text-center md:text-left">
             {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4 bg-white/5 p-2 rounded-[2rem] border border-white/5">
           <button
             onClick={prevMonth}
-            className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-300 shadow-sm"
+            className="w-12 h-12 bg-white/5 text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={24} />
           </button>
           <button
             onClick={() => setCurrentMonth(new Date())}
-            className="px-6 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-sm font-bold text-slate-600 dark:text-slate-300 shadow-sm"
+            className="px-8 py-3 bg-yellow-500 text-black rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)]"
           >
             Hoje
           </button>
           <button
             onClick={nextMonth}
-            className="p-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-slate-600 dark:text-slate-300 shadow-sm"
+            className="w-12 h-12 bg-white/5 text-slate-400 hover:text-white rounded-2xl flex items-center justify-center transition-all border border-white/5"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={24} />
           </button>
         </div>
       </div>
@@ -97,9 +97,9 @@ export default function AdminCalendar() {
   const renderDays = () => {
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     return (
-      <div className="grid grid-cols-7 mb-2 bg-slate-50/50 dark:bg-slate-900/50 rounded-xl overflow-hidden">
+      <div className="grid grid-cols-7 mb-4 bg-white/[0.02] rounded-2xl overflow-hidden border border-white/5">
         {days.map((day, i) => (
-          <div key={i} className="text-center text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest py-3">
+          <div key={i} className="text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] py-5">
             {day}
           </div>
         ))}
@@ -120,7 +120,7 @@ export default function AdminCalendar() {
     });
 
     return (
-      <div className="grid grid-cols-7 gap-px bg-slate-200 dark:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+      <div className="grid grid-cols-7 gap-1 bg-white/5 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
         {allDays.map((day, i) => {
           const dayFormatted = format(day, dateFormat);
           const dayEvents = events.filter(event => isSameDay(parseISO(event.start_date), day));
@@ -130,32 +130,35 @@ export default function AdminCalendar() {
           return (
             <div
               key={i}
-              className={`min-h-[120px] p-2 bg-white dark:bg-[#0F172A] flex flex-col gap-1 ${
-                !isSelectedMonth ? 'bg-slate-50/50 dark:bg-slate-900/40 opacity-50' : ''
+              className={`min-h-[140px] p-4 flex flex-col gap-3 transition-colors ${
+                !isSelectedMonth ? 'bg-[#050505] opacity-20' : 'bg-[#0A0A0A]'
               }`}
             >
-              <div className="flex items-center justify-between mb-1">
-                <span className={`text-sm font-bold ${
-                  !isSelectedMonth ? 'text-slate-300 dark:text-slate-600' : 
-                  isToday ? 'bg-[#0054A6] dark:bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center' : 
-                  'text-slate-900 dark:text-slate-200'
+              <div className="flex items-center justify-between">
+                <span className={`text-sm font-black tracking-tighter ${
+                  !isSelectedMonth ? 'text-slate-800' : 
+                  isToday ? 'bg-yellow-500 text-black w-8 h-8 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.4)]' : 
+                  'text-white'
                 }`}>
                   {dayFormatted}
                 </span>
+                {dayEvents.length > 0 && isSelectedMonth && (
+                  <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
+                )}
               </div>
-              <div className="flex-grow flex flex-col gap-1 overflow-y-auto max-h-[100px] custom-scrollbar pr-1">
+              <div className="flex-grow flex flex-col gap-2 overflow-y-auto max-h-[90px] custom-scrollbar pr-1">
                 {dayEvents.map(event => (
                   <Link
                     key={event.id}
                     to={`/admin/events`}
                     className="group"
                   >
-                    <div className="px-2 py-1.5 bg-blue-50 dark:bg-blue-500/10 border-l-4 border-[#0054A6] dark:border-blue-500 rounded flex flex-col gap-0.5 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors cursor-pointer">
-                      <p className="text-[10px] font-black text-[#0054A6] dark:text-blue-400 truncate leading-tight group-hover:dark:text-blue-300">
+                    <div className="px-3 py-2 bg-white/[0.03] border-l-2 border-yellow-500 rounded-lg flex flex-col gap-1 hover:bg-white/[0.06] transition-all cursor-pointer group-hover:translate-x-1">
+                      <p className="text-[10px] font-black text-white truncate leading-tight uppercase tracking-tight group-hover:text-yellow-500 transition-colors">
                         {event.name}
                       </p>
-                      <div className="flex items-center gap-1 text-[8px] text-blue-500 dark:text-blue-400/80 font-bold uppercase tracking-tighter">
-                        <Clock size={8} />
+                      <div className="flex items-center gap-1.5 text-[8px] text-slate-500 font-bold uppercase tracking-widest">
+                        <Clock size={10} className="text-yellow-500/50" />
                         {event.start_time}
                       </div>
                     </div>
@@ -170,55 +173,57 @@ export default function AdminCalendar() {
   };
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center py-20">
-      <div className="w-12 h-12 border-4 border-[#0054A6] dark:border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p className="text-slate-500 dark:text-slate-400 font-medium">Carregando calendário...</p>
+    <div className="flex flex-col items-center justify-center py-40">
+      <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-8 shadow-[0_0_20px_rgba(234,179,8,0.2)]"></div>
+      <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Sincronizando Agenda...</p>
     </div>
   );
 
   return (
-    <div className="animate-in fade-in duration-500 p-2 md:p-0">
+    <div className="p-2 md:p-0">
       {renderHeader()}
-      <div className="bg-white dark:bg-[#0F172A] p-2 md:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div className="bg-[#0A0A0A] p-2 md:p-10 rounded-[3rem] border border-white/5 shadow-2xl overflow-hidden mb-16">
         {renderDays()}
         {renderCells()}
       </div>
 
-      {/* Upcoming Events List for Mobile/Quick View */}
-      <div className="mt-12">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <CalendarIcon size={20} className="text-[#0054A6] dark:text-blue-400" />
-            Próximos Eventos
+      {/* Upcoming Events List */}
+      <div className="mt-20">
+        <div className="flex items-center gap-6 mb-12">
+          <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-2xl flex items-center justify-center border border-yellow-500/10">
+            <CalendarIcon size={24} />
+          </div>
+          <h3 className="text-2xl font-black text-white tracking-tight uppercase">
+            Radar de Eventos
           </h3>
-          <div className="h-1 flex-grow mx-4 border-t border-slate-100 dark:border-slate-800 hidden md:block"></div>
+          <div className="h-px flex-grow bg-white/5"></div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events
             .filter(e => parseISO(e.start_date) >= startOfMonth(currentMonth))
             .slice(0, 6)
             .map(event => (
-              <div key={event.id} className="bg-white dark:bg-[#0F172A] p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md dark:hover:border-slate-700 transition-all flex items-center justify-between group">
-                <div className="flex items-center gap-4 overflow-hidden">
-                  <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-700">
-                    <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <div key={event.id} className="bg-[#0A0A0A] p-6 rounded-[2rem] border border-white/5 shadow-xl hover:border-yellow-500/30 transition-all flex items-center justify-between group">
+                <div className="flex items-center gap-5 overflow-hidden">
+                  <div className="w-16 h-16 bg-white/5 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 group-hover:border-yellow-500/20 transition-all">
+                    <img src={event.image_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   </div>
                   <div className="overflow-hidden">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-[#0054A6] dark:group-hover:text-blue-400 transition-colors truncate">{event.name}</h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                      {format(parseISO(event.start_date), "dd 'de' MMMM", { locale: ptBR })} • {event.start_time}
+                    <h4 className="text-base font-black text-white group-hover:text-yellow-500 transition-colors truncate tracking-tight">{event.name}</h4>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                      {format(parseISO(event.start_date), "dd 'DE' MMMM", { locale: ptBR })}
                     </p>
                   </div>
                 </div>
-                <Link to="/admin/events" className="text-slate-400 dark:text-slate-600 hover:text-[#0054A6] dark:hover:text-blue-400 flex-shrink-0 ml-2">
+                <Link to="/admin/events" className="w-10 h-10 bg-white/5 text-slate-700 hover:text-yellow-500 rounded-xl flex items-center justify-center transition-all">
                   <ExternalLink size={18} />
                 </Link>
               </div>
             ))}
           {events.length === 0 && (
-            <div className="col-span-full py-12 text-center bg-slate-50/50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
-              <CalendarIcon size={40} className="mx-auto text-slate-300 dark:text-slate-700 mb-3" />
-              <p className="text-slate-400 dark:text-slate-500 font-medium">Nenhum evento futuro encontrado.</p>
+            <div className="col-span-full py-24 text-center bg-white/[0.01] rounded-[3rem] border border-dashed border-white/10">
+              <CalendarIcon size={48} className="mx-auto text-slate-800 mb-6 opacity-20" />
+              <p className="text-slate-600 font-black uppercase tracking-[0.2em]">Sem eventos detectados.</p>
             </div>
           )}
         </div>

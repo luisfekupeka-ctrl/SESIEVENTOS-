@@ -14,64 +14,74 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
   return (
     <Link
       to={`/event/${event.id}`}
-      className="group bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:border-[#0054A6]/20 dark:hover:border-blue-500/30 transition-all duration-300 flex flex-col h-full shadow-sm"
+      className="group bg-[#0A0A0A] rounded-[2rem] border border-white/5 overflow-hidden hover:shadow-[0_0_50px_rgba(234,179,8,0.15)] hover:border-yellow-500/30 transition-all duration-500 flex flex-col h-full"
     >
-      <div className="relative aspect-video overflow-hidden">
+      <div className="relative aspect-[16/10] overflow-hidden">
         <img
           src={event.image_url || `https://picsum.photos/seed/${event.id}/800/450`}
           alt={event.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute top-4 left-4">
-          <span className="bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-sm text-[#0054A6] dark:text-blue-400 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm uppercase tracking-wider border border-slate-100 dark:border-slate-800">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent opacity-60"></div>
+        <div className="absolute top-5 left-5">
+          <span className="bg-yellow-500 text-black text-[10px] font-black px-4 py-1.5 rounded-full shadow-lg uppercase tracking-[0.2em]">
             {category?.name || 'Evento'}
           </span>
         </div>
       </div>
 
-      <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-[#0054A6] dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+      <div className="p-8 flex flex-col flex-grow relative">
+        <h3 className="text-2xl font-black text-white mb-3 group-hover:text-yellow-500 transition-colors line-clamp-1 tracking-tight">
           {event.name}
         </h3>
         
-        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-2 flex-grow font-medium">
+        <p className="text-slate-500 text-base mb-8 line-clamp-2 flex-grow font-bold leading-relaxed">
           {event.description}
         </p>
 
-        <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-            <Calendar size={18} className="text-[#0054A6] dark:text-blue-500" />
-            <span className="text-sm font-medium">
+        <div className="space-y-4 pt-6 border-t border-white/5">
+          <div className="flex items-center gap-4 text-slate-400">
+            <div className="w-10 h-10 bg-yellow-500/5 rounded-xl flex items-center justify-center text-yellow-500 group-hover:bg-yellow-500 group-hover:text-black transition-all duration-500">
+              <Calendar size={20} />
+            </div>
+            <span className="text-sm font-black uppercase tracking-widest">
               {format(new Date(event.start_date), "dd 'de' MMMM", { locale: ptBR })}
             </span>
           </div>
           
-          <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-            <Tag size={18} className="text-[#0054A6] dark:text-blue-500" />
-            <span className="text-sm font-medium">
-              {(event.restrictions as any).type === 'all' ? 'Aberto para todos' : 'Restrito'}
+          <div className="flex items-center gap-4 text-slate-400">
+            <div className="w-10 h-10 bg-blue-500/5 rounded-xl flex items-center justify-center text-blue-400">
+              <Tag size={20} />
+            </div>
+            <span className="text-sm font-black uppercase tracking-widest">
+              {(event.restrictions as any).type === 'all' ? 'Público Geral' : 'Público Restrito'}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-            <Users size={18} className="text-[#0054A6] dark:text-blue-500" />
-            <span className="text-sm font-medium">
-              {event.registration_count || 0} {event.max_capacity && event.max_capacity > 0 ? `/ ${event.max_capacity}` : ''} inscritos
-              {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity && (
-                <span className="ml-2 text-red-500 dark:text-red-400 font-black uppercase text-[10px]">Esgotado</span>
-              )}
-            </span>
+          <div className="flex items-center gap-4 text-slate-400">
+            <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-400">
+              <Users size={20} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Vagas</span>
+              <span className="text-sm font-black text-white">
+                {event.registration_count || 0} {event.max_capacity && event.max_capacity > 0 ? `/ ${event.max_capacity}` : ''}
+                {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity && (
+                  <span className="ml-3 text-red-500 font-black uppercase text-[10px] animate-pulse">Esgotado</span>
+                )}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-between">
-          <span className="text-[#0054A6] dark:text-blue-400 font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-            Ver detalhes <ChevronRight size={16} />
+        <div className="mt-8 flex items-center justify-between">
+          <span className="text-slate-500 font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2 group-hover:text-yellow-500 transition-all">
+            Detalhes <ChevronRight size={16} />
           </span>
-          <button className="bg-[#0054A6] dark:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#004080] dark:hover:bg-blue-700 transition-colors shadow-lg shadow-[#0054A6]/10 dark:shadow-blue-900/20">
-            Inscrever-se
-          </button>
+          <div className="bg-yellow-500 text-black px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+            Inscrever
+          </div>
         </div>
       </div>
     </Link>

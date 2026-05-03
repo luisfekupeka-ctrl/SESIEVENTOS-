@@ -77,93 +77,93 @@ export default function AdminManagement() {
   if (loading) return <div className="p-8 text-center text-slate-500 font-medium animate-pulse">Carregando gerenciamento...</div>;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Gestão de Administradores</h1>
-        <p className="text-slate-500 dark:text-slate-400 font-medium">Aprovar, bloquear ou remover acessos ao painel administrativo.</p>
+        <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Gestão de Administradores</h1>
+        <p className="text-slate-500 font-bold">Aprovar, bloquear ou remover acessos ao painel administrativo.</p>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl flex items-center gap-3 text-red-700 dark:text-red-400">
-          <AlertCircle size={20} />
-          <p className="font-medium">{error}</p>
+        <div className="p-6 bg-red-500/5 border border-red-500/20 rounded-[2rem] flex items-center gap-4 text-red-500 font-bold">
+          <AlertCircle size={24} />
+          <p>{error}</p>
         </div>
       )}
 
-      <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Usuário</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Função</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider">Data de Solicitação</th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-wider text-right">Ações</th>
+              <tr className="bg-white/[0.02] border-b border-white/5">
+                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Usuário</th>
+                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Função</th>
+                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Solicitação</th>
+                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <tbody className="divide-y divide-white/5">
               {profiles.map((profile) => (
-                <tr key={profile.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold border border-blue-100 dark:border-blue-500/20">
+                <tr key={profile.id} className="hover:bg-white/[0.01] transition-colors group">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-yellow-500 text-black flex items-center justify-center font-black text-lg shadow-[0_0_20px_rgba(234,179,8,0.2)]">
                         {profile.full_name?.charAt(0) || 'U'}
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900 dark:text-white">{profile.full_name}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                          <Mail size={12} />
+                        <p className="font-black text-white tracking-tight">{profile.full_name}</p>
+                        <p className="text-[10px] text-slate-600 font-bold flex items-center gap-1 uppercase tracking-widest">
+                          <Mail size={12} className="text-yellow-500" />
                           {profile.email}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                  <td className="px-8 py-5">
+                    <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.1em] border ${
                       profile.role === 'super_admin' 
-                        ? 'bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                        ? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                        : 'bg-white/5 border-white/5 text-slate-500'
                     }`}>
-                      {profile.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                      {profile.role === 'super_admin' ? 'Master' : 'Admin'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-3">
                        <span className={`w-2 h-2 rounded-full ${
-                         profile.status === 'approved' ? 'bg-green-500' :
-                         profile.status === 'pending' ? 'bg-amber-500 animate-pulse' :
-                         'bg-red-500'
+                         profile.status === 'approved' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' :
+                         profile.status === 'pending' ? 'bg-amber-500 animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.5)]' :
+                         'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'
                        }`} />
-                       <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                         {profile.status === 'approved' ? 'Aprovado' :
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                         {profile.status === 'approved' ? 'Ativo' :
                           profile.status === 'pending' ? 'Pendente' :
                           'Bloqueado'}
                        </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
-                    <div className="flex items-center gap-1">
-                      <Clock size={14} />
+                  <td className="px-8 py-5 text-xs text-slate-500 font-bold uppercase tracking-widest">
+                    <div className="flex items-center gap-2">
+                      <Clock size={14} className="text-slate-700" />
                       {new Date(profile.created_at).toLocaleDateString('pt-BR')}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-8 py-5 text-right">
+                    <div className="flex items-center justify-end gap-3">
                       {profile.status === 'pending' && (
                         <button
                           onClick={() => updateStatus(profile.id, 'approved')}
-                          className="p-2 bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-500/20 rounded-lg transition-colors border border-green-100 dark:border-green-500/20"
+                          className="w-10 h-10 bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white rounded-xl flex items-center justify-center transition-all border border-green-500/10"
                           title="Aprovar Acesso"
                         >
                           <CheckCircle size={18} />
                         </button>
                       )}
                       
-                      {profile.status === 'approved' && profile.role !== 'super_admin' && (
+                      {profile.status === 'approved' && profile.id !== currentUserProfile?.id && (
                         <button
                           onClick={() => updateStatus(profile.id, 'blocked')}
-                          className="p-2 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-lg transition-colors border border-amber-100 dark:border-amber-500/20"
+                          className="w-10 h-10 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white rounded-xl flex items-center justify-center transition-all border border-amber-500/10"
                           title="Bloquear Acesso"
                         >
                           <XCircle size={18} />
@@ -173,17 +173,17 @@ export default function AdminManagement() {
                       {profile.status === 'blocked' && (
                         <button
                           onClick={() => updateStatus(profile.id, 'approved')}
-                          className="p-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 rounded-lg transition-colors border border-blue-100 dark:border-blue-500/20"
+                          className="w-10 h-10 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-xl flex items-center justify-center transition-all border border-blue-500/10"
                           title="Desbloquear Acesso"
                         >
                           <Shield size={18} />
                         </button>
                       )}
 
-                      {profile.role !== 'super_admin' && (
+                      {profile.id !== currentUserProfile?.id && (
                         <button
                           onClick={() => deleteAdmin(profile.id)}
-                          className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 rounded-lg transition-colors border border-red-100 dark:border-red-500/20"
+                          className="w-10 h-10 bg-red-500/5 text-slate-600 hover:text-red-500 rounded-xl flex items-center justify-center transition-all"
                           title="Remover"
                         >
                           <Trash2 size={18} />

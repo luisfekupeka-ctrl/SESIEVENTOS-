@@ -42,19 +42,29 @@ export default function AdminCategories() {
     setLoading(false);
   };
 
+  const [isAdding, setIsAdding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategory.trim()) return;
     
-    const { error } = await supabase
-      .from('categories')
-      .insert([{ name: newCategory.trim() }]);
+    setIsAdding(true);
+    setError(null);
+    try {
+      const { error: insertError } = await supabase
+        .from('categories')
+        .insert([{ name: newCategory.trim() }]);
 
-    if (error) {
-      console.error("Erro ao adicionar categoria:", error);
-    } else {
+      if (insertError) throw insertError;
+      
       setNewCategory('');
       fetchCategories();
+    } catch (err: any) {
+      console.error("Erro ao adicionar categoria:", err);
+      setError(err.message || "Erro ao adicionar categoria.");
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -107,78 +117,88 @@ export default function AdminCategories() {
   if (loading) return <div className="p-8 text-center text-slate-500 dark:text-slate-400 font-medium animate-pulse">Carregando...</div>;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Gerenciar Categorias</h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Crie e edite as categorias dos eventos.</p>
+          <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Gerenciar Categorias</h1>
+          <p className="text-slate-500 font-bold">Crie e edite as categorias dos eventos.</p>
         </div>
         {categories.length === 0 && (
           <button
             onClick={seedCategories}
-            className="text-sm font-bold text-[#0054A6] dark:text-blue-400 hover:underline"
+            className="text-xs font-black text-yellow-500 uppercase tracking-widest hover:underline"
           >
             Carregar categorias padrão
           </button>
         )}
       </div>
 
-      <div className="bg-white dark:bg-[#0F172A] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-          <form onSubmit={handleAdd} className="flex gap-4">
-            <input
-              type="text"
-              placeholder="Nome da nova categoria..."
-              className="flex-grow px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0054A6]/20 dark:focus:ring-blue-500/20 focus:border-[#0054A6] dark:focus:border-blue-500 transition-all text-slate-900 dark:text-white"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="bg-[#0054A6] dark:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-[#004080] dark:hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-lg shadow-blue-500/20"
-            >
-              <Plus size={20} /> Adicionar
-            </button>
+      <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
+        <div className="p-10 border-b border-white/5 bg-white/[0.01]">
+          <form onSubmit={handleAdd} className="flex flex-col gap-6">
+            <div className="flex gap-4">
+              <input
+                type="text"
+                placeholder="Nome da nova categoria..."
+                className="flex-grow px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold placeholder:text-slate-700"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                disabled={isAdding}
+              />
+              <button
+                type="submit"
+                disabled={isAdding || !newCategory.trim()}
+                className="bg-yellow-500 text-black px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)] flex items-center gap-3 disabled:opacity-50"
+              >
+                {isAdding ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />} 
+                {isAdding ? 'Sincronizando...' : 'Adicionar'}
+              </button>
+            </div>
+            {error && (
+              <p className="text-sm text-red-500 font-bold flex items-center gap-2">
+                <AlertTriangle size={18} /> {error}
+              </p>
+            )}
           </form>
         </div>
 
-        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        <div className="divide-y divide-white/5">
           {categories.map(cat => (
-            <div key={cat.id} className="p-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors">
+            <div key={cat.id} className="p-8 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
               {editingId === cat.id ? (
-                <div className="flex-grow flex gap-4 mr-4">
+                <div className="flex-grow flex gap-4 mr-4 animate-in fade-in slide-in-from-left-4 duration-300">
                   <input
                     type="text"
-                    className="flex-grow px-4 py-2 bg-white dark:bg-slate-800 border border-[#0054A6] dark:border-blue-500 rounded-lg focus:outline-none text-slate-900 dark:text-white"
+                    className="flex-grow px-6 py-3 bg-white/5 border border-yellow-500 rounded-xl focus:outline-none text-white font-bold"
                     value={editingName}
                     onChange={(e) => setEditingName(e.target.value)}
                     autoFocus
                   />
-                  <button onClick={handleSaveEdit} className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg transition-colors">
-                    <Check size={20} />
+                  <button onClick={handleSaveEdit} className="w-12 h-12 bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white rounded-xl flex items-center justify-center transition-all">
+                    <Check size={24} />
                   </button>
-                  <button onClick={() => setEditingId(null)} className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors">
-                    <X size={20} />
+                  <button onClick={() => setEditingId(null)} className="w-12 h-12 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl flex items-center justify-center transition-all">
+                    <X size={24} />
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-[#0054A6]/5 dark:bg-blue-500/10 rounded-xl flex items-center justify-center text-[#0054A6] dark:text-blue-400">
-                      <Tags size={20} />
+                  <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 bg-yellow-500/5 text-yellow-500 rounded-2xl flex items-center justify-center border border-yellow-500/10 group-hover:scale-110 transition-transform">
+                      <Tags size={24} />
                     </div>
-                    <span className="text-lg font-bold text-slate-900 dark:text-slate-100">{cat.name}</span>
+                    <span className="text-xl font-black text-white tracking-tight">{cat.name}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => handleEdit(cat)}
-                      className="p-2 text-slate-400 dark:text-slate-500 hover:text-[#0054A6] dark:hover:text-blue-400 hover:bg-[#0054A6]/5 dark:hover:bg-blue-500/10 rounded-lg transition-all"
+                      className="w-12 h-12 bg-white/5 text-slate-500 hover:text-blue-400 rounded-xl flex items-center justify-center transition-all border border-white/5"
                     >
                       <Edit2 size={20} />
                     </button>
                     <button
                       onClick={() => setDeleteId(cat.id)}
-                      className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all"
+                      className="w-12 h-12 bg-white/5 text-slate-500 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-white/5"
                     >
                       <Trash2 size={20} />
                     </button>
@@ -188,8 +208,8 @@ export default function AdminCategories() {
             </div>
           ))}
           {categories.length === 0 && (
-            <div className="p-12 text-center text-slate-400 dark:text-slate-500 font-medium">
-              Nenhuma categoria cadastrada.
+            <div className="p-20 text-center text-slate-700 font-black text-xl uppercase tracking-widest">
+              Nenhuma categoria catalogada.
             </div>
           )}
         </div>
@@ -197,24 +217,27 @@ export default function AdminCategories() {
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0F172A] w-full max-w-md rounded-3xl shadow-2xl p-8 animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-4">Confirmar Exclusão</h3>
-            <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
-              Tem certeza que deseja excluir esta categoria? Esta ação não pode ser desfeita.
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#0A0A0A] w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in fade-in zoom-in duration-300 border border-white/10">
+            <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+              <Trash2 size={32} />
+            </div>
+            <h3 className="text-3xl font-black text-white text-center mb-4 tracking-tight">Confirmar Exclusão</h3>
+            <p className="text-slate-400 text-center mb-10 font-bold text-lg leading-relaxed">
+              Deseja remover esta categoria? Esta ação pode impactar eventos vinculados.
             </p>
             <div className="flex gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-grow py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                className="flex-grow py-4 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
               >
-                Cancelar
+                Voltar
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-grow py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                className="flex-grow py-4 bg-red-600 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
               >
-                Excluir
+                Sim, Excluir
               </button>
             </div>
           </div>

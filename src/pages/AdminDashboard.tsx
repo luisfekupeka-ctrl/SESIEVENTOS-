@@ -236,67 +236,67 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Painel de Controle</h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Visão geral do sistema de eventos SESI.</p>
+          <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Painel de Controle</h1>
+          <p className="text-slate-500 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-4">
           <button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-3 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all border border-white/5 disabled:opacity-50"
           >
-            <Clock size={18} />
+            <Clock size={18} className="text-yellow-500" />
             Atualizar
           </button>
           <button
             onClick={seedData}
             disabled={isResetting || loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold rounded-xl hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors border border-blue-100 dark:border-blue-500/20 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-3 bg-blue-500/10 text-blue-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-blue-500/20 transition-all border border-blue-500/20 disabled:opacity-50"
           >
             <TrendingUp size={18} />
-            Gerar Dados de Teste
+            Gerar Dados
           </button>
           <button
             onClick={() => setShowResetConfirm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-bold rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors border border-red-100 dark:border-red-500/20"
+            className="flex items-center gap-2 px-6 py-3 bg-red-500/10 text-red-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-500/20 transition-all border border-red-500/20"
           >
             <Trash2 size={18} />
-            Resetar Sistema
+            Resetar
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl flex items-center gap-3 text-red-700 dark:text-red-400">
-          <AlertTriangle size={20} />
-          <p className="font-medium">{error}</p>
+        <div className="p-5 bg-red-500/10 border border-red-500/20 rounded-[2rem] flex items-center gap-4 text-red-400">
+          <AlertTriangle size={24} />
+          <p className="font-bold">{error}</p>
         </div>
       )}
 
       {showResetConfirm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-300 border border-slate-200 dark:border-slate-800">
-            <div className="w-16 h-16 bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-              <AlertTriangle size={32} />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-[#0A0A0A] rounded-[3rem] p-10 max-w-md w-full shadow-2xl border border-white/10">
+            <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-[2rem] flex items-center justify-center mb-8 mx-auto shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+              <AlertTriangle size={40} />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white text-center mb-2">Atenção!</h2>
-            <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
-              Esta ação irá apagar <strong>TODOS</strong> os eventos, alunos e inscrições permanentemente. Deseja continuar?
+            <h2 className="text-3xl font-black text-white text-center mb-4">Atenção Crítica!</h2>
+            <p className="text-slate-400 text-center mb-10 font-bold leading-relaxed text-lg">
+              Esta ação irá apagar <span className="text-red-500 underline uppercase">todos</span> os dados permanentemente. Tem certeza absoluta?
             </p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <button
                 onClick={() => setShowResetConfirm(false)}
-                className="py-3 px-6 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                className="py-4 px-6 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleReset}
                 disabled={isResetting}
-                className="py-3 px-6 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20 disabled:opacity-50"
+                className="py-4 px-6 bg-red-600 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20 disabled:opacity-50"
               >
                 {isResetting ? 'Limpando...' : 'Sim, Resetar'}
               </button>
@@ -305,68 +305,46 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {feedback && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-300 text-center border border-slate-200 dark:border-slate-800">
-            <div className={`w-16 h-16 ${feedback.type === 'success' ? 'bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400'} rounded-2xl flex items-center justify-center mb-6 mx-auto`}>
-              {feedback.type === 'success' ? <TrendingUp size={32} /> : <AlertTriangle size={32} />}
-            </div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">
-              {feedback.type === 'success' ? 'Sucesso!' : 'Erro'}
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">
-              {feedback.message}
-            </p>
-            <button
-              onClick={() => setFeedback(null)}
-              className="w-full py-3 bg-slate-900 dark:bg-slate-800 text-white font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-700 transition-all"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-[#0F172A] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4 transition-colors">
-            <div className={`w-12 h-12 ${stat.color} text-white rounded-xl flex items-center justify-center shadow-lg`}>
+          <div key={i} className="bg-[#0A0A0A] p-8 rounded-[2rem] border border-white/5 shadow-xl flex flex-col gap-6 transition-all hover:border-yellow-500/20 group">
+            <div className={`w-14 h-14 ${stat.color} text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
               {stat.icon}
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{stat.label}</p>
-              <p className="text-2xl font-black text-slate-900 dark:text-white">{stat.value}</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
+              <p className="text-4xl font-black text-white tracking-tight">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Recent Events */}
-        <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">Eventos Recentes</h3>
-            <Link to="/admin/events" className="text-sm font-bold text-[#0054A6] dark:text-blue-400 hover:underline">Ver todos</Link>
+        <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-xl overflow-hidden transition-all hover:border-blue-500/20">
+          <div className="p-8 border-b border-white/5 flex items-center justify-between">
+            <h3 className="text-xl font-black text-white">Eventos Recentes</h3>
+            <Link to="/admin/events" className="text-xs font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 transition-colors">Ver todos</Link>
           </div>
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
+          <div className="divide-y divide-white/5">
             {events.slice(0, 5).map(event => (
-              <div key={event.id} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
+              <div key={event.id} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-white/5 border border-white/10">
                     <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900 dark:text-white">{event.name}</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{format(new Date(event.start_date), "dd/MM/yyyy")}</p>
-                      <span className="text-[10px] font-black px-1.5 py-0.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-md">
+                    <p className="text-lg font-black text-white mb-1">{event.name}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-xs font-bold text-slate-500">{format(new Date(event.start_date), "dd/MM/yyyy")}</p>
+                      <span className="text-[10px] font-black px-2.5 py-1 bg-blue-500/10 text-blue-400 rounded-lg uppercase tracking-widest">
                         {event.registration_count || 0} inscritos
                       </span>
                     </div>
                   </div>
                 </div>
-                <Link to={`/admin/events`} className="text-slate-400 dark:text-slate-500 hover:text-[#0054A6] dark:hover:text-blue-400 transition-colors">
+                <Link to={`/admin/events`} className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500 hover:text-yellow-500 transition-colors">
                   <ChevronRight size={20} />
                 </Link>
               </div>
@@ -375,29 +353,29 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Registrations */}
-        <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">Últimas Inscrições</h3>
+        <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-xl overflow-hidden transition-all hover:border-yellow-500/20">
+          <div className="p-8 border-b border-white/5 flex items-center justify-between">
+            <h3 className="text-xl font-black text-white">Últimas Inscrições</h3>
           </div>
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
+          <div className="divide-y divide-white/5">
             {recentRegistrations.map(reg => {
               const student = (reg as any).students;
               return (
-                <div key={reg.id} className="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#0054A6]/10 dark:bg-blue-500/10 flex items-center justify-center text-[#0054A6] dark:text-blue-400">
-                      <Users size={20} />
+                <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-full bg-yellow-500/5 flex items-center justify-center text-yellow-500 border border-yellow-500/10">
+                      <Users size={24} />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-slate-900 dark:text-white">{student?.name} {student?.surname}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Inscrito em: {events.find(e => e.id === reg.event_id)?.name}</p>
+                      <p className="text-lg font-black text-white mb-1">{student?.name} {student?.surname}</p>
+                      <p className="text-xs font-bold text-slate-500">Inscrito em: <span className="text-yellow-500/70">{events.find(e => e.id === reg.event_id)?.name}</span></p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    <p className="text-xs font-black text-white uppercase tracking-widest">
                       {format(new Date(reg.timestamp), "HH:mm", { locale: ptBR })}
                     </p>
-                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
                       {format(new Date(reg.timestamp), "dd/MM", { locale: ptBR })}
                     </p>
                   </div>

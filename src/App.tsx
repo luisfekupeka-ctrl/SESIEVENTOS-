@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Layout } from './components/Layout';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import Home from './pages/Home';
 import EventDetails from './pages/EventDetails';
 import AdminLogin from './pages/AdminLogin';
@@ -26,10 +27,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 const SuperProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { loading, isAdmin, profile } = useAuth();
+  const { loading, isAdmin } = useAuth();
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
-  if (!isAdmin || profile?.role !== 'super_admin') return <Navigate to="/admin" />;
+  if (!isAdmin) return <Navigate to="/admin" />;
 
   return <>{children}</>;
 };
@@ -37,30 +38,32 @@ const SuperProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/event/:id" element={<EventDetails />} />
-              <Route path="/login" element={<AdminLogin />} />
-              
-              {/* Admin Routes */}
-              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/calendar" element={<ProtectedRoute><AdminCalendar /></ProtectedRoute>} />
-              <Route path="/admin/events" element={<ProtectedRoute><AdminEvents /></ProtectedRoute>} />
-              <Route path="/admin/events/:id/registrations" element={<ProtectedRoute><AdminEventRegistrations /></ProtectedRoute>} />
-              <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
-              <Route path="/admin/students" element={<ProtectedRoute><AdminStudents /></ProtectedRoute>} />
-              <Route path="/admin/collaborators" element={<ProtectedRoute><AdminCollaborators /></ProtectedRoute>} />
-              <Route path="/admin/responsible" element={<ProtectedRoute><AdminResponsible /></ProtectedRoute>} />
-              <Route path="/admin/management" element={<SuperProtectedRoute><AdminManagement /></SuperProtectedRoute>} />
-              
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </Layout>
-        </Router>
-      </AuthProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <Router>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/event/:id" element={<EventDetails />} />
+                <Route path="/login" element={<AdminLogin />} />
+                
+                {/* Admin Routes */}
+                <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin/calendar" element={<ProtectedRoute><AdminCalendar /></ProtectedRoute>} />
+                <Route path="/admin/events" element={<ProtectedRoute><AdminEvents /></ProtectedRoute>} />
+                <Route path="/admin/events/:id/registrations" element={<ProtectedRoute><AdminEventRegistrations /></ProtectedRoute>} />
+                <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
+                <Route path="/admin/students" element={<ProtectedRoute><AdminStudents /></ProtectedRoute>} />
+                <Route path="/admin/collaborators" element={<ProtectedRoute><AdminCollaborators /></ProtectedRoute>} />
+                <Route path="/admin/responsible" element={<ProtectedRoute><AdminResponsible /></ProtectedRoute>} />
+                <Route path="/admin/management" element={<SuperProtectedRoute><AdminManagement /></SuperProtectedRoute>} />
+                
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </Layout>
+          </Router>
+        </AuthProvider>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 }

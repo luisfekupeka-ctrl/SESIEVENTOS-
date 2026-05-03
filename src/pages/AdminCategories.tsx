@@ -126,7 +126,7 @@ export default function AdminCategories() {
         {categories.length === 0 && (
           <button
             onClick={seedCategories}
-            className="text-xs font-black text-yellow-500 uppercase tracking-widest hover:underline"
+            className="text-xs font-black text-sky-500 uppercase tracking-widest hover:underline"
           >
             Carregar categorias padrão
           </button>
@@ -140,7 +140,7 @@ export default function AdminCategories() {
               <input
                 type="text"
                 placeholder="Nome da nova categoria..."
-                className="flex-grow px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold placeholder:text-slate-700"
+                className="flex-grow px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
                 disabled={isAdding}
@@ -148,7 +148,7 @@ export default function AdminCategories() {
               <button
                 type="submit"
                 disabled={isAdding || !newCategory.trim()}
-                className="bg-yellow-500 text-black px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)] flex items-center gap-3 disabled:opacity-50"
+                className="bg-sky-500 text-black px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)] flex items-center gap-3 disabled:opacity-50"
               >
                 {isAdding ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />} 
                 {isAdding ? 'Sincronizando...' : 'Adicionar'}
@@ -169,7 +169,7 @@ export default function AdminCategories() {
                 <div className="flex-grow flex gap-4 mr-4 animate-in fade-in slide-in-from-left-4 duration-300">
                   <input
                     type="text"
-                    className="flex-grow px-6 py-3 bg-white/5 border border-yellow-500 rounded-xl focus:outline-none text-white font-bold"
+                    className="flex-grow px-6 py-3 bg-white/5 border border-sky-500 rounded-xl focus:outline-none text-white font-bold"
                     value={editingName}
                     onChange={(e) => setEditingName(e.target.value)}
                     autoFocus
@@ -184,7 +184,7 @@ export default function AdminCategories() {
               ) : (
                 <>
                   <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 bg-yellow-500/5 text-yellow-500 rounded-2xl flex items-center justify-center border border-yellow-500/10 group-hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 bg-sky-500/5 text-sky-500 rounded-2xl flex items-center justify-center border border-sky-500/10 group-hover:scale-110 transition-transform">
                       <Tags size={24} />
                     </div>
                     <span className="text-xl font-black text-white tracking-tight">{cat.name}</span>

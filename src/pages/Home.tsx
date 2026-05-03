@@ -69,7 +69,7 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-5xl md:text-8xl font-black text-white mb-8 leading-[1.1] tracking-tighter"
           >
-            Explore os <span className="text-yellow-500 shadow-yellow-500/20">Eventos</span> <br/>
+            Explore os <span className="text-sky-500 shadow-sky-500/20">Eventos</span> <br/>
             do <span className="text-blue-500">SESI</span>
           </motion.h1>
           <motion.p
@@ -85,13 +85,13 @@ export default function Home() {
 
       {/* Search and Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20">
-        <div className="bg-[#0A0A0A]/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/10 p-8 flex flex-col md:flex-row gap-6 items-center transition-all hover:border-yellow-500/20">
+        <div className="bg-[#0A0A0A]/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/10 p-8 flex flex-col md:flex-row gap-6 items-center transition-all hover:border-sky-500/20">
           <div className="relative flex-grow w-full">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-500" size={24} />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500" size={24} />
             <input
               type="text"
               placeholder="Pesquisar eventos por nome ou descrição..."
-              className="w-full pl-14 pr-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold placeholder:text-slate-600"
+              className="w-full pl-14 pr-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-600"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -99,9 +99,9 @@ export default function Home() {
           
           <div className="flex items-center gap-4 w-full md:w-auto">
             <div className="relative flex-grow md:w-80">
-              <Filter className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-500" size={20} />
+              <Filter className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500" size={20} />
               <select
-                className="w-full pl-14 pr-10 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all appearance-none cursor-pointer text-white font-bold"
+                className="w-full pl-14 pr-10 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all appearance-none cursor-pointer text-white font-bold"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -110,7 +110,7 @@ export default function Home() {
                   <option key={cat.id} value={cat.id} className="bg-black text-white">{cat.name}</option>
                 ))}
               </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-yellow-500">
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-sky-500">
                 <Filter size={16} className="rotate-90" />
               </div>
             </div>

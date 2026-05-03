@@ -166,6 +166,7 @@ export default function EventDetails() {
               animate={{ opacity: 1, x: 0 }}
               onClick={() => navigate('/')}
               className="mb-8 flex items-center gap-2 text-white/60 hover:text-yellow-500 font-bold transition-all"
+              className="mb-8 flex items-center gap-2 text-white/60 hover:text-sky-500 font-bold transition-all"
             >
               <ChevronLeft size={20} /> Voltar para o início
             </motion.button>
@@ -174,12 +175,12 @@ export default function EventDetails() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-wrap gap-3 mb-6"
             >
-              <span className="bg-yellow-500 text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(234,179,8,0.4)]">
+              <span className="bg-sky-500 text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(14,165,233,0.4)]">
                 {category?.name || 'Evento'}
               </span>
               {event.password_protected && (
                 <span className="bg-white/10 backdrop-blur-md text-white text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 border border-white/10">
-                  <Lock size={12} className="text-yellow-500" /> Protegido
+                  <Lock size={12} className="text-sky-500" /> Protegido
                 </span>
               )}
             </motion.div>
@@ -201,7 +202,7 @@ export default function EventDetails() {
           <div className="lg:col-span-2 space-y-16">
             <section className="bg-[#0A0A0A]/80 backdrop-blur-xl p-10 rounded-[2.5rem] border border-white/5 shadow-2xl">
               <h2 className="text-3xl font-black text-white mb-8 flex items-center gap-4">
-                <div className="w-2 h-10 bg-yellow-500 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.5)]"></div>
+                <div className="w-2 h-10 bg-sky-500 rounded-full shadow-[0_0_15px_rgba(14,165,233,0.5)]"></div>
                 Sobre o Evento
               </h2>
               <div className="prose prose-invert max-w-none text-slate-400 leading-relaxed text-xl font-medium">
@@ -210,12 +211,12 @@ export default function EventDetails() {
             </section>
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-yellow-500/20 group">
-                <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
+              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-sky-500/20 group">
+                <div className="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-500 group-hover:scale-110 transition-transform">
                   <Calendar size={32} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-yellow-500/50 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
+                  <h4 className="text-xs font-black text-sky-500/50 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
                   <p className="text-white text-2xl font-black">
                     {(() => {
                       try {
@@ -231,20 +232,15 @@ export default function EventDetails() {
                 </div>
               </div>
 
-              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-blue-500/20 group">
-                <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-sky-500/20 group">
+                <div className="w-16 h-16 bg-sky-500/10 text-sky-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg border border-sky-500/10 group-hover:scale-110 transition-transform">
                   <Users size={32} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-blue-400/50 uppercase tracking-[0.2em] mb-2">Público Alvo</h4>
-                  <p className="text-white text-2xl font-black line-clamp-1">
-                    {(event.restrictions as any).type === 'all' ? 'Aberto para todos' : 'Público Restrito'}
+                  <h4 className="text-xs font-black text-sky-400/50 uppercase tracking-[0.2em] mb-2">Vagas</h4>
+                  <p className="text-3xl font-black text-white tracking-tight">
+                    {event.registration_count || 0} / {event.max_capacity}
                   </p>
-                  {(event.restrictions as any).type !== 'all' && (
-                    <p className="text-slate-400 text-lg font-bold mt-1 line-clamp-1">
-                      {(event.restrictions as any).values.join(', ')}
-                    </p>
-                  )}
                 </div>
               </div>
             </section>
@@ -252,7 +248,7 @@ export default function EventDetails() {
 
           {/* Right Column: Registration Form */}
           <div className="lg:col-span-1">
-            <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl p-10 sticky top-28 transition-all hover:border-yellow-500/10">
+            <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl p-10 sticky top-28 transition-all hover:border-sky-500/10">
               <AnimatePresence mode="wait">
                 {registrationSuccess ? (
                   <motion.div
@@ -261,16 +257,14 @@ export default function EventDetails() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center py-12"
                   >
-                    <div className="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
-                      <CheckCircle2 size={48} />
+                    <div className="w-20 h-20 bg-sky-500/10 text-sky-500 rounded-[1.5rem] flex items-center justify-center mb-8 mx-auto shadow-lg border border-sky-500/10">
+                      <CheckCircle2 size={40} />
                     </div>
-                    <h3 className="text-3xl font-black text-white mb-4">Inscrição Realizada!</h3>
-                    <p className="text-slate-400 font-bold mb-10 text-lg leading-relaxed">
-                      Sua participação no evento foi confirmada com sucesso.
-                    </p>
+                    <h2 className="text-4xl font-black text-white mb-4 tracking-tight">Inscrição Realizada!</h2>
+                    <p className="text-slate-400 mb-10 font-bold text-lg">Seu lugar está garantido. Enviamos os detalhes para o seu registro interno.</p>
                     <button
                       onClick={() => navigate('/')}
-                      className="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)] text-xl"
+                      className="w-full py-5 bg-sky-500 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-sky-400 transition-all shadow-xl"
                     >
                       Voltar para o Início
                     </button>
@@ -288,14 +282,14 @@ export default function EventDetails() {
                       <div className="mb-10 space-y-3">
                         <div className="flex justify-between text-xs font-black text-slate-400 uppercase tracking-widest">
                           <span>Vagas Preenchidas</span>
-                          <span className="text-yellow-500">{event.registration_count || 0} / {event.max_capacity}</span>
+                          <span className="text-sky-500">{event.registration_count || 0} / {event.max_capacity}</span>
                         </div>
                         <div className="w-full bg-white/5 h-3 rounded-full overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(((event.registration_count || 0) / event.max_capacity) * 100, 100)}%` }}
                             className={`h-full transition-all duration-1000 ${
-                              (event.registration_count || 0) >= event.max_capacity ? 'bg-red-500' : 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]'
+                              (event.registration_count || 0) >= event.max_capacity ? 'bg-red-500' : 'bg-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]'
                             }`}
                           />
                         </div>
@@ -324,7 +318,7 @@ export default function EventDetails() {
                         <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Tipo de Participante</label>
                         <select
                           required
-                          className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold appearance-none"
+                          className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
                           value={participantType}
                           onChange={(e) => setParticipantType(e.target.value as any)}
                         >
@@ -339,20 +333,20 @@ export default function EventDetails() {
                       {(event.form_fields as any[]).map((field) => (
                         <div key={field.id} className="space-y-2">
                           <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
-                            {field.label} {field.required && <span className="text-yellow-500">*</span>}
+                            {field.label} {field.required && <span className="text-sky-500">*</span>}
                           </label>
                           {field.type === 'text' ? (
                             <input
                               type="text"
                               required={field.required}
                               placeholder={`Seu ${field.label.toLowerCase()}`}
-                              className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold placeholder:text-slate-700"
+                              className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
                               onChange={(e) => setFormData({ ...formData, [field.label.toLowerCase()]: e.target.value })}
                             />
                           ) : (
                             <select
                               required={field.required}
-                              className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold appearance-none"
+                              className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
                               onChange={(e) => setFormData({ ...formData, [field.label.toLowerCase()]: e.target.value })}
                             >
                               <option value="">Selecione o(a) {field.label.toLowerCase()}</option>
@@ -377,7 +371,7 @@ export default function EventDetails() {
 
                       {event.password_protected && (
                         <div className="space-y-3 pt-6 border-t border-white/5">
-                          <label className="text-xs font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                          <label className="text-xs font-black text-sky-500 uppercase tracking-widest flex items-center gap-2">
                             <Lock size={14} /> Senha de Acesso
                           </label>
                           <input
@@ -385,7 +379,7 @@ export default function EventDetails() {
                             required
                             placeholder="Digite a senha do evento"
                             className={`w-full px-5 py-4 bg-white/5 border rounded-2xl focus:outline-none focus:ring-2 transition-all font-bold ${
-                              passwordError ? 'border-red-500 focus:ring-red-500/50' : 'border-white/10 focus:ring-yellow-500/50 focus:border-yellow-500'
+                              passwordError ? 'border-red-500 focus:ring-red-500/50' : 'border-white/10 focus:ring-sky-500/50 focus:border-sky-500'
                             }`}
                             value={eventPassword}
                             onChange={(e) => {
@@ -405,14 +399,15 @@ export default function EventDetails() {
 
                       <button
                         type="submit"
-                        disabled={isRegistering}
-                        className="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl hover:bg-yellow-400 transition-all shadow-[0_0_30px_rgba(234,179,8,0.3)] flex items-center justify-center gap-3 disabled:opacity-50 text-xl mt-4"
+                        disabled={submitting}
+                        className="w-full bg-sky-500 hover:bg-sky-400 text-black font-black uppercase tracking-[0.2em] text-sm py-6 px-10 rounded-[2rem] transition-all flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(14,165,233,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                       >
-                        {isRegistering ? (
-                          <div className="w-6 h-6 border-3 border-black border-t-transparent rounded-full animate-spin"></div>
+                        {submitting ? (
+                          <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
                         ) : (
                           <>
-                            <Send size={22} /> Confirmar Inscrição
+                            <CheckCircle2 size={24} />
+                            Confirmar Inscrição Gratuita
                           </>
                         )}
                       </button>

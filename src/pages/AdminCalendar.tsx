@@ -138,13 +138,13 @@ export default function AdminCalendar() {
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] md:text-sm font-black tracking-tighter ${
                     !isSelectedMonth ? 'text-slate-800' : 
-                    isToday ? 'bg-yellow-500 text-black w-5 h-5 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.4)]' : 
+                    isToday ? 'bg-sky-500 text-black w-5 h-5 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(14,165,233,0.4)]' : 
                     'text-white'
                   }`}>
                     {format(day, 'd')}
                   </span>
                   {dayEvents.length > 0 && isSelectedMonth && (
-                    <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
+                    <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.8)]" />
                   )}
                 </div>
                 
@@ -152,14 +152,14 @@ export default function AdminCalendar() {
                 <div className="flex-grow flex flex-col gap-1 md:gap-2 overflow-y-auto max-h-[40px] md:max-h-[90px] custom-scrollbar pr-0.5">
                   <div className="flex flex-wrap gap-0.5 md:hidden">
                     {dayEvents.map(e => (
-                      <div key={e.id} className="w-1 h-1 rounded-full bg-yellow-500/50" />
+                      <div key={e.id} className="w-1 h-1 rounded-full bg-sky-500/50" />
                     ))}
                   </div>
                   <div className="hidden md:flex flex-col gap-2">
                     {dayEvents.map(event => (
                       <Link key={event.id} to={`/admin/events`} className="group">
-                        <div className="px-3 py-2 bg-white/[0.03] border-l-2 border-yellow-500 rounded-lg flex flex-col gap-1 hover:bg-white/[0.06] transition-all group-hover:translate-x-1">
-                          <p className="text-[10px] font-black text-white truncate leading-tight uppercase tracking-tight group-hover:text-yellow-500 transition-colors">
+                        <div className="px-3 py-2 bg-white/[0.03] border-l-2 border-sky-500 rounded-lg flex flex-col gap-1 hover:bg-white/[0.06] transition-all group-hover:translate-x-1">
+                          <p className="text-[10px] font-black text-white truncate leading-tight uppercase tracking-tight group-hover:text-sky-500 transition-colors">
                             {event.name}
                           </p>
                           <div className="flex items-center gap-1.5 text-[8px] text-slate-500 font-bold uppercase tracking-widest">

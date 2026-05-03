@@ -57,7 +57,7 @@ export default function AdminLogin() {
         <div className="text-center mb-12">
           <motion.div 
             whileHover={{ scale: 1.1, rotate: 5 }}
-            className="w-24 h-24 bg-yellow-500 rounded-3xl flex items-center justify-center text-black font-black text-5xl mx-auto mb-8 shadow-[0_0_30px_rgba(234,179,8,0.3)]"
+            className="w-24 h-24 bg-sky-500 rounded-3xl flex items-center justify-center text-black font-black text-5xl mx-auto mb-8 shadow-[0_0_30px_rgba(14,165,233,0.3)]"
           >
             S
           </motion.div>
@@ -156,7 +156,7 @@ export default function AdminLogin() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoggingIn}
-            className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black uppercase tracking-widest text-xs py-5 px-8 rounded-2xl shadow-[0_0_30px_rgba(234,179,8,0.3)] transition-all flex items-center justify-center gap-4 disabled:opacity-50 mt-4"
+            className="w-full bg-sky-500 hover:bg-sky-400 text-black font-black uppercase tracking-widest text-xs py-5 px-8 rounded-2xl shadow-[0_0_30px_rgba(14,165,233,0.3)] transition-all flex items-center justify-center gap-4 disabled:opacity-50 mt-4"
           >
             {isLoggingIn ? (
               <Loader2 className="animate-spin" size={24} />
@@ -176,7 +176,7 @@ export default function AdminLogin() {
               setIsRegistering(!isRegistering);
               setError(null);
             }}
-            className="text-white/40 hover:text-yellow-500 font-black uppercase tracking-widest text-[10px] transition-colors"
+            className="text-white/40 hover:text-sky-500 font-black uppercase tracking-widest text-[10px] transition-colors"
           >
             {isRegistering 
               ? 'Já sou administrador? Logar' 

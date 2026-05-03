@@ -248,7 +248,7 @@ export default function AdminDashboard() {
             disabled={loading}
             className="flex items-center gap-2 px-6 py-3 bg-white/5 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-white/10 transition-all border border-white/5 disabled:opacity-50"
           >
-            <Clock size={18} className="text-yellow-500" />
+            <Clock size={18} className="text-sky-500" />
             Atualizar
           </button>
           <button
@@ -308,7 +308,7 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-[#0A0A0A] p-8 rounded-[2rem] border border-white/5 shadow-xl flex flex-col gap-6 transition-all hover:border-yellow-500/20 group">
+          <div key={i} className="bg-[#0A0A0A] p-8 rounded-[2rem] border border-white/5 shadow-xl flex flex-col gap-6 transition-all hover:border-sky-500/20 group">
             <div className={`w-14 h-14 ${stat.color} text-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
               {stat.icon}
             </div>
@@ -352,7 +352,7 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
-                <Link to={`/admin/events`} className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500 hover:text-yellow-500 transition-colors">
+                <Link to={`/admin/events`} className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-slate-500 hover:text-sky-500 transition-colors">
                   <ChevronRight size={20} />
                 </Link>
               </div>
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Registrations */}
-        <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-xl overflow-hidden transition-all hover:border-yellow-500/20">
+        <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-xl overflow-hidden transition-all hover:border-sky-500/20">
           <div className="p-8 border-b border-white/5 flex items-center justify-between">
             <h3 className="text-xl font-black text-white">Últimas Inscrições</h3>
           </div>
@@ -371,12 +371,12 @@ export default function AdminDashboard() {
               return (
                 <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
                   <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 rounded-full bg-yellow-500/5 flex items-center justify-center text-yellow-500 border border-yellow-500/10">
+                    <div className="w-14 h-14 rounded-full bg-sky-500/5 flex items-center justify-center text-sky-500 border border-sky-500/10">
                       <Users size={24} />
                     </div>
                     <div>
                       <p className="text-lg font-black text-white mb-1">{student?.name} {student?.surname}</p>
-                      <p className="text-xs font-bold text-slate-500">Inscrito em: <span className="text-yellow-500/70">{events.find(e => e.id === reg.event_id)?.name}</span></p>
+                      <p className="text-xs font-bold text-slate-500">Inscrito em: <span className="text-sky-500/70">{events.find(e => e.id === reg.event_id)?.name}</span></p>
                     </div>
                   </div>
                   <div className="text-right">

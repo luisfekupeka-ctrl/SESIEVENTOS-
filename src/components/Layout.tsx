@@ -32,20 +32,20 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   return (
     <div className="min-h-screen bg-black flex flex-col font-sans transition-colors duration-300">
       {/* Header */}
-      <header className="bg-black/80 backdrop-blur-md border-b border-yellow-500/10 sticky top-0 z-50 transition-colors">
+      <header className="bg-black/80 backdrop-blur-md border-b border-sky-500/10 sticky top-0 z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-yellow-500 rounded-xl flex items-center justify-center text-black font-black text-2xl group-hover:rotate-6 transition-transform shadow-[0_0_20px_rgba(234,179,8,0.3)]">S</div>
-            <span className="text-xl md:text-2xl font-black text-white transition-colors">SESI <span className="text-yellow-500">Eventos</span></span>
+            <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-black font-black text-2xl group-hover:rotate-6 transition-transform shadow-[0_0_20px_rgba(14,165,233,0.3)]">S</div>
+            <span className="text-xl md:text-2xl font-black text-white transition-colors">SESI <span className="text-sky-500">Eventos</span></span>
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link to="/" className={`text-sm font-bold transition-all hover:scale-105 ${location.pathname === '/' ? 'text-yellow-500' : 'text-slate-400 hover:text-white'}`}>
+            <Link to="/" className={`text-sm font-bold transition-all hover:scale-105 ${location.pathname === '/' ? 'text-sky-500' : 'text-slate-400 hover:text-white'}`}>
               Início
             </Link>
             {isAdmin && (
-              <Link to="/admin" className={`text-sm font-bold transition-all hover:scale-105 ${isAdminPath ? 'text-yellow-500' : 'text-slate-400 hover:text-white'}`}>
+              <Link to="/admin" className={`text-sm font-bold transition-all hover:scale-105 ${isAdminPath ? 'text-sky-500' : 'text-slate-400 hover:text-white'}`}>
                 Painel Admin
               </Link>
             )}
@@ -70,7 +70,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-bold text-black bg-yellow-500 hover:bg-yellow-400 rounded-xl transition-all shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-bold text-black bg-sky-500 hover:bg-sky-400 rounded-xl transition-all shadow-[0_0_15px_rgba(14,165,233,0.2)]"
               >
                 <LogIn size={18} />
                 <span className="hidden sm:inline">Admin</span>
@@ -81,7 +81,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {isAdmin && (
               <button 
                 onClick={toggleMobileMenu}
-                className="md:hidden p-2.5 text-slate-400 hover:text-yellow-500 hover:bg-white/5 rounded-xl transition-all"
+                className="md:hidden p-2.5 text-slate-400 hover:text-sky-500 hover:bg-white/5 rounded-xl transition-all"
               >
                 <LayoutDashboard size={20} />
               </button>
@@ -91,10 +91,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         {/* Mobile Sidebar Overlay */}
         {isAdmin && isMobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="md:hidden fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl animate-in fade-in duration-300">
             <div className="p-6 flex flex-col h-full">
               <div className="flex items-center justify-between mb-10">
-                <span className="text-xl font-black text-white">Menu <span className="text-yellow-500">Admin</span></span>
+                <span className="text-xl font-black text-white">Menu <span className="text-sky-500">Admin</span></span>
                 <button onClick={toggleMobileMenu} className="p-3 bg-white/5 rounded-2xl text-slate-400">
                   <LogOut size={20} className="rotate-180" />
                 </button>
@@ -105,12 +105,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label="Calendário" active={location.pathname === '/admin/calendar'} onClick={toggleMobileMenu} />
                 <AdminNavItem to="/admin/events" icon={<Calendar size={18} />} label="Eventos" active={location.pathname === '/admin/events'} onClick={toggleMobileMenu} />
                 <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label="Categorias" active={location.pathname === '/admin/categories'} onClick={toggleMobileMenu} />
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Participantes</div>
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-sky-500/50 uppercase tracking-[0.2em]">Participantes</div>
                 <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label="Alunos" active={location.pathname === '/admin/students'} onClick={toggleMobileMenu} />
                 <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label="Colaboradores" active={location.pathname === '/admin/collaborators'} onClick={toggleMobileMenu} />
                 <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label="Responsáveis" active={location.pathname === '/admin/responsible'} onClick={toggleMobileMenu} />
                 
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Segurança</div>
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-sky-500/50 uppercase tracking-[0.2em]">Segurança</div>
                 <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label="Administradores" active={location.pathname === '/admin/management'} onClick={toggleMobileMenu} />
               </nav>
 
@@ -138,12 +138,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label="Calendário" active={location.pathname === '/admin/calendar'} />
                 <AdminNavItem to="/admin/events" icon={<Calendar size={18} />} label="Eventos" active={location.pathname === '/admin/events'} />
                 <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label="Categorias" active={location.pathname === '/admin/categories'} />
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Participantes</div>
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-sky-500/50 uppercase tracking-[0.2em]">Participantes</div>
                 <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label="Alunos" active={location.pathname === '/admin/students'} />
                 <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label="Colaboradores" active={location.pathname === '/admin/collaborators'} />
                 <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label="Responsáveis" active={location.pathname === '/admin/responsible'} />
                 
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-yellow-500/50 uppercase tracking-[0.2em]">Segurança</div>
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-sky-500/50 uppercase tracking-[0.2em]">Segurança</div>
                 <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label="Administradores" active={location.pathname === '/admin/management'} />
               </nav>
             </aside>
@@ -173,7 +173,7 @@ const AdminNavItem: React.FC<{ to: string; icon: React.ReactNode; label: string;
     to={to}
     className={`flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-all ${
       active
-        ? 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)]'
+        ? 'bg-sky-500 text-black shadow-[0_0_20px_rgba(14,165,233,0.3)]'
         : 'text-slate-400 hover:text-white hover:bg-white/5'
     }`}
   >

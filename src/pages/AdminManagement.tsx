@@ -107,13 +107,13 @@ export default function AdminManagement() {
                 <tr key={profile.id} className="hover:bg-white/[0.01] transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-yellow-500 text-black flex items-center justify-center font-black text-lg shadow-[0_0_20px_rgba(234,179,8,0.2)]">
+                      <div className="w-12 h-12 rounded-2xl bg-sky-500 text-black flex items-center justify-center font-black text-lg shadow-[0_0_20px_rgba(14,165,233,0.2)]">
                         {profile.full_name?.charAt(0) || 'U'}
                       </div>
                       <div>
                         <p className="font-black text-white tracking-tight">{profile.full_name}</p>
                         <p className="text-[10px] text-slate-600 font-bold flex items-center gap-1 uppercase tracking-widest">
-                          <Mail size={12} className="text-yellow-500" />
+                          <Mail size={12} className="text-sky-500" />
                           {profile.email}
                         </p>
                       </div>

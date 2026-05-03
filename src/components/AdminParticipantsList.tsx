@@ -186,7 +186,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           </button>
           <button
             onClick={() => handleOpenModal()}
-            className="bg-yellow-500 text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)] flex items-center gap-3"
+            className="bg-sky-500 text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)] flex items-center gap-3"
           >
             <Plus size={20} /> Novo {labelSingular}
           </button>
@@ -196,11 +196,11 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
       <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
         <div className="p-8 border-b border-white/5 bg-white/[0.01] flex flex-col md:flex-row gap-6">
           <div className="relative flex-grow">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-500" size={24} />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500" size={24} />
             <input
               type="text"
               placeholder={`Buscar ${labelSingular.toLowerCase()} por nome...`}
-              className="w-full pl-14 pr-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold placeholder:text-slate-700"
+              className="w-full pl-14 pr-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -223,7 +223,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 <tr key={participant.id} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 bg-yellow-500/5 text-yellow-500 rounded-2xl flex items-center justify-center font-black text-lg border border-yellow-500/10 group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 bg-sky-500/5 text-sky-500 rounded-2xl flex items-center justify-center font-black text-lg border border-sky-500/10 group-hover:scale-110 transition-transform">
                         {participant.name[0]}{participant.surname[0]}
                       </div>
                       <span className="font-black text-white text-lg tracking-tight">{participant.name} {participant.surname}</span>
@@ -285,7 +285,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                   <input
                     type="text"
                     required
-                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
@@ -295,7 +295,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                   <input
                     type="text"
                     required
-                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
                     value={formData.surname}
                     onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
                   />
@@ -308,7 +308,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Série</label>
                     <select
                       required
-                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold appearance-none"
+                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
                       value={formData.grade}
                       onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
                     >
@@ -322,7 +322,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Turma</label>
                     <select
                       required
-                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold appearance-none"
+                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
                       value={formData.class}
                       onChange={(e) => setFormData({ ...formData, class: e.target.value })}
                     >
@@ -345,7 +345,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 </button>
                 <button
                   type="submit"
-                  className="px-12 py-4 bg-yellow-500 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)]"
+                  className="px-12 py-4 bg-sky-500 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-sky-400 transition-all shadow-[0_0_20px_rgba(14,165,233,0.3)]"
                 >
                   Confirmar e Salvar
                 </button>

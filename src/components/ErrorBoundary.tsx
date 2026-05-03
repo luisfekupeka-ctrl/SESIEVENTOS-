@@ -55,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 sessionStorage.clear();
                 window.location.href = '/';
               }}
-              className="w-full py-5 bg-yellow-500 text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-yellow-400 transition-all shadow-[0_0_30px_rgba(234,179,8,0.3)]"
+              className="w-full py-5 bg-sky-500 text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-sky-400 transition-all shadow-[0_0_30px_rgba(14,165,233,0.3)]"
             >
               Reinicializar e Voltar ao Início
             </button>

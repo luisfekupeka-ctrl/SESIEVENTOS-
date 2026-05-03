@@ -351,11 +351,11 @@ export default function AdminEvents() {
             onClick={() => setShowTemplates(true)}
             className="bg-white/5 text-slate-400 px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white/10 transition-all border border-white/5 flex items-center gap-3"
           >
-            <Bookmark size={20} className="text-yellow-500" /> Modelos
+            <Bookmark size={20} className="text-sky-500" /> Modelos
           </button>
           <button
             onClick={() => handleOpenModal()}
-            className="bg-yellow-500 text-black px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-yellow-400 transition-all shadow-[0_0_20px_rgba(234,179,8,0.3)] flex items-center gap-3"
+            className="flex items-center gap-3 px-8 py-4 bg-sky-500 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-sky-400 transition-all shadow-[0_0_30px_rgba(14,165,233,0.3)]"
           >
             <Plus size={20} /> Novo Evento
           </button>
@@ -364,7 +364,7 @@ export default function AdminEvents() {
 
       <div className="grid grid-cols-1 gap-8">
         {events.map(event => (
-          <div key={event.id} className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden hover:border-yellow-500/20 transition-all flex flex-col md:flex-row group">
+          <div key={event.id} className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden hover:border-sky-500/20 transition-all flex flex-col md:flex-row group">
             <div className="w-full md:w-64 h-64 md:h-auto bg-white/5 flex-shrink-0 relative overflow-hidden">
               <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" referrerPolicy="no-referrer" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent md:hidden"></div>
@@ -372,7 +372,7 @@ export default function AdminEvents() {
             <div className="p-10 flex-grow flex flex-col justify-between relative">
               <div>
                 <div className="flex items-center gap-4 mb-4">
-                  <span className="bg-yellow-500/10 text-yellow-500 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] border border-yellow-500/20">
+                  <span className="bg-sky-500/10 text-sky-500 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] border border-sky-500/20">
                     {categories.find(c => c.id === event.category_id)?.name || 'Sem Categoria'}
                   </span>
                   {event.password_protected && (
@@ -381,11 +381,11 @@ export default function AdminEvents() {
                     </div>
                   )}
                 </div>
-                <h3 className="text-3xl font-black text-white mb-6 group-hover:text-yellow-500 transition-colors tracking-tight">{event.name}</h3>
+                <h3 className="text-3xl font-black text-white mb-6 group-hover:text-sky-500 transition-colors tracking-tight">{event.name}</h3>
                 
                 <div className="flex flex-wrap gap-8 text-sm font-bold">
                   <div className="flex items-center gap-3 text-slate-400">
-                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-yellow-500">
+                    <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-sky-500">
                       <Calendar size={18} />
                     </div>
                     <span className="uppercase tracking-widest">
@@ -447,10 +447,10 @@ export default function AdminEvents() {
                 </button>
                 <button
                   onClick={() => handleOpenModal(event)}
-                  className="w-12 h-12 bg-white/5 text-slate-400 hover:text-yellow-500 rounded-2xl flex items-center justify-center transition-all border border-white/5"
-                  title="Editar"
+                  className="w-12 h-12 bg-white/5 text-slate-400 hover:text-sky-500 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                  title="Editar Evento"
                 >
-                  <Edit2 size={22} />
+                  <Edit2 size={20} />
                 </button>
                 <button
                   onClick={() => handleDelete(event.id)}
@@ -471,7 +471,7 @@ export default function AdminEvents() {
           <div className="bg-[#0A0A0A] w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col border border-white/10">
             <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-2xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-sky-500/10 text-sky-500 rounded-2xl flex items-center justify-center">
                   <Bookmark size={24} />
                 </div>
                 <h2 className="text-3xl font-black text-white tracking-tight">Biblioteca de Modelos</h2>
@@ -489,7 +489,7 @@ export default function AdminEvents() {
                 </div>
               ) : (
                 templates.map(template => (
-                  <div key={template.id} className="flex items-center justify-between p-6 bg-white/[0.02] rounded-3xl border border-white/5 hover:border-yellow-500/30 transition-all group">
+                  <div key={template.id} className="flex items-center justify-between p-6 bg-white/[0.02] rounded-3xl border border-white/5 hover:border-sky-500/30 transition-all group">
                     <div className="flex items-center gap-5">
                       <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white/5 flex-shrink-0">
                         <img src={template.image_url || undefined} alt="" className="w-full h-full object-cover" />
@@ -502,9 +502,9 @@ export default function AdminEvents() {
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                       <button
                         onClick={() => handleUseTemplate(template)}
-                        className="px-6 py-3 bg-yellow-500 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all flex items-center gap-2"
+                        className="px-6 py-3 bg-sky-500 text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-sky-400 transition-all flex items-center gap-2"
                       >
-                        <Sparkles size={16} /> Usar
+                        <Copy size={16} /> Usar
                       </button>
                       <button
                         onClick={() => handleDeleteTemplate(template.id)}
@@ -538,7 +538,7 @@ export default function AdminEvents() {
               {/* Basic Info */}
               <section className="space-y-8">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-sky-500/10 text-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
                     <FileText size={24} />
                   </div>
                   <h3 className="text-2xl font-black text-white tracking-tight">Informações Básicas</h3>
@@ -550,7 +550,7 @@ export default function AdminEvents() {
                     <input
                       type="text"
                       required
-                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
@@ -559,7 +559,7 @@ export default function AdminEvents() {
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Categoria</label>
                     <select
                       required
-                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold appearance-none"
+                      className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
                       value={formData.category_id}
                       onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                     >
@@ -575,7 +575,7 @@ export default function AdminEvents() {
                   <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Descrição Completa</label>
                   <textarea
                     rows={4}
-                    className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                    className="w-full px-6 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
@@ -598,17 +598,17 @@ export default function AdminEvents() {
                         }}
                       />
                       <label htmlFor="image-upload" className="cursor-pointer group">
-                        <UploadCloud size={40} className="mx-auto text-slate-700 group-hover:text-yellow-500 transition-colors mb-4" />
+                        <UploadCloud size={40} className="mx-auto text-slate-700 group-hover:text-sky-500 transition-colors mb-4" />
                         <p className="text-sm font-black text-white uppercase tracking-widest mb-1">Upload de Arquivo</p>
                         <p className="text-xs font-bold text-slate-500 uppercase">PNG, JPG ou WEBP</p>
-                        {selectedImageFile && <p className="mt-4 text-xs font-black text-yellow-500 underline uppercase">{selectedImageFile.name}</p>}
+                        {selectedImageFile && <p className="mt-4 text-xs font-black text-sky-500 underline uppercase">{selectedImageFile.name}</p>}
                       </label>
                     </div>
                     <div className="p-6 bg-white/5 border border-white/10 rounded-[2rem] flex flex-col justify-center">
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Ou Cole o Link</label>
                       <input
                         type="url"
-                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold"
                         placeholder="https://..."
                         value={formData.image_url}
                         onChange={(e) => {
@@ -624,7 +624,7 @@ export default function AdminEvents() {
               {/* Date and Time */}
               <section className="space-y-8">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-sky-500/10 text-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
                     <Clock size={24} />
                   </div>
                   <h3 className="text-2xl font-black text-white tracking-tight">Data e Duração</h3>
@@ -654,18 +654,18 @@ export default function AdminEvents() {
               <section className="space-y-8 pt-8 border-t border-white/5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-yellow-500/10 text-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 bg-sky-500/10 text-sky-500 rounded-2xl flex items-center justify-center shadow-lg">
                       <List size={24} />
                     </div>
                     <h3 className="text-2xl font-black text-white tracking-tight">Formulário de Inscrição</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {['name', 'surname', 'grade', 'class'].map(preset => (
-                      <button key={preset} type="button" onClick={() => addPresetField(preset as any)} className="px-4 py-2 bg-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-yellow-500 hover:text-black transition-all border border-white/5">
+                      <button key={preset} type="button" onClick={() => addPresetField(preset as any)} className="px-4 py-2 bg-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-sky-500 hover:text-black transition-all border border-white/5">
                         + {preset}
                       </button>
                     ))}
-                    <button type="button" onClick={addFormField} className="px-4 py-2 bg-yellow-500 text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all flex items-center gap-2">
+                    <button type="button" onClick={addFormField} className="px-4 py-2 bg-sky-500 text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-sky-400 transition-all flex items-center gap-2">
                       <Plus size={14} /> Custom
                     </button>
                   </div>
@@ -691,8 +691,17 @@ export default function AdminEvents() {
 
               <div className="pt-10 flex justify-end gap-6">
                 <button type="button" onClick={() => { setIsModalOpen(false); setSelectedImageFile(null); }} className="px-8 py-4 text-slate-500 font-black uppercase tracking-widest text-xs hover:text-white transition-colors">Cancelar</button>
-                <button type="submit" disabled={isUploading} className="px-16 py-4 bg-yellow-500 text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-yellow-400 transition-all shadow-[0_0_30px_rgba(234,179,8,0.3)]">
-                  {isUploading ? 'Salvando...' : 'Finalizar Evento'}
+                <button
+                  type="submit"
+                  disabled={isUploading}
+                  className="flex-grow py-5 bg-sky-500 text-black font-black uppercase text-sm tracking-[0.2em] rounded-3xl hover:bg-sky-400 transition-all shadow-[0_0_30px_rgba(14,165,233,0.3)] flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  {isUploading ? <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div> : (
+                    <>
+                      <CheckCircle2 size={24} />
+                      Confirmar e Salvar
+                    </>
+                  )}
                 </button>
               </div>
             </form>

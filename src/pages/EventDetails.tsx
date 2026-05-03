@@ -399,10 +399,10 @@ export default function EventDetails() {
 
                       <button
                         type="submit"
-                        disabled={submitting}
+                        disabled={isRegistering}
                         className="w-full bg-sky-500 hover:bg-sky-400 text-black font-black uppercase tracking-[0.2em] text-sm py-6 px-10 rounded-[2rem] transition-all flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(14,165,233,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                       >
-                        {submitting ? (
+                        {isRegistering ? (
                           <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
                         ) : (
                           <>

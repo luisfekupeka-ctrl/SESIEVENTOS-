@@ -116,15 +116,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
       
       if (data.user) {
-        console.log("[Auth] Login successful, waiting for profile...");
         const userProfile = await fetchProfile(data.user.id);
-        
-        if (userProfile && userProfile.status !== 'approved') {
-          console.warn("[Auth] Account not approved:", userProfile.status);
-          await supabase.auth.signOut();
-          setProfile(null);
-          setUser(null);
-          throw new Error("Sua conta está aguardando aprovação ou foi bloqueada.");
+        if (userProfile) {
+          console.log("[Auth] User profile loaded:", userProfile.role, "Status:", userProfile.status);
         }
         
         setUser(data.user);
@@ -159,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{ 
       loading, 
-      isAdmin: !!user && profile?.status === 'approved', 
+      isAdmin: !!user && (profile?.role === 'admin' || profile?.role === 'super_admin'), 
       user, 
       profile,
       login, 

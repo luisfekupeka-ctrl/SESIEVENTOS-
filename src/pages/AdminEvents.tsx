@@ -6,8 +6,10 @@ import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { GRADES, CLASSES } from '../constants';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminEvents() {
+  const { profile } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -359,12 +361,27 @@ export default function AdminEvents() {
           </button>
           <button
             onClick={() => handleOpenModal()}
-            className="flex-grow sm:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-yellow-400 text-black font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
+            disabled={profile?.status !== 'approved'}
+            className="flex-grow sm:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-yellow-400 text-black font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale"
           >
             <Plus size={18} /> Novo Evento
           </button>
         </div>
       </div>
+
+      {profile?.status !== 'approved' && (
+        <div className="p-8 bg-amber-500/10 border border-amber-500/20 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 text-amber-400 shadow-xl shadow-amber-500/5 mb-10">
+          <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-amber-500/10">
+            <ShieldCheck size={32} />
+          </div>
+          <div className="flex-grow text-center md:text-left">
+            <h3 className="text-xl font-black text-white mb-1">Criação Bloqueada</h3>
+            <p className="font-bold text-slate-300 leading-relaxed">
+              Sua conta ainda não foi aprovada por um Super Admin. Por razões de segurança, a criação e edição de eventos só é permitida para usuários com status <span className="text-amber-400 uppercase">Aprovado</span>.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col md:flex-row gap-4 mb-10">
         <div className="relative flex-grow">

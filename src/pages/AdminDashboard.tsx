@@ -6,8 +6,10 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { GRADES, CLASSES } from '../constants';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminDashboard() {
+  const { profile } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [recentRegistrations, setRecentRegistrations] = useState<Registration[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -321,6 +323,21 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
+
+      {profile?.status !== 'approved' && (
+        <div className="p-8 bg-amber-500/10 border border-amber-500/20 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 text-amber-400 shadow-xl shadow-amber-500/5">
+          <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center shrink-0 border border-amber-500/10">
+            <ShieldCheck size={32} />
+          </div>
+          <div className="flex-grow text-center md:text-left">
+            <h3 className="text-xl font-black text-white mb-1">Acesso Restrito (Pendente de Aprovação)</h3>
+            <p className="font-bold text-slate-300 leading-relaxed">
+              Sua conta foi autenticada como <span className="text-amber-400 uppercase">{profile?.role}</span>, mas ainda aguarda a ativação oficial por um Super Admin. 
+              Você pode navegar pelo painel, mas as ações de criação e exclusão estão temporariamente bloqueadas.
+            </p>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="p-5 bg-red-500/10 border border-red-500/20 rounded-[2rem] flex items-center gap-4 text-red-400">

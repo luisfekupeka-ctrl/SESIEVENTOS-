@@ -51,8 +51,8 @@ export default function AdminDashboard() {
       if (regsRes.data) setRecentRegistrations(regsRes.data as any);
       if (studentsRes.data) setStudents(studentsRes.data as Student[]);
     } catch (err: any) {
-      console.error("Erro ao carregar dados:", err);
-      setError("Não foi possível carregar os dados do painel. Verifique sua conexão.");
+      console.error("Erro detalhado ao carregar dados do dashboard:", err);
+      setError(`Erro no servidor (${err.message || '500'}). Verifique se o projeto no Supabase está ativo.`);
     } finally {
       setLoading(false);
     }

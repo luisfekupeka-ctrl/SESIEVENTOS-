@@ -89,6 +89,30 @@ export default function AdminEventRegistrations() {
     }
   };
 
+  const handleApprove = async (regId: string) => {
+    try {
+      // Try to update both the status column and the form_data (as backup)
+      const reg = registrations.find(r => r.id === regId);
+      const newFormData = { ...reg?.form_data, status: 'approved' };
+      
+      const { error } = await supabase
+        .from('registrations')
+        .update({ 
+          status: 'approved',
+          form_data: newFormData
+        })
+        .eq('id', regId);
+      
+      if (error) throw error;
+      
+      setRegistrations(prev => prev.map(r => 
+        r.id === regId ? { ...r, status: 'approved', form_data: newFormData } : r
+      ));
+    } catch (error) {
+      console.error("Erro ao aprovar:", error);
+    }
+  };
+
   const exportToExcel = () => {
     if (!event || registrations.length === 0) return;
     try {
@@ -189,11 +213,11 @@ export default function AdminEventRegistrations() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-black text-slate-400 hover:text-sky-400 rounded-2xl flex items-center justify-center transition-all border border-white/5">
+          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-white text-slate-400 hover:text-sky-600 rounded-2xl flex items-center justify-center transition-all border border-slate-200 shadow-sm">
             <ChevronLeft size={28} />
           </button>
           <div>
-            <h1 className="text-3xl font-black text-white line-clamp-1 tracking-tight">{event.name}</h1>
+            <h1 className="text-3xl font-black text-slate-900 line-clamp-1 tracking-tight">{event.name}</h1>
             <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Lista de Inscritos • {registrations.length} Alunos</p>
           </div>
         </div>
@@ -201,7 +225,7 @@ export default function AdminEventRegistrations() {
         <div className="grid grid-cols-1 sm:flex items-center gap-2 md:gap-4">
           <button
             onClick={copyToClipboard}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-black border border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-[#0F0F0F] transition-all"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all shadow-sm"
           >
             {copied ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
             {copied ? 'Copiado!' : 'Copiar'}
@@ -223,37 +247,58 @@ export default function AdminEventRegistrations() {
         </div>
       </div>
 
-      <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-black border-b border-white/5">
-                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Data</th>
+              <tr className="bg-slate-50 border-b border-slate-200">
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Data</th>
                 {event.form_fields.map(field => (
-                  <th key={field.id} className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{field.label}</th>
+                  <th key={field.id} className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{field.label}</th>
                 ))}
-                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Ações</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100">
               {registrations.map(reg => {
+                const regStatus = (reg as any).status || reg.form_data?.status || 'approved';
                 return (
-                  <tr key={reg.id} className="hover:bg-black transition-colors group">
+                  <tr key={reg.id} className="hover:bg-sky-50/30 transition-colors group">
                     <td className="px-4 md:px-8 py-5 text-xs text-slate-400 font-bold whitespace-nowrap uppercase tracking-widest">
                       {formatRegDate(reg.timestamp)}
                     </td>
                     {event.form_fields.map(field => (
-                      <td key={field.id} className="px-4 md:px-8 py-5 text-sm text-white font-bold truncate max-w-[200px]">
-                        {reg.form_data[field.label.toLowerCase()] || '-'}
+                      <td key={field.id} className="px-4 md:px-8 py-5 text-sm text-slate-900 font-bold truncate max-w-[200px]">
+                        {reg.form_data[field.label.toLowerCase()] || reg.form_data[field.label] || '-'}
                       </td>
                     ))}
+                    <td className="px-4 md:px-8 py-5">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${regStatus === 'approved' ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`} />
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${regStatus === 'approved' ? 'text-green-600' : 'text-amber-600'}`}>
+                          {regStatus === 'approved' ? 'Confirmado' : 'Pendente'}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-4 md:px-8 py-5 text-right">
-                      <button
-                        onClick={() => setDeleteId(reg.id)}
-                        className="w-10 h-10 bg-red-500/5 text-slate-600 hover:text-red-500 rounded-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {regStatus === 'pending' && (
+                          <button
+                            onClick={() => handleApprove(reg.id)}
+                            className="w-10 h-10 bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white rounded-xl flex items-center justify-center transition-all shadow-sm"
+                            title="Aprovar Inscrição"
+                          >
+                            <CheckCircle2 size={18} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setDeleteId(reg.id)}
+                          className="w-10 h-10 bg-red-500/5 text-slate-600 hover:text-red-500 rounded-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -273,19 +318,19 @@ export default function AdminEventRegistrations() {
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#0A0A0A] w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in fade-in zoom-in duration-300 border border-white/10 text-center">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-red-500/10 text-red-500 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 mx-auto">
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in fade-in zoom-in duration-300 border border-slate-200 text-center">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-red-500/10 text-red-600 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 mx-auto">
               <Trash2 size={32} className="md:w-10 md:h-10" />
             </div>
-            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Remoção</h3>
-            <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">
+            <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Confirmar Remoção</h3>
+            <p className="text-slate-500 mb-10 font-bold text-lg leading-relaxed">
               Deseja remover este aluno da lista oficial? Esta ação é irreversível.
             </p>
             <div className="flex gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-grow py-4 bg-black text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-[#0F0F0F] transition-all"
+                className="flex-grow py-4 bg-slate-100 text-slate-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-200 transition-all"
               >
                 Voltar
               </button>

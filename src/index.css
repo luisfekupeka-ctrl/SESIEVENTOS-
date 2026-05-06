@@ -9,21 +9,21 @@
 
 @layer base {
   body {
-    @apply bg-black text-white transition-colors duration-300 antialiased;
+    @apply bg-[#f0f9ff] text-slate-900 transition-colors duration-300 antialiased;
   }
 
   .dark body {
-    @apply bg-black text-white;
+    @apply bg-slate-950 text-slate-50;
   }
 
   /* Global Input/Select Fixes */
   select, input, textarea {
-    @apply bg-[#0A0A0A] text-white border-white/10 focus:ring-sky-400/50 focus:border-sky-400 transition-all;
+    @apply bg-white text-slate-900 border-slate-200 focus:ring-sky-500/50 focus:border-sky-400 transition-all;
   }
   
   option {
-    background-color: #000000 !important;
-    color: white !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
   }
 
   /* Custom Scrollbar Utility */

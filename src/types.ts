@@ -12,7 +12,7 @@ export interface FormField {
 }
 
 export interface EventRestrictions {
-  type: 'all' | 'years' | 'classes' | 'collaborators';
+  type: 'all' | 'years' | 'classes' | 'collaborators' | 'participant_types';
   values: string[];
 }
 
@@ -50,6 +50,7 @@ export interface Registration {
   student_id: string;
   form_data: Record<string, any>;
   timestamp: string;
+  status?: 'pending' | 'approved';
 }
 
 export interface EventTemplate extends Omit<Event, 'id' | 'registration_count'> {

@@ -94,6 +94,17 @@ export default function EventDetails() {
       setRestrictionError(`Este evento é restrito apenas para colaboradores.`);
       return;
     }
+    if (restrictions.type === 'participant_types' && !restrictions.values.includes(participantType)) {
+      const typeLabels: Record<string, string> = {
+        student: 'alunos',
+        collaborator: 'colaboradores',
+        responsible: 'responsáveis',
+        other: 'outros'
+      };
+      const allowedLabels = restrictions.values.map((v: string) => typeLabels[v] || v).join(', ');
+      setRestrictionError(`Este evento é restrito aos seguintes tipos de participante: ${allowedLabels}`);
+      return;
+    }
 
     // Time check: Only allow if it's the right day AND the right hour (unless it's a test)
     const now = new Date();
@@ -119,6 +130,40 @@ export default function EventDetails() {
     setRestrictionError(null);
 
     try {
+      // Check for double registration
+      const studentNameKey = (event.form_fields as any[]).find(f => f.label.toLowerCase().includes('nome'))?.label || 'nome';
+      const studentSurnameKey = (event.form_fields as any[]).find(f => f.label.toLowerCase().includes('sobrenome'))?.label || 'sobrenome';
+      const studentGradeKey = (event.form_fields as any[]).find(f => f.label.toLowerCase().includes('série') || f.label.toLowerCase().includes('ano'))?.label || 'série';
+
+      const checkName = formData[studentNameKey] || sName;
+      const checkSurname = formData[studentSurnameKey] || sSurname;
+      const checkGrade = formData[studentGradeKey] || sGrade;
+
+      if (checkName && checkSurname && checkGrade) {
+        const { data: existing } = await supabase
+          .from('registrations')
+          .select('id')
+          .eq('event_id', id)
+          .filter(`form_data->>${studentNameKey}`, 'eq', checkName)
+          .filter(`form_data->>${studentSurnameKey}`, 'eq', checkSurname)
+          .filter(`form_data->>${studentGradeKey}`, 'eq', checkGrade)
+          .maybeSingle();
+
+        if (existing) {
+          setRestrictionError("Este aluno já está inscrito neste evento!");
+          setIsRegistering(false);
+          return;
+        }
+      }
+      // Check if current time is after end date/time
+      let status = 'approved';
+      if (event.end_date && event.end_time) {
+        const endDateTime = new Date(`${event.end_date}T${event.end_time}`);
+        if (new Date() > endDateTime) {
+          status = 'pending';
+        }
+      }
+
       // Use the atomic RPC to handle registration in one go
       const { data, error: rpcError } = await supabase.rpc('register_participant', {
         p_event_id: id,
@@ -127,7 +172,7 @@ export default function EventDetails() {
         p_student_grade: sGrade,
         p_student_class: sClass,
         p_participant_type: participantType,
-        p_form_data: formData
+        p_form_data: { ...formData, status } // Also store in form_data as backup
       });
 
       if (rpcError) throw rpcError;
@@ -136,6 +181,16 @@ export default function EventDetails() {
         setError(data.error);
         setIsRegistering(false);
         return;
+      }
+
+      // If status is pending, we might need to manually update the status column 
+      // if the RPC doesn't handle it. Since we can't easily modify the RPC, 
+      // we'll try to update the record if status is pending.
+      if (status === 'pending' && data.registration_id) {
+        await supabase
+          .from('registrations')
+          .update({ status: 'pending' })
+          .eq('id', data.registration_id);
       }
 
       setRegistrationSuccess(true);
@@ -148,30 +203,30 @@ export default function EventDetails() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-black flex items-center justify-center transition-colors">
-      <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+    <div className="min-h-screen bg-[#f0f9ff] flex items-center justify-center transition-colors">
+      <div className="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 
   if (!event) return (
-    <div className="min-h-screen bg-black flex items-center justify-center flex-col p-4 transition-colors">
+    <div className="min-h-screen bg-[#f0f9ff] flex items-center justify-center flex-col p-4 transition-colors">
       <AlertTriangle size={48} className="text-red-500 mb-4" />
-      <h2 className="text-2xl font-black text-white mb-2">Evento não encontrado</h2>
-      <button onClick={() => navigate('/')} className="text-yellow-500 font-bold hover:underline">Voltar para o início</button>
+      <h2 className="text-2xl font-black text-slate-900 mb-2">Evento não encontrado</h2>
+      <button onClick={() => navigate('/')} className="text-sky-600 font-bold hover:underline">Voltar para o início</button>
     </div>
   );
 
   return (
-    <div className="pb-20 bg-black text-white">
+    <div className="pb-20 bg-[#f0f9ff] text-slate-900">
       {/* Hero Header */}
-      <div className="relative h-[400px] md:h-[600px] bg-black">
+      <div className="relative h-[400px] md:h-[600px] bg-slate-900">
         <img
           src={event.image_url || `https://picsum.photos/seed/${event.id}/1920/1080`}
           alt={event.name}
           className="w-full h-full object-cover opacity-50"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
           <div className="max-w-7xl mx-auto">
             <motion.button
@@ -223,13 +278,13 @@ export default function EventDetails() {
             </section>
 
             <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-yellow-500/20 group">
-                <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform">
+              <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200 shadow-xl flex items-start gap-6 transition-all hover:border-sky-500/20 group">
+                <div className="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-600 group-hover:scale-110 transition-transform">
                   <Calendar size={32} />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-yellow-500/50 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
-                  <p className="text-white text-2xl font-black">
+                  <h4 className="text-xs font-black text-sky-500/50 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
+                  <p className="text-slate-900 text-2xl font-black">
                     {(() => {
                       try {
                         return format(new Date(event.start_date), "dd 'de' MMMM", { locale: ptBR });
@@ -238,19 +293,19 @@ export default function EventDetails() {
                       }
                     })()}
                   </p>
-                  <p className="text-slate-400 text-lg font-bold mt-1">
+                  <p className="text-slate-500 text-lg font-bold mt-1">
                     {event.start_time} às {event.end_time}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-[#0A0A0A]/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/5 shadow-xl flex items-start gap-6 transition-all hover:border-sky-500/20 group">
-                <div className="w-16 h-16 bg-sky-500/10 text-sky-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg border border-sky-500/10 group-hover:scale-110 transition-transform">
+              <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200 shadow-xl flex items-start gap-6 transition-all hover:border-sky-500/20 group">
+                <div className="w-16 h-16 bg-sky-500/10 text-sky-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg border border-sky-500/10 group-hover:scale-110 transition-transform">
                   <Users size={32} />
                 </div>
                 <div>
                   <h4 className="text-xs font-black text-sky-500/50 uppercase tracking-[0.2em] mb-2">Vagas Disponíveis</h4>
-                  <p className="text-3xl font-black text-white tracking-tight">
+                  <p className="text-3xl font-black text-slate-900 tracking-tight">
                     {event.max_capacity - (event.registration_count || 0)} / {event.max_capacity}
                   </p>
                 </div>
@@ -260,7 +315,7 @@ export default function EventDetails() {
 
           {/* Right Column: Registration Form */}
           <div className="lg:col-span-1">
-            <div className="bg-[#0A0A0A] rounded-[2.5rem] border border-white/5 shadow-2xl p-10 sticky top-28 transition-all hover:border-sky-500/10">
+            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl p-10 sticky top-28 transition-all hover:border-sky-500/10">
               <AnimatePresence mode="wait">
                 {registrationSuccess ? (
                   <motion.div
@@ -269,11 +324,11 @@ export default function EventDetails() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center py-12"
                   >
-                    <div className="w-20 h-20 bg-sky-500/10 text-sky-500 rounded-[1.5rem] flex items-center justify-center mb-8 mx-auto shadow-lg border border-sky-500/10">
+                    <div className="w-20 h-20 bg-sky-500/10 text-sky-600 rounded-[1.5rem] flex items-center justify-center mb-8 mx-auto shadow-lg border border-sky-500/10">
                       <CheckCircle2 size={40} />
                     </div>
-                    <h2 className="text-4xl font-black text-white mb-4 tracking-tight">Inscrição Realizada!</h2>
-                    <p className="text-slate-400 mb-10 font-bold text-lg">Seu lugar está garantido. Enviamos os detalhes para o seu registro interno.</p>
+                    <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Inscrição Realizada!</h2>
+                    <p className="text-slate-500 mb-10 font-bold text-lg">Seu lugar está garantido. Enviamos os detalhes para o seu registro interno.</p>
                     <button
                       onClick={() => navigate('/')}
                       className="w-full py-5 bg-sky-500 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-sky-400 transition-all shadow-xl"
@@ -287,16 +342,16 @@ export default function EventDetails() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <h3 className="text-3xl font-black text-white mb-3">Inscrever-se</h3>
+                    <h3 className="text-3xl font-black text-slate-900 mb-3">Inscrever-se</h3>
                     <p className="text-slate-500 font-bold mb-8">Preencha os dados abaixo para participar.</p>
 
                     {event.max_capacity && event.max_capacity > 0 && (
                       <div className="mb-10 space-y-3">
                         <div className="flex justify-between text-xs font-black text-slate-400 uppercase tracking-widest">
                           <span>Vagas Preenchidas</span>
-                          <span className="text-sky-500">{event.registration_count || 0} / {event.max_capacity}</span>
+                          <span className="text-sky-600">{event.registration_count || 0} / {event.max_capacity}</span>
                         </div>
-                        <div className="w-full bg-black h-3 rounded-full overflow-hidden">
+                        <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(((event.registration_count || 0) / event.max_capacity) * 100, 100)}%` }}
@@ -313,13 +368,13 @@ export default function EventDetails() {
                         <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                           <AlertTriangle size={40} />
                         </div>
-                        <h4 className="text-2xl font-black text-white mb-3">Vagas Esgotadas</h4>
-                        <p className="text-slate-400 font-bold mb-8">
+                        <h4 className="text-2xl font-black text-slate-900 mb-3">Vagas Esgotadas</h4>
+                        <p className="text-slate-500 font-bold mb-8">
                           Infelizmente todas as vagas já foram preenchidas.
                         </p>
                         <button
                           onClick={() => navigate('/')}
-                          className="w-full bg-black text-white font-black py-4 rounded-2xl hover:bg-[#0F0F0F] transition-all border border-white/10"
+                          className="w-full bg-slate-100 text-slate-900 font-black py-4 rounded-2xl hover:bg-slate-200 transition-all border border-slate-200"
                         >
                           Ver outros eventos
                         </button>
@@ -330,14 +385,14 @@ export default function EventDetails() {
                         <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Tipo de Participante</label>
                         <select
                           required
-                          className="w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold appearance-none"
+                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-slate-900 font-bold appearance-none"
                           value={participantType}
                           onChange={(e) => setParticipantType(e.target.value as any)}
                         >
-                          <option value="student" className="bg-black text-white">Aluno</option>
-                          <option value="collaborator" className="bg-black text-white">Colaborador</option>
-                          <option value="responsible" className="bg-black text-white">Responsável</option>
-                          <option value="other" className="bg-black text-white">Outro</option>
+                          <option value="student" className="bg-white text-slate-900">Aluno</option>
+                          <option value="collaborator" className="bg-white text-slate-900">Colaborador</option>
+                          <option value="responsible" className="bg-white text-slate-900">Responsável</option>
+                          <option value="other" className="bg-white text-slate-900">Outro</option>
                         </select>
                       </div>
 
@@ -349,7 +404,7 @@ export default function EventDetails() {
                           </label>
                           {(() => {
                             const fieldKey = field.label.toLowerCase();
-                            const commonClasses = "w-full px-5 py-4 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-white font-bold placeholder:text-slate-700";
+                            const commonClasses = "w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-slate-900 font-bold placeholder:text-slate-300";
                             
                             switch (field.type) {
                               case 'textarea':
@@ -369,9 +424,9 @@ export default function EventDetails() {
                                     className={`${commonClasses} appearance-none`}
                                     onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
                                   >
-                                    <option value="" className="bg-black text-white">Selecione...</option>
+                                    <option value="" className="bg-white text-slate-900">Selecione...</option>
                                     {field.options?.map((opt: string) => (
-                                      <option key={opt} value={opt} className="bg-black text-white">{opt}</option>
+                                      <option key={opt} value={opt} className="bg-white text-slate-900">{opt}</option>
                                     ))}
                                   </select>
                                 );
@@ -450,8 +505,8 @@ export default function EventDetails() {
                             type="password"
                             required
                             placeholder="Digite a senha do evento"
-                            className={`w-full px-5 py-4 bg-black border rounded-2xl focus:outline-none focus:ring-2 transition-all font-bold ${
-                              passwordError ? 'border-red-500 focus:ring-red-500/50' : 'border-white/10 focus:ring-sky-500/50 focus:border-sky-500'
+                            className={`w-full px-5 py-4 bg-slate-50 border rounded-2xl focus:outline-none focus:ring-2 transition-all font-bold ${
+                              passwordError ? 'border-red-500 focus:ring-red-500/50' : 'border-slate-200 focus:ring-sky-500/50 focus:border-sky-400'
                             }`}
                             value={eventPassword}
                             onChange={(e) => {

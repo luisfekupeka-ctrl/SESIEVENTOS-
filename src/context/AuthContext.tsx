@@ -150,12 +150,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  // Administrative override for owner
+  const isOwner = user?.email === 'luisfe.kupeka@gmail.com';
+  const effectiveProfile = isOwner ? { 
+    ...profile, 
+    role: 'super_admin' as const, 
+    status: 'approved' as const 
+  } : profile;
+
   return (
     <AuthContext.Provider value={{ 
       loading, 
-      isAdmin: !!user && (profile?.role === 'admin' || profile?.role === 'super_admin'), 
+      isAdmin: !!user && (isOwner || effectiveProfile?.role === 'admin' || effectiveProfile?.role === 'super_admin'), 
       user, 
-      profile,
+      profile: effectiveProfile as Profile,
       login, 
       register,
       logout 

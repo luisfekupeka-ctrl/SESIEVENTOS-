@@ -410,7 +410,7 @@ export default function AdminDashboard() {
                       <p className="text-xs font-bold text-slate-300">
                         {(() => {
                           try {
-                            return format(new Date(event.start_date), "dd/MM/yyyy");
+                            return format(new Date(event.start_date + 'T00:00:00'), "dd/MM/yyyy");
                           } catch (e) {
                             return '-';
                           }

@@ -102,17 +102,6 @@ export default function EventDetails() {
       return;
     }
 
-    const now = new Date();
-    const eventDate = new Date(event.start_date);
-    const isTestEvent = category?.name?.toLowerCase().includes('teste');
-    const [eventHour] = event.start_time.split(':').map(Number);
-    const currentHour = now.getHours();
-    const isSameDay = now.toDateString() === eventDate.toDateString();
-
-    if (!isTestEvent && (!isSameDay || currentHour !== eventHour)) {
-      setRestrictionError(`A inscrição para este evento só será liberada às ${event.start_time} no dia ${format(eventDate, "dd/MM")}.`);
-      return;
-    }
 
     if (event.password_protected && event.password !== eventPassword) {
       setPasswordError(true);
@@ -289,7 +278,7 @@ export default function EventDetails() {
                   <p className="text-white text-2xl font-black tracking-tight">
                     {(() => {
                       try {
-                        return format(new Date(event.start_date), "dd 'de' MMMM", { locale: ptBR });
+                        return format(new Date(event.start_date + 'T00:00:00'), "dd 'de' MMMM", { locale: ptBR });
                       } catch (e) {
                         return event.start_date;
                       }

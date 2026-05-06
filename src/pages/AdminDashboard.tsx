@@ -277,16 +277,16 @@ export default function AdminDashboard() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 tracking-tight">Painel de Controle</h1>
-          <p className="text-sm md:text-base text-slate-500 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel de Controle</h1>
+          <p className="text-sm md:text-base text-slate-400 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-white text-slate-500 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-slate-50 transition-all border border-slate-200 disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-slate-900 text-slate-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-slate-800 transition-all border border-slate-800 disabled:opacity-50 shadow-sm"
           >
-            <Clock size={16} className="text-sky-500" />
+            <Clock size={16} className="text-yellow-400" />
             Atualizar
           </button>
           <button
@@ -323,19 +323,19 @@ export default function AdminDashboard() {
       )}
 
       {showResetConfirm && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3rem] p-10 max-w-md w-full shadow-2xl border border-slate-200">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-[3rem] p-10 max-w-md w-full shadow-2xl border border-slate-800">
             <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-[2rem] flex items-center justify-center mb-8 mx-auto">
               <AlertTriangle size={40} />
             </div>
-            <h2 className="text-3xl font-black text-slate-900 text-center mb-4">Atenção Crítica!</h2>
-            <p className="text-slate-500 text-center mb-10 font-bold leading-relaxed text-lg">
+            <h2 className="text-3xl font-black text-white text-center mb-4">Atenção Crítica!</h2>
+            <p className="text-slate-400 text-center mb-10 font-bold leading-relaxed text-lg">
               Esta ação irá apagar <span className="text-red-500 underline uppercase">todos</span> os dados permanentemente. Tem certeza absoluta?
             </p>
             <div className="grid grid-cols-2 gap-6">
               <button
                 onClick={() => setShowResetConfirm(false)}
-                className="py-4 px-6 bg-slate-100 text-slate-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-200 transition-all"
+                className="py-4 px-6 bg-slate-800 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-700 transition-all"
               >
                 Cancelar
               </button>
@@ -354,13 +354,13 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-200 shadow-xl flex flex-col gap-6 transition-all hover:border-sky-500/30 group">
-            <div className={`w-14 h-14 ${stat.color} text-black rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+          <div key={i} className="bg-slate-900/40 p-8 rounded-[2rem] border border-slate-800 shadow-2xl flex flex-col gap-6 transition-all hover:border-yellow-400/30 group backdrop-blur-sm">
+            <div className={`w-14 h-14 ${stat.color} text-black rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
               {stat.icon}
             </div>
             <div>
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
-              <p className="text-4xl font-black text-slate-900 tracking-tight">{stat.value}</p>
+              <p className="text-4xl font-black text-white tracking-tight">{stat.value}</p>
             </div>
           </div>
         ))}
@@ -368,20 +368,20 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Recent Events */}
-        <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden transition-all hover:border-sky-500/20">
-          <div className="p-8 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xl font-black text-slate-900">Eventos Recentes</h3>
-            <Link to="/admin/events" className="text-xs font-black uppercase tracking-widest text-sky-600 hover:text-sky-500 transition-colors">Ver todos</Link>
+        <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden transition-all hover:border-yellow-400/20 backdrop-blur-sm">
+          <div className="p-8 border-b border-slate-800 flex items-center justify-between">
+            <h3 className="text-xl font-black text-white">Eventos Recentes</h3>
+            <Link to="/admin/events" className="text-xs font-black uppercase tracking-widest text-yellow-400 hover:text-yellow-300 transition-colors">Ver todos</Link>
           </div>
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-800">
             {events.slice(0, 5).map(event => (
-              <div key={event.id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+              <div key={event.id} className="p-6 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
                 <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100">
-                    <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-800">
+                    <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" referrerPolicy="no-referrer" />
                   </div>
                   <div>
-                    <p className="text-lg font-black text-slate-900 mb-1">{event.name}</p>
+                    <p className="text-lg font-black text-white mb-1">{event.name}</p>
                     <div className="flex items-center gap-3">
                       <p className="text-xs font-bold text-slate-500">
                         {(() => {
@@ -392,13 +392,13 @@ export default function AdminDashboard() {
                           }
                         })()}
                       </p>
-                      <span className="text-[10px] font-black px-2.5 py-1 bg-sky-500/10 text-sky-600 rounded-lg uppercase tracking-widest">
+                      <span className="text-[10px] font-black px-2.5 py-1 bg-yellow-400/10 text-yellow-400 rounded-lg uppercase tracking-widest border border-yellow-400/10">
                         {event.registration_count || 0} inscritos
                       </span>
                     </div>
                   </div>
                 </div>
-                <Link to={`/admin/events`} className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:text-sky-600 transition-colors">
+                <Link to={`/admin/events`} className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-yellow-400 transition-colors border border-slate-700">
                   <ChevronRight size={20} />
                 </Link>
               </div>
@@ -407,26 +407,26 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Registrations */}
-        <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden transition-all hover:border-sky-500/20">
-          <div className="p-8 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="text-xl font-black text-slate-900">Últimas Inscrições</h3>
+        <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden transition-all hover:border-yellow-400/20 backdrop-blur-sm">
+          <div className="p-8 border-b border-slate-800 flex items-center justify-between">
+            <h3 className="text-xl font-black text-white">Últimas Inscrições</h3>
           </div>
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-800">
             {recentRegistrations.map(reg => {
               const student = (reg as any).students;
               return (
-                <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
                   <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 rounded-full bg-sky-500/5 flex items-center justify-center text-sky-600 border border-sky-500/10">
+                    <div className="w-14 h-14 rounded-full bg-yellow-400/5 flex items-center justify-center text-yellow-400 border border-yellow-400/10">
                       <Users size={24} />
                     </div>
                     <div>
-                      <p className="text-lg font-black text-slate-900 mb-1">{student?.name} {student?.surname}</p>
-                      <p className="text-xs font-bold text-slate-500">Inscrito em: <span className="text-sky-600/70">{events.find(e => e.id === reg.event_id)?.name}</span></p>
+                      <p className="text-lg font-black text-white mb-1">{student?.name} {student?.surname}</p>
+                      <p className="text-xs font-bold text-slate-500">Inscrito em: <span className="text-yellow-400/70">{events.find(e => e.id === reg.event_id)?.name}</span></p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-black text-slate-900 uppercase tracking-widest">
+                    <p className="text-xs font-black text-white uppercase tracking-widest">
                       {(() => {
                         try {
                           return format(new Date(reg.timestamp), "HH:mm", { locale: ptBR });

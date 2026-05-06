@@ -65,7 +65,7 @@ export default function Home() {
   return (
     <div className="pb-20">
       {/* Hero Section */}
-      <section className="relative h-[500px] flex items-center justify-center overflow-hidden bg-[#e0f2fe]">
+      <section className="relative h-[500px] flex items-center justify-center overflow-hidden bg-[#020617]">
         <div className="absolute inset-0 opacity-40">
           <img
             src="https://picsum.photos/seed/sesi/1920/1080?blur=4"
@@ -74,15 +74,15 @@ export default function Home() {
             referrerPolicy="no-referrer"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-sky-100/60 via-sky-50/40 to-[#f0f9ff]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-[#020617]/40 to-[#020617]"></div>
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
           <motion.h1
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-5xl md:text-8xl font-black text-slate-900 mb-8 leading-[1.1] tracking-tighter"
           >
-            Explore os <span className="text-yellow-500 bg-black px-4 rounded-2xl drop-shadow-sm">Eventos</span> <br/>
-            do <span className="text-sky-600">SESI</span>
+            Explore os <span className="text-yellow-400 bg-black px-4 rounded-2xl drop-shadow-sm">Eventos</span> <br/>
+            do <span className="text-yellow-400">SESI</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -97,13 +97,13 @@ export default function Home() {
 
       {/* Search and Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-20">
-        <div className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-200 p-8 flex flex-col md:flex-row gap-6 items-center transition-all hover:border-sky-500/20">
+        <div className="bg-slate-900/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-slate-800 p-8 flex flex-col md:flex-row gap-6 items-center transition-all hover:border-yellow-400/20">
           <div className="relative flex-grow w-full">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500" size={24} />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={24} />
             <input
               type="text"
               placeholder="Pesquisar eventos por nome ou descrição..."
-              className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all text-slate-900 font-bold placeholder:text-slate-400"
+              className="w-full pl-14 pr-6 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -111,35 +111,35 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
             <div className="relative flex-grow md:w-64">
-              <Filter className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500" size={20} />
+              <Filter className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
               <select
-                className="w-full pl-14 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all appearance-none cursor-pointer text-slate-900 font-bold"
+                className="w-full pl-14 pr-10 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all appearance-none cursor-pointer text-white font-bold"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
                 <option value="all">Todas as Categorias</option>
                 {categories.map(cat => (
-                  <option key={cat.id} value={cat.id} className="bg-white text-slate-900">{cat.name}</option>
+                  <option key={cat.id} value={cat.id} className="bg-slate-950 text-white">{cat.name}</option>
                 ))}
               </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-sky-500">
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-yellow-400">
                 <ChevronDown size={16} />
               </div>
             </div>
 
             <div className="relative flex-grow md:w-64">
-              <CalendarDays className="absolute left-5 top-1/2 -translate-y-1/2 text-sky-500" size={20} />
+              <CalendarDays className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
               <select
-                className="w-full pl-14 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all appearance-none cursor-pointer text-slate-900 font-bold"
+                className="w-full pl-14 pr-10 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all appearance-none cursor-pointer text-white font-bold"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
               >
                 <option value="all">Todos os Anos</option>
                 {GRADES.map(grade => (
-                  <option key={grade} value={grade} className="bg-white text-slate-900">{grade}</option>
+                  <option key={grade} value={grade} className="bg-slate-950 text-white">{grade}</option>
                 ))}
               </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-sky-500">
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-yellow-400">
                 <ChevronDown size={16} />
               </div>
             </div>
@@ -172,12 +172,12 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-32 bg-white rounded-[3rem] border border-slate-200 shadow-sm transition-colors">
-            <div className="w-24 h-24 bg-sky-50 rounded-full flex items-center justify-center mx-auto mb-8">
-              <Search className="text-sky-300" size={48} />
+          <div className="text-center py-32 bg-slate-900/40 rounded-[3rem] border border-slate-800 shadow-2xl transition-colors">
+            <div className="w-24 h-24 bg-slate-950 rounded-full flex items-center justify-center mx-auto mb-8 border border-slate-800">
+              <Search className="text-yellow-400/30" size={48} />
             </div>
-            <h3 className="text-3xl font-black text-slate-900 mb-4">Nenhum evento encontrado</h3>
-            <p className="text-slate-500 font-bold text-lg max-w-md mx-auto">Tente ajustar seus filtros para descobrir novas oportunidades.</p>
+            <h3 className="text-3xl font-black text-white mb-4">Nenhum evento encontrado</h3>
+            <p className="text-slate-400 font-bold text-lg max-w-md mx-auto leading-relaxed">Tente ajustar seus filtros para descobrir novas oportunidades.</p>
           </div>
         )}
       </div>

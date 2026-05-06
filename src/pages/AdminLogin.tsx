@@ -50,14 +50,14 @@ export default function AdminLogin() {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "circOut" }}
-        className="max-w-md w-full bg-[#0A0A0A] rounded-[3rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/5 p-12 md:p-16 relative overflow-hidden group"
+        className="max-w-md w-full bg-slate-900/60 backdrop-blur-2xl rounded-[3rem] shadow-2xl border border-white/5 p-12 md:p-16 relative overflow-hidden group"
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
         
         <div className="text-center mb-12">
           <motion.div 
             whileHover={{ scale: 1.1, rotate: 5 }}
-            className="w-24 h-24 bg-sky-500 rounded-3xl flex items-center justify-center text-black font-black text-5xl mx-auto mb-8 shadow-[0_0_30px_rgba(14,165,233,0.3)]"
+            className="w-24 h-24 bg-yellow-400 rounded-3xl flex items-center justify-center text-black font-black text-5xl mx-auto mb-8 shadow-lg shadow-yellow-400/20"
           >
             S
           </motion.div>
@@ -156,7 +156,7 @@ export default function AdminLogin() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={isLoggingIn}
-            className="w-full bg-sky-500 hover:bg-sky-400 text-black font-black uppercase tracking-widest text-xs py-5 px-8 rounded-2xl shadow-[0_0_30px_rgba(14,165,233,0.3)] transition-all flex items-center justify-center gap-4 disabled:opacity-50 mt-4"
+            className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black uppercase tracking-widest text-xs py-5 px-8 rounded-2xl shadow-lg shadow-yellow-400/20 transition-all flex items-center justify-center gap-4 disabled:opacity-50 mt-4"
           >
             {isLoggingIn ? (
               <Loader2 className="animate-spin" size={24} />
@@ -176,7 +176,7 @@ export default function AdminLogin() {
               setIsRegistering(!isRegistering);
               setError(null);
             }}
-            className="text-white/40 hover:text-sky-500 font-black uppercase tracking-widest text-[10px] transition-colors"
+            className="text-white/40 hover:text-yellow-400 font-black uppercase tracking-widest text-[10px] transition-colors"
           >
             {isRegistering 
               ? 'Já sou administrador? Logar' 

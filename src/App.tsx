@@ -21,8 +21,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   const { loading, isAdmin } = useAuth();
 
   if (loading) return (
-    <div className="min-h-screen bg-[#f0f9ff] flex items-center justify-center">
-      <div className="w-16 h-16 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+    <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+      <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(234,179,8,0.3)]"></div>
     </div>
   );
   
@@ -35,8 +35,8 @@ const SuperProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children
   const { loading, isAdmin, profile } = useAuth();
 
   if (loading) return (
-    <div className="min-h-screen bg-[#f0f9ff] flex items-center justify-center">
-      <div className="w-16 h-16 border-4 border-sky-500 border-t-transparent rounded-full animate-spin"></div>
+    <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+      <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(234,179,8,0.3)]"></div>
     </div>
   );
   

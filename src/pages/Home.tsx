@@ -81,7 +81,7 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-5xl md:text-8xl font-black text-slate-900 mb-8 leading-[1.1] tracking-tighter"
           >
-            Explore os <span className="text-yellow-600 drop-shadow-sm">Eventos</span> <br/>
+            Explore os <span className="text-yellow-500 bg-black px-4 rounded-2xl drop-shadow-sm">Eventos</span> <br/>
             do <span className="text-sky-600">SESI</span>
           </motion.h1>
           <motion.p

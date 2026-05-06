@@ -357,7 +357,7 @@ export default function AdminEvents() {
           </button>
           <button
             onClick={() => handleOpenModal()}
-            className="flex-grow sm:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-sky-500 text-black font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20"
+            className="flex-grow sm:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 md:py-4 bg-yellow-400 text-black font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
           >
             <Plus size={18} /> Novo Evento
           </button>

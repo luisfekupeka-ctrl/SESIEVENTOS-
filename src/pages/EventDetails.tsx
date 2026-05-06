@@ -242,7 +242,7 @@ export default function EventDetails() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-wrap gap-3 mb-6"
             >
-              <span className="bg-yellow-500 text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(234,179,8,0.4)]">
+              <span className="bg-yellow-400 text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(234,179,8,0.4)]">
                 {category?.name || 'Evento'}
               </span>
               {event.password_protected && (
@@ -356,7 +356,7 @@ export default function EventDetails() {
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(((event.registration_count || 0) / event.max_capacity) * 100, 100)}%` }}
                             className={`h-full transition-all duration-1000 ${
-                              (event.registration_count || 0) >= event.max_capacity ? 'bg-red-500' : 'bg-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]'
+                              (event.registration_count || 0) >= event.max_capacity ? 'bg-red-500' : 'bg-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.5)]'
                             }`}
                           />
                         </div>
@@ -527,7 +527,7 @@ export default function EventDetails() {
                       <button
                         type="submit"
                         disabled={isRegistering}
-                        className="w-full bg-sky-500 hover:bg-sky-400 text-black font-black uppercase tracking-[0.2em] text-sm py-6 px-10 rounded-[2rem] transition-all flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(14,165,233,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                        className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black uppercase tracking-[0.2em] text-sm py-6 px-10 rounded-[2rem] transition-all flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(234,179,8,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                       >
                         {isRegistering ? (
                           <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>

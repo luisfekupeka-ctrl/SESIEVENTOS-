@@ -63,11 +63,11 @@ export default function AdminDashboard() {
   const totalRegistrations = events.reduce((sum, event) => sum + (event.registration_count || 0), 0);
 
   const stats = [
-    { label: 'Eventos', value: events.length, icon: <Calendar size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
-    { label: 'Inscrições', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-500 shadow-yellow-500/20' },
-    { label: 'Alunos', value: students.filter(s => s.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
-    { label: 'Colaboradores', value: students.filter(s => s.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
-    { label: 'Responsáveis', value: students.filter(s => s.type === 'responsible').length, icon: <School size={24} />, color: 'bg-sky-400 shadow-sky-400/20' },
+    { label: 'Eventos', value: events.length, icon: <Calendar size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Inscrições', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Alunos', value: students.filter(s => s.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Colaboradores', value: students.filter(s => s.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Responsáveis', value: students.filter(s => s.type === 'responsible').length, icon: <School size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
   ];
 
   const handleReset = async () => {
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
           <button
             onClick={seedData}
             disabled={isResetting || loading}
-            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-sky-500/10 text-sky-600 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-sky-500 hover:text-black transition-all border border-sky-500/20 disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-yellow-400 text-black font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
           >
             <TrendingUp size={16} />
             Gerar Dados

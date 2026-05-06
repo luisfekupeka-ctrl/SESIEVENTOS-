@@ -207,7 +207,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           </button>
           <button
             onClick={() => handleOpenModal()}
-            className="col-span-2 sm:flex-grow flex items-center justify-center gap-3 px-8 py-4 bg-sky-500 text-black rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-sm"
+            className="col-span-2 sm:flex-grow flex items-center justify-center gap-3 px-8 py-4 bg-yellow-400 text-black rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
           >
             <Plus size={20} /> Novo {labelSingular}
           </button>
@@ -244,7 +244,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 <tr key={participant.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-4 md:px-8 py-5">
                     <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 bg-sky-500/10 text-sky-600 rounded-2xl flex items-center justify-center font-black text-lg shadow-sm">
+                      <div className="w-12 h-12 bg-yellow-400/10 text-yellow-600 rounded-2xl flex items-center justify-center font-black text-lg shadow-sm border border-yellow-400/10">
                         {participant.name[0]}{participant.surname[0]}
                       </div>
                       <span className="font-black text-slate-900 text-lg tracking-tight">{participant.name} {participant.surname}</span>
@@ -366,7 +366,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 </button>
                 <button
                   type="submit"
-                  className="px-12 py-4 bg-sky-500 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-sky-400 transition-all shadow-sm"
+                  className="px-12 py-4 bg-yellow-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
                 >
                   Confirmar e Salvar
                 </button>

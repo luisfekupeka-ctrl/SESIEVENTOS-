@@ -153,7 +153,7 @@ export default function AdminCategories() {
               <button
                 type="submit"
                 disabled={isAdding || !newCategory.trim()}
-                className="bg-sky-500 text-black px-6 md:px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-400 transition-all shadow-sm flex items-center gap-3 disabled:opacity-50"
+                className="bg-yellow-400 text-black px-6 md:px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-yellow-300 transition-all shadow-sm flex items-center gap-3 disabled:opacity-50"
               >
                 {isAdding ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />} 
                 {isAdding ? 'Sincronizando...' : 'Adicionar'}
@@ -189,7 +189,7 @@ export default function AdminCategories() {
               ) : (
                 <>
                   <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 bg-sky-500/10 text-sky-600 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 bg-yellow-400/10 text-yellow-600 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                       <Tags size={24} />
                     </div>
                     <span className="text-xl font-black text-slate-900 tracking-tight">{cat.name}</span>

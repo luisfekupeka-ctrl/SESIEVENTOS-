@@ -49,8 +49,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-sky-500 rounded-xl flex items-center justify-center text-black font-black text-2xl group-hover:rotate-6 transition-transform shadow-sm">S</div>
-            <span className="text-xl md:text-2xl font-black text-slate-900 transition-colors">SESI <span className="text-sky-500">Eventos</span></span>
+            <div className="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center text-black font-black text-2xl group-hover:rotate-6 transition-transform shadow-sm">S</div>
+            <span className="text-xl md:text-2xl font-black text-slate-900 transition-colors">SESI <span className="text-sky-600">Eventos</span></span>
           </Link>
 
           {/* Desktop Nav */}
@@ -66,7 +66,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4">
-            <ThemeToggle />
+            {/* Theme Toggle Removed */}
             
             {isAdmin ? (
               <div className="flex items-center gap-2 md:gap-4">

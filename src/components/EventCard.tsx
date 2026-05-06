@@ -31,11 +31,11 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
         )}
         <div className="absolute top-5 left-5 right-5">
           <div className="flex items-center justify-between mb-4">
-            <span className="px-3 py-1 bg-sky-500/10 text-sky-500 text-[10px] font-black uppercase tracking-widest rounded-lg border border-sky-500/10">
+            <span className="px-3 py-1 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
               {category?.name || 'Evento'}
             </span>
-            <div className="flex items-center gap-1.5 text-sky-500">
-              <Users size={14} className="fill-sky-500/20" />
+            <div className="flex items-center gap-1.5 text-yellow-600">
+              <Users size={14} className="fill-yellow-500/20" />
               <span className="text-[10px] font-black uppercase tracking-tighter">{event.registration_count || 0} Inscritos</span>
             </div>
           </div>
@@ -96,7 +96,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
           <span className="text-slate-500 font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2 group-hover:text-sky-500 transition-all">
             Detalhes <ChevronRight size={16} />
           </span>
-          <div className="bg-sky-500 text-black px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_20px_rgba(14,165,233,0.2)]">
+          <div className="bg-yellow-400 text-black px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-yellow-400/20">
             Inscrever
           </div>
         </div>

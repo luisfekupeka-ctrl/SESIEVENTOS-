@@ -79,7 +79,7 @@ export default function AdminCalendar() {
           </button>
           <button
             onClick={() => setCurrentMonth(new Date())}
-            className="px-4 md:px-8 py-2.5 md:py-3 bg-sky-500 text-black rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/20"
+            className="px-4 md:px-8 py-2.5 md:py-3 bg-yellow-400 text-black rounded-xl md:rounded-2xl text-[10px] md:text-xs font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
           >
             Hoje
           </button>
@@ -139,13 +139,13 @@ export default function AdminCalendar() {
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] md:text-sm font-black tracking-tighter ${
                     !isSelectedMonth ? 'text-slate-300' : 
-                    isToday ? 'bg-sky-500 text-black w-5 h-5 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/20' : 
+                    isToday ? 'bg-yellow-400 text-black w-5 h-5 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg shadow-yellow-400/20' : 
                     'text-slate-900'
                   }`}>
                     {format(day, 'd')}
                   </span>
                   {dayEvents.length > 0 && isSelectedMonth && (
-                    <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.8)]" />
+                    <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
                   )}
                 </div>
                 
@@ -181,7 +181,7 @@ export default function AdminCalendar() {
       {/* Upcoming Events List */}
       <div className="mt-20">
         <div className="flex items-center gap-6 mb-12">
-          <div className="w-12 h-12 bg-sky-500/10 text-sky-600 rounded-2xl flex items-center justify-center border border-sky-500/10">
+          <div className="w-12 h-12 bg-yellow-400/10 text-yellow-600 rounded-2xl flex items-center justify-center border border-yellow-400/10">
             <CalendarIcon size={24} />
           </div>
           <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight uppercase">

@@ -64,7 +64,7 @@ export default function AdminLogin() {
           <h2 className="text-4xl font-black text-white mb-3 tracking-tight">
             {isRegistering ? 'Solicitar Acesso' : 'Restrito'}
           </h2>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
+          <p className="text-slate-300 font-bold uppercase tracking-widest text-[10px]">
             {isRegistering 
               ? 'Área de Credenciamento SESI' 
               : 'Painel de Controle Administrativo'}
@@ -89,56 +89,56 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {isRegistering && (
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nome Completo</label>
-              <div className="relative">
-                <Users className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
-                <input
-                  type="text"
-                  required
-                  className="w-full pl-14 pr-6 py-5 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
-                  placeholder="Seu nome"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Endereço de Email</label>
+            <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-1">Nome Completo</label>
             <div className="relative">
-              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
+              <Users className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
               <input
-                type="email"
+                type="text"
                 required
                 className="w-full pl-14 pr-6 py-5 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
-                placeholder="exemplo@sesi.com.br"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Seu nome"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
               />
             </div>
           </div>
+        )}
 
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Senha Secreta</label>
-            <div className="relative">
-              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
-              <input
-                type="password"
-                required
-                className="w-full pl-14 pr-6 py-5 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-1">Endereço de Email</label>
+          <div className="relative">
+            <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+            <input
+              type="email"
+              required
+              className="w-full pl-14 pr-6 py-5 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+              placeholder="exemplo@sesi.com.br"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
+        </div>
 
-          {isRegistering && (
-            <div className="space-y-3">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Validar Senha</label>
-              <div className="relative">
-                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-700" size={20} />
+        <div className="space-y-3">
+          <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-1">Senha Secreta</label>
+          <div className="relative">
+            <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+            <input
+              type="password"
+              required
+              className="w-full pl-14 pr-6 py-5 bg-black border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all text-white font-bold"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {isRegistering && (
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-1">Validar Senha</label>
+            <div className="relative">
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
                   type="password"
                   required
@@ -176,7 +176,7 @@ export default function AdminLogin() {
               setIsRegistering(!isRegistering);
               setError(null);
             }}
-            className="text-white/40 hover:text-yellow-400 font-black uppercase tracking-widest text-[10px] transition-colors"
+            className="text-white hover:text-yellow-400 font-black uppercase tracking-widest text-[10px] transition-colors"
           >
             {isRegistering 
               ? 'Já sou administrador? Logar' 

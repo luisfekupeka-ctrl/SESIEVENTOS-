@@ -58,7 +58,14 @@ export default function AdminDashboard() {
 
   const [error, setError] = useState<string | null>(null);
 
-  if (loading) return <div className="p-8 text-center text-slate-500 dark:text-slate-400 font-medium animate-pulse">Carregando...</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="w-12 h-12 text-yellow-400 animate-spin mb-4 shadow-[0_0_15px_rgba(234,179,8,0.3)]" />
+        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Sincronizando Dashboard...</p>
+      </div>
+    );
+  }
 
   const totalRegistrations = events.reduce((sum, event) => sum + (event.registration_count || 0), 0);
 
@@ -278,7 +285,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel de Controle</h1>
-          <p className="text-sm md:text-base text-slate-400 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
+          <p className="text-sm md:text-base text-slate-300 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <button
@@ -307,7 +314,7 @@ export default function AdminDashboard() {
           <button
             onClick={recountAllRegistrations}
             disabled={loading}
-            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-amber-500/10 text-amber-600 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-amber-500 hover:text-black transition-all border border-amber-500/20 disabled:opacity-50 shadow-sm"
+            className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-amber-500/10 text-amber-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-amber-500 hover:text-black transition-all border border-amber-500/20 disabled:opacity-50 shadow-sm"
           >
             <Users size={16} />
             Sincronizar Contagens
@@ -359,7 +366,7 @@ export default function AdminDashboard() {
               {stat.icon}
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2">{stat.label}</p>
               <p className="text-4xl font-black text-white tracking-tight">{stat.value}</p>
             </div>
           </div>
@@ -383,7 +390,7 @@ export default function AdminDashboard() {
                   <div>
                     <p className="text-lg font-black text-white mb-1">{event.name}</p>
                     <div className="flex items-center gap-3">
-                      <p className="text-xs font-bold text-slate-500">
+                      <p className="text-xs font-bold text-slate-300">
                         {(() => {
                           try {
                             return format(new Date(event.start_date), "dd/MM/yyyy");
@@ -412,7 +419,7 @@ export default function AdminDashboard() {
             <h3 className="text-xl font-black text-white">Últimas Inscrições</h3>
           </div>
           <div className="divide-y divide-slate-800">
-            {recentRegistrations.map(reg => {
+            {recentRegistrations.length > 0 ? recentRegistrations.map(reg => {
               const student = (reg as any).students;
               return (
                 <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
@@ -422,7 +429,7 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                       <p className="text-lg font-black text-white mb-1">{student?.name} {student?.surname}</p>
-                      <p className="text-xs font-bold text-slate-500">Inscrito em: <span className="text-yellow-400/70">{events.find(e => e.id === reg.event_id)?.name}</span></p>
+                      <p className="text-xs font-bold text-slate-300">Inscrito em: <span className="text-yellow-400">{events.find(e => e.id === reg.event_id)?.name}</span></p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -447,7 +454,9 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               );
-            })}
+            }) : (
+              <div className="p-20 text-center text-slate-500 font-bold">Nenhuma inscrição recente.</div>
+            )}
           </div>
         </div>
       </div>

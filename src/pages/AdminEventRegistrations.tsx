@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { Event, Registration } from '../types';
-import { ChevronLeft, Download, Trash2, Users, FileSpreadsheet, FileText, Copy, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, Download, Trash2, Users, FileSpreadsheet, FileText, Copy, CheckCircle2, Loader2, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
@@ -71,7 +71,6 @@ export default function AdminEventRegistrations() {
       
       if (error) throw error;
       
-      // Update registration_count in events table
       if (event) {
         await supabase
           .from('events')
@@ -81,7 +80,6 @@ export default function AdminEventRegistrations() {
         setEvent(prev => prev ? { ...prev, registration_count: Math.max(0, (prev.registration_count || 0) - 1) } : null);
       }
       
-      // Update local state immediately for better UX
       setRegistrations(prev => prev.filter(reg => reg.id !== deleteId));
       setDeleteId(null);
     } catch (error) {
@@ -91,7 +89,6 @@ export default function AdminEventRegistrations() {
 
   const handleApprove = async (regId: string) => {
     try {
-      // Try to update both the status column and the form_data (as backup)
       const reg = registrations.find(r => r.id === regId);
       const newFormData = { ...reg?.form_data, status: 'approved' };
       
@@ -158,35 +155,32 @@ export default function AdminEventRegistrations() {
         body,
         startY: 25,
         theme: 'grid',
-        headStyles: { fillColor: [14, 165, 233] },
+        headStyles: { fillColor: [234, 179, 8] },
         styles: { fontSize: 8 }
       });
 
       pdfDoc.save(`Inscritos_${event.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
     } catch (err) {
       console.error("Erro no PDF:", err);
-      alert("Erro ao exportar PDF.");
     }
   };
 
   const copyToClipboard = () => {
     if (!event) return;
     
-    // Create header row
     const headers = ['Data Inscrição'];
     event.form_fields.forEach(field => headers.push(field.label));
     
-    // Create data rows
     const rows = registrations.map(reg => {
       const row = [
         format(new Date(reg.timestamp), "dd/MM/yyyy HH:mm")
       ];
       
       event.form_fields.forEach(field => {
-        row.push(reg.form_data[field.label.toLowerCase()] || '-');
+        row.push(reg.form_data[field.label.toLowerCase()] || reg.form_data[field.label] || '-');
       });
       
-      return row.join('\t'); // Tab separated for Excel
+      return row.join('\t');
     });
 
     const fullText = [headers.join('\t'), ...rows].join('\n');
@@ -206,40 +200,48 @@ export default function AdminEventRegistrations() {
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-yellow-500 font-black animate-pulse uppercase tracking-widest">Sincronizando...</div>;
-  if (!event) return <div className="p-8 text-center text-red-500 font-bold">Evento não encontrado.</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="w-12 h-12 text-yellow-400 animate-spin mb-4" />
+        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Sincronizando inscrições...</p>
+      </div>
+    );
+  }
+
+  if (!event) return <div className="p-20 text-center text-red-500 font-bold bg-[#020617]">Evento não encontrado.</div>;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 bg-[#020617]">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-white text-slate-400 hover:text-sky-600 rounded-2xl flex items-center justify-center transition-all border border-slate-200 shadow-sm">
+          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-slate-900 text-slate-400 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-800 shadow-lg">
             <ChevronLeft size={28} />
           </button>
           <div>
-            <h1 className="text-3xl font-black text-slate-900 line-clamp-1 tracking-tight">{event.name}</h1>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Lista de Inscritos • {registrations.length} Alunos</p>
+            <h1 className="text-3xl font-black text-white line-clamp-1 tracking-tight">{event.name}</h1>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Lista de Inscritos • <span className="text-yellow-400">{registrations.length}</span> Participantes</p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 sm:flex items-center gap-2 md:gap-4">
           <button
             onClick={copyToClipboard}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-all shadow-sm"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg"
           >
             {copied ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-            {copied ? 'Copiado!' : 'Copiar'}
+            {copied ? 'Copiado!' : 'Copiar Dados'}
           </button>
           <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
             <button
               onClick={exportToExcel}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500/10 border border-green-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/5"
             >
               <FileSpreadsheet size={16} /> Excel
             </button>
             <button
               onClick={exportToPDF}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5"
             >
               <FileText size={16} /> PDF
             </button>
@@ -247,56 +249,56 @@ export default function AdminEventRegistrations() {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
+      <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-sm">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Data</th>
+              <tr className="bg-slate-950/50 border-b border-slate-800">
+                <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Data</th>
                 {event.form_fields.map(field => (
-                  <th key={field.id} className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{field.label}</th>
+                  <th key={field.id} className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{field.label}</th>
                 ))}
-                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Status</th>
-                <th className="px-4 md:px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Ações</th>
+                <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-800">
               {registrations.map(reg => {
                 const regStatus = (reg as any).status || reg.form_data?.status || 'approved';
                 return (
-                  <tr key={reg.id} className="hover:bg-sky-50/30 transition-colors group">
-                    <td className="px-4 md:px-8 py-5 text-xs text-slate-400 font-bold whitespace-nowrap uppercase tracking-widest">
+                  <tr key={reg.id} className="hover:bg-slate-800/30 transition-colors group">
+                    <td className="px-6 md:px-10 py-6 text-xs text-slate-400 font-bold whitespace-nowrap uppercase tracking-widest">
                       {formatRegDate(reg.timestamp)}
                     </td>
                     {event.form_fields.map(field => (
-                      <td key={field.id} className="px-4 md:px-8 py-5 text-sm text-slate-900 font-bold truncate max-w-[200px]">
+                      <td key={field.id} className="px-6 md:px-10 py-6 text-sm text-white font-bold truncate max-w-[250px]">
                         {reg.form_data[field.label.toLowerCase()] || reg.form_data[field.label] || '-'}
                       </td>
                     ))}
-                    <td className="px-4 md:px-8 py-5">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${regStatus === 'approved' ? 'bg-green-500' : 'bg-amber-500 animate-pulse'}`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${regStatus === 'approved' ? 'text-green-600' : 'text-amber-600'}`}>
+                    <td className="px-6 md:px-10 py-6">
+                      <div className="flex items-center gap-3">
+                        <span className={`w-2.5 h-2.5 rounded-full ${regStatus === 'approved' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-amber-500 animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.4)]'}`} />
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${regStatus === 'approved' ? 'text-green-500' : 'text-amber-500'}`}>
                           {regStatus === 'approved' ? 'Confirmado' : 'Pendente'}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 md:px-8 py-5 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-6 md:px-10 py-6 text-right">
+                      <div className="flex items-center justify-end gap-3">
                         {regStatus === 'pending' && (
                           <button
                             onClick={() => handleApprove(reg.id)}
-                            className="w-10 h-10 bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white rounded-xl flex items-center justify-center transition-all shadow-sm"
+                            className="w-11 h-11 bg-green-500/10 text-green-500 hover:bg-green-500 hover:text-white rounded-xl flex items-center justify-center transition-all border border-green-500/10 shadow-lg"
                             title="Aprovar Inscrição"
                           >
-                            <CheckCircle2 size={18} />
+                            <CheckCircle2 size={20} />
                           </button>
                         )}
                         <button
                           onClick={() => setDeleteId(reg.id)}
-                          className="w-10 h-10 bg-red-500/5 text-slate-600 hover:text-red-500 rounded-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                          className="w-11 h-11 bg-red-500/5 text-slate-500 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-transparent hover:border-red-500/20"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={20} />
                         </button>
                       </div>
                     </td>
@@ -307,8 +309,8 @@ export default function AdminEventRegistrations() {
           </table>
           {registrations.length === 0 && (
             <div className="p-32 text-center">
-              <Users size={60} className="mx-auto text-slate-800 mb-6 opacity-20" />
-              <p className="text-slate-600 font-black text-xl uppercase tracking-widest">
+              <Users size={64} className="mx-auto text-slate-800 mb-6" />
+              <p className="text-slate-400 font-black text-xl uppercase tracking-widest">
                 Nenhuma inscrição catalogada.
               </p>
             </div>
@@ -318,27 +320,27 @@ export default function AdminEventRegistrations() {
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in fade-in zoom-in duration-300 border border-slate-200 text-center">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-red-500/10 text-red-600 rounded-2xl md:rounded-3xl flex items-center justify-center mb-6 md:mb-8 mx-auto">
-              <Trash2 size={32} className="md:w-10 md:h-10" />
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 border border-slate-800 text-center">
+            <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-8 mx-auto border border-red-500/10">
+              <Trash2 size={40} />
             </div>
-            <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Confirmar Remoção</h3>
-            <p className="text-slate-500 mb-10 font-bold text-lg leading-relaxed">
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Remoção</h3>
+            <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">
               Deseja remover este aluno da lista oficial? Esta ação é irreversível.
             </p>
-            <div className="flex gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-grow py-4 bg-slate-100 text-slate-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-200 transition-all"
+                className="py-4 bg-slate-800 text-slate-300 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-700 transition-all"
               >
-                Voltar
+                Cancelar
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-grow py-4 bg-red-600 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                className="py-4 bg-red-500 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
               >
-                Remover
+                Excluir
               </button>
             </div>
           </div>

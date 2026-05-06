@@ -79,16 +79,16 @@ export default function Home() {
           <motion.h1
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-5xl md:text-8xl font-black text-slate-900 mb-8 leading-[1.1] tracking-tighter"
+            className="text-5xl md:text-8xl font-black text-white mb-8 leading-[1.1] tracking-tighter"
           >
-            Explore os <span className="text-yellow-400 bg-black px-4 rounded-2xl drop-shadow-sm">Eventos</span> <br/>
+            Explore os <span className="text-yellow-400 bg-slate-950 px-4 rounded-2xl drop-shadow-sm border border-yellow-400/20">Eventos</span> <br/>
             do <span className="text-yellow-400">SESI</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl md:text-2xl text-slate-600 font-bold max-w-3xl mx-auto leading-relaxed"
+            className="text-xl md:text-2xl text-slate-300 font-bold max-w-3xl mx-auto leading-relaxed"
           >
             A sua porta de entrada para oficinas, palestras, esportes e experiências únicas.
           </motion.p>

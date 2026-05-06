@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Student } from '../types';
-import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle, Download, RefreshCw, FileSpreadsheet } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle, Download, RefreshCw, FileSpreadsheet, Loader2, User } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { GRADES, CLASSES } from '../constants';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminParticipantsListProps {
   type: 'student' | 'collaborator' | 'responsible' | 'other';
@@ -21,6 +22,8 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  const labelPlural = type === 'student' ? 'Alunos' : type === 'collaborator' ? 'Colaboradores' : type === 'responsible' ? 'Responsáveis' : 'Participantes';
 
   const [formData, setFormData] = useState<Partial<Student>>({
     name: '',
@@ -94,7 +97,6 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
       XLSX.writeFile(wb, `Lista_${labelPlural.toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`);
     } catch (err) {
       console.error("Erro ao exportar Excel:", err);
-      alert("Erro ao exportar para Excel.");
     }
   };
 
@@ -136,24 +138,20 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      // 1. Get student's registrations before deletion to know which events to update
       const { data: regs } = await supabase
         .from('registrations')
         .select('event_id')
         .eq('student_id', deleteId);
 
-      // 2. Delete student
       const { error } = await supabase
         .from('students')
         .delete()
         .eq('id', deleteId);
       if (error) throw error;
 
-      // 3. Update registration counts for affected events
       if (regs && regs.length > 0) {
         const eventIds = [...new Set(regs.map(r => r.event_id))];
         for (const eid of eventIds) {
-          // Count remaining registrations for this event
           const { count } = await supabase
             .from('registrations')
             .select('*', { count: 'exact', head: true })
@@ -166,7 +164,6 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         }
       }
       
-      // Update local state immediately
       setParticipants(prev => prev.filter(p => p.id !== deleteId));
       setDeleteId(null);
       setFeedback({ type: 'success', message: `${labelSingular} removido com sucesso!` });
@@ -181,29 +178,36 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     p.surname.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="p-12 text-center text-slate-500 font-bold animate-pulse">Sincronizando dados...</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="w-12 h-12 text-yellow-400 animate-spin mb-4" />
+        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Sincronizando participantes...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 bg-[#020617]">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 tracking-tight">{title}</h1>
-          <p className="text-sm md:text-base text-slate-500 font-bold">{description}</p>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">{title}</h1>
+          <p className="text-sm md:text-base text-slate-300 font-bold">{description}</p>
         </div>        
         <div className="grid grid-cols-2 sm:flex items-center gap-2 md:gap-4">
           <button
             onClick={() => fetchParticipants(true)}
             disabled={isRefreshing}
-            className="w-full sm:w-12 h-12 bg-white text-slate-400 hover:text-sky-600 rounded-xl flex items-center justify-center transition-all border border-slate-200 disabled:opacity-50 shadow-sm"
+            className="w-full sm:w-12 h-12 bg-slate-900 text-slate-400 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-800 disabled:opacity-50 shadow-lg"
             title="Atualizar Lista"
           >
             <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={exportToExcel}
-            className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-white text-slate-500 border border-slate-200 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all shadow-sm"
+            className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
           >
-            <FileSpreadsheet size={18} className="text-sky-500" /> Exportar
+            <FileSpreadsheet size={18} className="text-yellow-400" /> Exportar
           </button>
           <button
             onClick={() => handleOpenModal()}
@@ -214,61 +218,61 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl overflow-hidden">
-        <div className="p-8 border-b border-slate-100 bg-white flex flex-col md:flex-row gap-6">
+      <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-sm">
+        <div className="p-8 border-b border-slate-800 bg-slate-950/30 flex flex-col md:flex-row gap-6">
           <div className="relative flex-grow">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={24} />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={24} />
             <input
               type="text"
-              placeholder={`Buscar ${labelSingular.toLowerCase()} por nome...`}
-              className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-slate-900 font-bold placeholder:text-slate-300"
+              placeholder={`Buscar por nome ou sobrenome...`}
+              className="w-full pl-14 pr-6 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-500 shadow-inner"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-4 md:px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Identificação</th>
+              <tr className="bg-slate-950/50 border-b border-slate-800">
+                <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Identificação</th>
                 {type === 'student' && (
-                  <th className="px-4 md:px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Série/Turma</th>
+                  <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Série/Turma</th>
                 )}
-                <th className="px-4 md:px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Controle</th>
+                <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Controle</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-800">
               {filteredParticipants.map(participant => (
-                <tr key={participant.id} className="hover:bg-slate-50 transition-colors group">
-                  <td className="px-4 md:px-8 py-5">
+                <tr key={participant.id} className="hover:bg-slate-800/30 transition-colors group">
+                  <td className="px-6 md:px-10 py-6">
                     <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 bg-yellow-400/10 text-yellow-600 rounded-2xl flex items-center justify-center font-black text-lg shadow-sm border border-yellow-400/10">
+                      <div className="w-12 h-12 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center font-black text-lg shadow-lg border border-yellow-400/10 group-hover:scale-105 transition-transform">
                         {participant.name[0]}{participant.surname[0]}
                       </div>
-                      <span className="font-black text-slate-900 text-lg tracking-tight">{participant.name} {participant.surname}</span>
+                      <span className="font-black text-white text-lg tracking-tight">{participant.name} {participant.surname}</span>
                     </div>
                   </td>
                   {type === 'student' && (
-                    <td className="px-4 md:px-8 py-5">
+                    <td className="px-6 md:px-10 py-6">
                       <div className="flex flex-col">
-                        <span className="text-base font-black text-slate-900">{participant.grade}</span>
+                        <span className="text-base font-black text-white">{participant.grade}</span>
                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{participant.class}</span>
                       </div>
                     </td>
                   )}
-                  <td className="px-4 md:px-8 py-5 text-right">
+                  <td className="px-6 md:px-10 py-6 text-right">
                     <div className="flex items-center justify-end gap-3">
                       <button
                         onClick={() => handleOpenModal(participant)}
-                        className="w-10 h-10 bg-white text-slate-400 hover:text-sky-600 rounded-xl flex items-center justify-center transition-all border border-slate-200 shadow-sm"
+                        className="w-11 h-11 bg-slate-800 text-slate-400 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
                       >
                         <Edit2 size={18} />
                       </button>
                       <button
                         onClick={() => setDeleteId(participant.id)}
-                        className="w-10 h-10 bg-red-500/5 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-red-500/10"
+                        className="w-11 h-11 bg-red-500/5 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-transparent hover:border-red-500/20"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -279,7 +283,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
             </tbody>
           </table>
           {filteredParticipants.length === 0 && (
-            <div className="p-20 text-center text-slate-600 font-bold text-lg">
+            <div className="p-20 text-center text-slate-400 font-bold text-lg">
               Nenhum registro encontrado para esta pesquisa.
             </div>
           )}
@@ -288,13 +292,13 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
 
       {/* Modal Form */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-4 bg-slate-900/40 backdrop-blur-md">
-          <div className="bg-white w-full max-w-lg rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200">
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-white">
-              <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-slate-900 w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-800">
+            <div className="p-8 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+              <h2 className="text-3xl font-black text-white tracking-tight">
                 {editingParticipant ? `Editar ${labelSingular}` : `Novo ${labelSingular}`}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-xl flex items-center justify-center transition-colors">
+              <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
                 <X size={24} />
               </button>
             </div>
@@ -302,21 +306,21 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
             <form onSubmit={handleSubmit} className="p-6 md:p-10 space-y-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Nome</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nome</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-slate-900 font-bold"
+                    className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold shadow-inner"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Sobrenome</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Sobrenome</label>
                   <input
                     type="text"
                     required
-                    className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-slate-900 font-bold"
+                    className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold shadow-inner"
                     value={formData.surname}
                     onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
                   />
@@ -326,30 +330,30 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
               {type === 'student' && (
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Série</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Série</label>
                     <select
                       required
-                      className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-slate-900 font-bold appearance-none shadow-sm"
+                      className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
                       value={formData.grade}
                       onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
                     >
-                      <option value="" className="bg-white">Selecione...</option>
+                      <option value="" className="bg-slate-900">Selecione...</option>
                       {GRADES.map(grade => (
-                        <option key={grade} value={grade} className="bg-white">{grade}</option>
+                        <option key={grade} value={grade} className="bg-slate-900">{grade}</option>
                       ))}
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Turma</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Turma</label>
                     <select
                       required
-                      className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-slate-900 font-bold appearance-none shadow-sm"
+                      className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
                       value={formData.class}
                       onChange={(e) => setFormData({ ...formData, class: e.target.value })}
                     >
-                      <option value="" className="bg-white">Selecione...</option>
+                      <option value="" className="bg-slate-900">Selecione...</option>
                       {CLASSES.map(cls => (
-                        <option key={cls} value={cls} className="bg-white">{cls}</option>
+                        <option key={cls} value={cls} className="bg-slate-900">{cls}</option>
                       ))}
                     </select>
                   </div>
@@ -360,7 +364,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-8 py-4 text-slate-400 font-black uppercase text-xs tracking-widest hover:text-slate-900 transition-colors"
+                  className="px-8 py-4 text-slate-400 font-black uppercase text-xs tracking-widest hover:text-white transition-colors"
                 >
                   Cancelar
                 </button>
@@ -376,52 +380,29 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         </div>
       )}
 
-      {/* Feedback Modal */}
-      {feedback && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[200] flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl text-center border border-slate-200">
-            <div className={`w-20 h-20 ${feedback.type === 'success' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'} rounded-[1.5rem] flex items-center justify-center mb-8 mx-auto shadow-sm`}>
-              {feedback.type === 'success' ? <TrendingUp size={40} /> : <AlertTriangle size={40} />}
-            </div>
-            <h2 className="text-3xl font-black text-slate-900 mb-3">
-              {feedback.type === 'success' ? 'Sucesso!' : 'Erro'}
-            </h2>
-            <p className="text-slate-500 mb-10 font-bold text-lg">
-              {feedback.message}
-            </p>
-            <button
-              onClick={() => setFeedback(null)}
-              className="w-full py-4 bg-slate-100 text-slate-600 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-200 transition-all"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 border border-slate-200">
-            <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-              <Trash2 size={32} />
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 border border-slate-800 text-center">
+            <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-8 mx-auto border border-red-500/10">
+              <Trash2 size={40} />
             </div>
-            <h3 className="text-3xl font-black text-slate-900 text-center mb-4 tracking-tight">Confirmar Exclusão</h3>
-            <p className="text-slate-500 text-center mb-10 font-bold text-lg leading-relaxed">
-              Tem certeza que deseja excluir este {labelSingular.toLowerCase()}? Esta operação <span className="text-red-500">não pode ser revertida</span>.
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Exclusão</h3>
+            <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">
+              Deseja remover este registro? Esta ação é irreversível.
             </p>
-            <div className="flex gap-5">
+            <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-grow py-4 bg-slate-100 text-slate-400 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-200 transition-all"
+                className="py-4 bg-slate-800 text-slate-300 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-700 transition-all"
               >
                 Voltar
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-grow py-4 bg-red-600 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+                className="py-4 bg-red-500 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
               >
-                Sim, Excluir
+                Excluir
               </button>
             </div>
           </div>

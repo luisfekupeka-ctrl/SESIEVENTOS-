@@ -338,7 +338,7 @@ export default function AdminEvents() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4 shadow-[0_0_15px_rgba(234,179,8,0.3)]"></div>
-        <p className="text-slate-500 font-bold">Sincronizando eventos...</p>
+        <p className="text-slate-300 font-bold">Sincronizando eventos...</p>
       </div>
     );
   }
@@ -348,7 +348,7 @@ export default function AdminEvents() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Gerenciar Eventos</h1>
-          <p className="text-sm md:text-base text-slate-400 font-bold">Crie, edite e acompanhe todos os eventos escolares.</p>
+          <p className="text-sm md:text-base text-slate-300 font-bold">Crie, edite e acompanhe todos os eventos escolares.</p>
         </div>
         <div className="grid grid-cols-2 sm:flex items-center gap-3 md:gap-4">
           <button
@@ -435,7 +435,7 @@ export default function AdminEvents() {
                       );
                     }
                     return (
-                      <div className="flex items-center gap-2 px-2.5 py-1 bg-slate-800 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-lg border border-slate-700">
+                      <div className="flex items-center gap-2 px-2.5 py-1 bg-slate-800 text-slate-300 font-black text-[10px] uppercase tracking-widest rounded-lg border border-slate-700">
                         <Users size={12} /> Público
                       </div>
                     );
@@ -444,7 +444,7 @@ export default function AdminEvents() {
                 <h3 className="text-xl font-black text-white mb-6 group-hover:text-yellow-400 transition-colors tracking-tight leading-tight line-clamp-2">{event.name}</h3>
 
                 <div className="grid grid-cols-1 gap-4 text-sm font-bold">
-                  <div className="flex items-center gap-3 text-slate-500">
+                  <div className="flex items-center gap-3 text-slate-300">
                     <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-yellow-400">
                       <Calendar size={16} />
                     </div>
@@ -458,19 +458,19 @@ export default function AdminEvents() {
                       })()}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-slate-500">
+                  <div className="flex items-center gap-3 text-slate-300">
                     <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-yellow-400">
                       <Clock size={16} />
                     </div>
                     <span className="uppercase tracking-widest text-xs font-bold text-slate-300">{event.start_time} - {event.end_time}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-slate-500">
+                  <div className="flex items-center gap-3 text-slate-300">
                     <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400">
                       <Users size={16} />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-white text-xs font-black">{event.registration_count || 0}</span>
-                      <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Inscritos</span>
+                      <span className="text-[10px] text-slate-300 uppercase tracking-widest font-bold">Inscritos</span>
                     </div>
                   </div>
                 </div>
@@ -479,42 +479,42 @@ export default function AdminEvents() {
               <div className="mt-10 flex flex-wrap items-center justify-end gap-2 md:gap-3 pt-6 border-t border-slate-800">
                 <Link
                   to={`/admin/events/${event.id}/registrations`}
-                  className="w-12 h-12 bg-slate-800 text-slate-400 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
+                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
                   title="Ver Inscritos"
                 >
                   <Users size={22} />
                 </Link>
                 <button
                   onClick={() => handleSaveAsTemplate(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-400 hover:text-green-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
+                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-green-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
                   title="Salvar como Modelo"
                 >
                   <Bookmark size={22} />
                 </button>
                 <button
                   onClick={() => handleClone(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-400 hover:text-amber-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
+                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-amber-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
                   title="Duplicar Evento"
                 >
                   <Copy size={22} />
                 </button>
                 <button
                   onClick={() => setQrEvent(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-400 hover:text-indigo-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
+                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-indigo-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
                   title="Gerar QR Code"
                 >
                   <QrCode size={22} />
                 </button>
                 <button
                   onClick={() => handleOpenModal(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-400 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
+                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
                   title="Editar Evento"
                 >
                   <Edit2 size={20} />
                 </button>
                 <button
                   onClick={() => handleDelete(event.id)}
-                  className="w-12 h-12 bg-red-500/5 text-slate-400 hover:text-red-500 rounded-2xl flex items-center justify-center transition-all border border-red-500/10"
+                  className="w-12 h-12 bg-red-500/5 text-slate-300 hover:text-red-500 rounded-2xl flex items-center justify-center transition-all border border-red-500/10"
                   title="Excluir"
                 >
                   <Trash2 size={22} />
@@ -527,8 +527,8 @@ export default function AdminEvents() {
         {events.length === 0 && (
           <div className="col-span-full py-20 text-center bg-slate-900/40 rounded-[3rem] border-2 border-dashed border-slate-800">
             <Calendar size={60} className="mx-auto text-slate-800 mb-6" />
-            <p className="text-slate-400 font-bold text-lg">Nenhum evento encontrado.</p>
-            <p className="text-slate-500 text-sm">Clique em "Novo Evento" para começar.</p>
+            <p className="text-slate-300 font-bold text-lg">Nenhum evento encontrado.</p>
+            <p className="text-slate-400 text-sm">Clique em "Novo Evento" para começar.</p>
           </div>
         )}
       </div>
@@ -544,7 +544,7 @@ export default function AdminEvents() {
                 </div>
                 <h2 className="text-3xl font-black text-white tracking-tight">Biblioteca de Modelos</h2>
               </div>
-              <button onClick={() => setShowTemplates(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
+              <button onClick={() => setShowTemplates(false)} className="w-10 h-10 bg-slate-800 text-slate-300 hover:text-white rounded-xl flex items-center justify-center transition-colors">
                 <X size={24} />
               </button>
             </div>
@@ -552,7 +552,7 @@ export default function AdminEvents() {
             <div className="p-8 overflow-y-auto max-h-[60vh] space-y-6">
               {templates.length === 0 ? (
                 <div className="text-center py-20">
-                  <Bookmark size={60} className="mx-auto text-slate-200 mb-6" />
+                  <Bookmark size={60} className="mx-auto text-slate-300 mb-6" />
                   <p className="text-slate-500 font-bold text-lg">Nenhum modelo salvo ainda.</p>
                 </div>
               ) : (
@@ -564,7 +564,7 @@ export default function AdminEvents() {
                       </div>
                       <div>
                         <h4 className="text-lg font-black text-white mb-1">{template.name}</h4>
-                        <p className="text-xs font-bold text-slate-500 line-clamp-1">{template.description}</p>
+                        <p className="text-xs font-bold text-slate-400 line-clamp-1">{template.description}</p>
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -576,7 +576,7 @@ export default function AdminEvents() {
                       </button>
                       <button
                         onClick={() => handleDeleteTemplate(template.id)}
-                        className="w-10 h-10 bg-red-500/5 text-slate-500 hover:text-red-500 rounded-xl flex items-center justify-center transition-colors"
+                        className="w-10 h-10 bg-red-500/5 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition-colors"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -597,7 +597,7 @@ export default function AdminEvents() {
               <h2 className="text-3xl font-black text-white tracking-tight">
                 {editingEvent ? 'Editar Evento' : 'Criar Novo Evento'}
               </h2>
-              <button onClick={() => { setIsModalOpen(false); setSelectedImageFile(null); }} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
+              <button onClick={() => { setIsModalOpen(false); setSelectedImageFile(null); }} className="w-10 h-10 bg-slate-800 text-slate-300 hover:text-white rounded-xl flex items-center justify-center transition-colors">
                 <X size={24} />
               </button>
             </div>
@@ -614,7 +614,7 @@ export default function AdminEvents() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Nome do Evento</label>
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Nome do Evento</label>
                     <input
                       type="text"
                       required
@@ -624,7 +624,7 @@ export default function AdminEvents() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Categoria</label>
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Categoria</label>
                     <select
                       required
                       className="w-full px-6 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400 transition-all text-white font-bold appearance-none placeholder:text-slate-600 shadow-sm"
@@ -640,7 +640,7 @@ export default function AdminEvents() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Descrição Completa</label>
+                  <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Descrição Completa</label>
                   <textarea
                     rows={4}
                     className="w-full px-6 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-600 shadow-sm"
@@ -650,7 +650,7 @@ export default function AdminEvents() {
                 </div>
 
                 <div className="space-y-6 pt-6 border-t border-slate-800">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Capa do Evento</label>
+                  <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Capa do Evento</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-[2rem] flex flex-col items-center justify-center text-center">
                       <input
@@ -700,23 +700,23 @@ export default function AdminEvents() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Início</label>
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Início</label>
                     <input type="date" required className="w-full px-5 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all shadow-sm" value={formData.start_date || ''} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Hora Início</label>
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Hora Início</label>
                     <input type="time" required className="w-full px-5 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all shadow-sm" value={formData.start_time} onChange={(e) => setFormData({ ...formData, start_time: e.target.value })} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Término</label>
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Término</label>
                     <input type="date" className="w-full px-5 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all shadow-sm" value={formData.end_date || ''} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Hora Término</label>
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Hora Término</label>
                     <input type="time" className="w-full px-5 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all shadow-sm" value={formData.end_time || ''} onChange={(e) => setFormData({ ...formData, end_time: e.target.value })} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Vagas</label>
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Vagas</label>
                     <input type="number" placeholder="0 = Ilimitado" className="w-full px-5 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all placeholder:text-slate-600 shadow-sm" value={formData.max_capacity || ''} onChange={(e) => setFormData({ ...formData, max_capacity: parseInt(e.target.value) || 0 })} />
                   </div>
                 </div>
@@ -734,7 +734,7 @@ export default function AdminEvents() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Proteção por Senha</label>
+                      <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Proteção por Senha</label>
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, password_protected: !formData.password_protected })}
@@ -763,7 +763,7 @@ export default function AdminEvents() {
 
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Restrição de Acesso</label>
+                      <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Restrição de Acesso</label>
                       <select
                         className="w-full px-5 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none shadow-sm"
                         value={formData.restrictions?.type || 'all'}

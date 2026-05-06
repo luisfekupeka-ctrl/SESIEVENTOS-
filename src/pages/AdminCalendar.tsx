@@ -6,7 +6,8 @@ import {
   ChevronRight, 
   Calendar as CalendarIcon, 
   Clock, 
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import { 
   format, 
@@ -65,15 +66,15 @@ export default function AdminCalendar() {
     return (
       <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
         <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 tracking-tight">Calendário de Eventos</h1>
-          <p className="text-sky-500 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs">
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Agenda SESI</h1>
+          <p className="text-yellow-400 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs">
             {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
           </p>
         </div>
-        <div className="flex items-center gap-2 md:gap-4 bg-white p-1.5 md:p-2 rounded-[2rem] border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-2 md:gap-4 bg-slate-900 p-1.5 md:p-2 rounded-[2rem] border border-slate-800 shadow-xl">
           <button
             onClick={prevMonth}
-            className="w-10 h-10 md:w-12 md:h-12 bg-white text-slate-400 hover:text-slate-900 rounded-xl md:rounded-2xl flex items-center justify-center transition-all border border-slate-200"
+            className="w-10 h-10 md:w-12 md:h-12 bg-slate-950 text-slate-400 hover:text-white rounded-xl md:rounded-2xl flex items-center justify-center transition-all border border-slate-800"
           >
             <ChevronLeft size={20} className="md:w-6 md:h-6" />
           </button>
@@ -85,7 +86,7 @@ export default function AdminCalendar() {
           </button>
           <button
             onClick={nextMonth}
-            className="w-10 h-10 md:w-12 md:h-12 bg-white text-slate-400 hover:text-slate-900 rounded-xl md:rounded-2xl flex items-center justify-center transition-all border border-slate-200"
+            className="w-10 h-10 md:w-12 md:h-12 bg-slate-950 text-slate-400 hover:text-white rounded-xl md:rounded-2xl flex items-center justify-center transition-all border border-slate-800"
           >
             <ChevronRight size={20} className="md:w-6 md:h-6" />
           </button>
@@ -97,7 +98,7 @@ export default function AdminCalendar() {
   const renderDays = () => {
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
     return (
-      <div className="grid grid-cols-7 mb-4 bg-slate-50 rounded-2xl overflow-hidden border border-slate-200">
+      <div className="grid grid-cols-7 mb-4 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800">
         {days.map((day, i) => (
           <div key={i} className="text-center text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] py-5">
             {day}
@@ -106,21 +107,22 @@ export default function AdminCalendar() {
       </div>
     );
   };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-40">
-        <div className="w-16 h-16 border-4 border-sky-400 border-t-transparent rounded-full animate-spin mb-8 shadow-[0_0_20px_rgba(56,189,248,0.2)]"></div>
-        <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Sincronizando Agenda...</p>
+        <Loader2 className="w-16 h-16 text-yellow-400 animate-spin mb-8 shadow-[0_0_20px_rgba(234,179,8,0.3)]" />
+        <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-xs">Sincronizando Agenda...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-0 md:p-0">
+    <div className="bg-[#020617] min-h-screen">
       {renderHeader()}
-      <div className="bg-white p-2 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-2xl overflow-hidden mb-16">
+      <div className="bg-slate-900/40 p-2 md:p-10 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden mb-16 backdrop-blur-sm">
         {renderDays()}
-        <div className="grid grid-cols-7 gap-px md:gap-1 bg-slate-100 border border-slate-200 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-sm">
+        <div className="grid grid-cols-7 gap-px bg-slate-800 border border-slate-800 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl">
           {eachDayOfInterval({
             start: startOfWeek(startOfMonth(currentMonth)),
             end: endOfWeek(endOfMonth(currentMonth)),
@@ -132,39 +134,38 @@ export default function AdminCalendar() {
             return (
               <div
                 key={i}
-                className={`min-h-[70px] md:min-h-[140px] p-2 md:p-4 flex flex-col gap-1 md:gap-3 transition-colors ${
-                  !isSelectedMonth ? 'bg-slate-50/50 opacity-40' : 'bg-white'
+                className={`min-h-[70px] md:min-h-[140px] p-2 md:p-4 flex flex-col gap-1 md:gap-3 transition-all ${
+                  !isSelectedMonth ? 'bg-slate-950 opacity-20' : 'bg-slate-900 hover:bg-slate-800/80'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span className={`text-[10px] md:text-sm font-black tracking-tighter ${
-                    !isSelectedMonth ? 'text-slate-300' : 
+                    !isSelectedMonth ? 'text-slate-700' : 
                     isToday ? 'bg-yellow-400 text-black w-5 h-5 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg shadow-yellow-400/20' : 
-                    'text-slate-900'
+                    'text-white'
                   }`}>
                     {format(day, 'd')}
                   </span>
                   {dayEvents.length > 0 && isSelectedMonth && (
-                    <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+                    <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-yellow-400 shadow-[0_0_10px_rgba(234,179,8,1)] animate-pulse" />
                   )}
                 </div>
                 
-                {/* Mobile: Dots only | Desktop: Event Cards */}
                 <div className="flex-grow flex flex-col gap-1 md:gap-2 overflow-y-auto max-h-[40px] md:max-h-[90px] custom-scrollbar pr-0.5">
                   <div className="flex flex-wrap gap-0.5 md:hidden">
                     {dayEvents.map(e => (
-                      <div key={e.id} className="w-1 h-1 rounded-full bg-sky-500/50" />
+                      <div key={e.id} className="w-1.5 h-1.5 rounded-full bg-yellow-400/50" />
                     ))}
                   </div>
                   <div className="hidden md:flex flex-col gap-2">
                     {dayEvents.map(event => (
                       <Link key={event.id} to={`/admin/events`} className="group">
-                        <div className="px-3 py-2 bg-slate-50 border-l-2 border-sky-500 rounded-lg flex flex-col gap-1 hover:bg-sky-50 transition-all group-hover:translate-x-1">
-                          <p className="text-[10px] font-black text-slate-900 truncate leading-tight uppercase tracking-tight group-hover:text-sky-600 transition-colors">
+                        <div className="px-3 py-2 bg-slate-950/50 border-l-2 border-yellow-400 rounded-lg flex flex-col gap-1 hover:bg-slate-950 transition-all group-hover:translate-x-1 border border-transparent hover:border-slate-800">
+                          <p className="text-[10px] font-black text-white truncate leading-tight uppercase tracking-tight group-hover:text-yellow-400 transition-colors">
                             {event.name}
                           </p>
                           <div className="flex items-center gap-1.5 text-[8px] text-slate-500 font-bold uppercase tracking-widest">
-                            <Clock size={10} className="text-sky-500/50" />
+                            <Clock size={10} className="text-yellow-400/50" />
                             {event.start_time}
                           </div>
                         </div>
@@ -178,30 +179,29 @@ export default function AdminCalendar() {
         </div>
       </div>
 
-      {/* Upcoming Events List */}
       <div className="mt-20">
         <div className="flex items-center gap-6 mb-12">
-          <div className="w-12 h-12 bg-yellow-400/10 text-yellow-600 rounded-2xl flex items-center justify-center border border-yellow-400/10">
+          <div className="w-12 h-12 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center border border-yellow-400/10 shadow-lg shadow-yellow-400/5">
             <CalendarIcon size={24} />
           </div>
-          <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight uppercase">
+          <h3 className="text-xl md:text-2xl font-black text-white tracking-tight uppercase">
             Radar de Eventos
           </h3>
-          <div className="h-px flex-grow bg-slate-100"></div>
+          <div className="h-px flex-grow bg-slate-800/50"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events
             .filter(e => parseISO(e.start_date) >= startOfMonth(currentMonth))
             .slice(0, 6)
             .map(event => (
-              <div key={event.id} className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-xl hover:border-sky-500/30 transition-all flex items-center justify-between group">
+              <div key={event.id} className="bg-slate-900/60 p-6 rounded-[2rem] border border-slate-800 shadow-2xl hover:border-yellow-400/30 transition-all flex items-center justify-between group backdrop-blur-sm">
                 <div className="flex items-center gap-5 overflow-hidden">
-                  <div className="w-16 h-16 bg-slate-50 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-100 group-hover:border-sky-500/20 transition-all">
-                    <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="w-16 h-16 bg-slate-950 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-800 group-hover:border-yellow-400/20 transition-all shadow-inner">
+                    <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" referrerPolicy="no-referrer" />
                   </div>
                   <div className="overflow-hidden">
-                    <h4 className="text-base font-black text-slate-900 group-hover:text-sky-600 transition-colors truncate tracking-tight">{event.name}</h4>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                    <h4 className="text-base font-black text-white group-hover:text-yellow-400 transition-colors truncate tracking-tight">{event.name}</h4>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
                       {(() => {
                         try {
                           return format(parseISO(event.start_date), "dd 'DE' MMMM", { locale: ptBR });
@@ -212,15 +212,15 @@ export default function AdminCalendar() {
                     </p>
                   </div>
                 </div>
-                <Link to="/admin/events" className="w-10 h-10 bg-slate-50 text-slate-400 hover:text-sky-600 rounded-xl flex items-center justify-center transition-all border border-slate-200">
+                <Link to="/admin/events" className="w-11 h-11 bg-slate-950 text-slate-500 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-800 shadow-sm">
                   <ExternalLink size={18} />
                 </Link>
               </div>
             ))}
           {events.length === 0 && (
-            <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-sm">
-              <CalendarIcon size={48} className="mx-auto text-slate-200 mb-6" />
-              <p className="text-slate-400 font-black uppercase tracking-[0.2em]">Sem eventos detectados.</p>
+            <div className="col-span-full py-24 text-center bg-slate-900/40 rounded-[3rem] border border-dashed border-slate-800 shadow-inner">
+              <CalendarIcon size={48} className="mx-auto text-slate-800 mb-6" />
+              <p className="text-slate-500 font-black uppercase tracking-[0.2em]">Sem eventos detectados.</p>
             </div>
           )}
         </div>

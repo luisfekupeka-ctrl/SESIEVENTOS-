@@ -82,26 +82,26 @@ export default function EventDetails() {
     const restrictions = event.restrictions as any;
 
     // Check restrictions
-    if (restrictions.type === 'years' && !restrictions.values.includes(sGrade)) {
-      setRestrictionError(`Este evento é restrito aos anos: ${restrictions.values.join(', ')}`);
+    if (restrictions?.type === 'years' && !restrictions.values?.includes(sGrade)) {
+      setRestrictionError(`Este evento é restrito aos anos: ${restrictions.values?.join(', ')}`);
       return;
     }
-    if (restrictions.type === 'classes' && !restrictions.values.includes(sClass)) {
-      setRestrictionError(`Este evento é restrito às turmas: ${restrictions.values.join(', ')}`);
+    if (restrictions?.type === 'classes' && !restrictions.values?.includes(sClass)) {
+      setRestrictionError(`Este evento é restrito às turmas: ${restrictions.values?.join(', ')}`);
       return;
     }
-    if (restrictions.type === 'collaborators' && participantType !== 'collaborator') {
+    if (restrictions?.type === 'collaborators' && participantType !== 'collaborator') {
       setRestrictionError(`Este evento é restrito apenas para colaboradores.`);
       return;
     }
-    if (restrictions.type === 'participant_types' && !restrictions.values.includes(participantType)) {
+    if (restrictions?.type === 'participant_types' && !restrictions.values?.includes(participantType)) {
       const typeLabels: Record<string, string> = {
         student: 'alunos',
         collaborator: 'colaboradores',
         responsible: 'responsáveis',
         other: 'outros'
       };
-      const allowedLabels = restrictions.values.map((v: string) => typeLabels[v] || v).join(', ');
+      const allowedLabels = restrictions.values?.map((v: string) => typeLabels[v] || v).join(', ');
       setRestrictionError(`Este evento é restrito aos seguintes tipos de participante: ${allowedLabels}`);
       return;
     }
@@ -131,9 +131,9 @@ export default function EventDetails() {
 
     try {
       // Check for double registration
-      const studentNameKey = (event.form_fields as any[]).find(f => f.label.toLowerCase().includes('nome'))?.label || 'nome';
-      const studentSurnameKey = (event.form_fields as any[]).find(f => f.label.toLowerCase().includes('sobrenome'))?.label || 'sobrenome';
-      const studentGradeKey = (event.form_fields as any[]).find(f => f.label.toLowerCase().includes('série') || f.label.toLowerCase().includes('ano'))?.label || 'série';
+      const studentNameKey = (event.form_fields as any[] || []).find(f => f.label?.toLowerCase().includes('nome'))?.label || 'nome';
+      const studentSurnameKey = (event.form_fields as any[] || []).find(f => f.label?.toLowerCase().includes('sobrenome'))?.label || 'sobrenome';
+      const studentGradeKey = (event.form_fields as any[] || []).find(f => f.label?.toLowerCase().includes('série') || f.label?.toLowerCase().includes('ano'))?.label || 'série';
 
       const checkName = formData[studentNameKey] || sName;
       const checkSurname = formData[studentSurnameKey] || sSurname;
@@ -267,12 +267,12 @@ export default function EventDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column: Details */}
           <div className="lg:col-span-2 space-y-16">
-            <section className="bg-[#0A0A0A]/80 backdrop-blur-xl p-10 rounded-[2.5rem] border border-white/5 shadow-2xl">
-              <h2 className="text-3xl font-black text-white mb-8 flex items-center gap-4">
-                <div className="w-2 h-10 bg-yellow-500 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.5)]"></div>
+            <section className="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-xl">
+              <h2 className="text-3xl font-black text-slate-900 mb-8 flex items-center gap-4">
+                <div className="w-2 h-10 bg-sky-500 rounded-full shadow-[0_0_15px_rgba(14,165,233,0.3)]"></div>
                 Sobre o Evento
               </h2>
-              <div className="prose prose-invert max-w-none text-slate-400 leading-relaxed text-xl font-medium">
+              <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-xl font-medium">
                 {event.description}
               </div>
             </section>
@@ -441,9 +441,9 @@ export default function EventDetails() {
                                           required={field.required}
                                           value={opt}
                                           onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
-                                          className="w-5 h-5 border-white/10 bg-black text-sky-500 focus:ring-sky-500/50"
+                                          className="w-5 h-5 border-slate-300 bg-white text-sky-500 focus:ring-sky-500/50"
                                         />
-                                        <span className="text-slate-400 group-hover:text-white transition-colors">{opt}</span>
+                                        <span className="text-slate-600 group-hover:text-sky-600 transition-colors font-bold">{opt}</span>
                                       </label>
                                     ))}
                                   </div>
@@ -463,9 +463,9 @@ export default function EventDetails() {
                                               : currentValues.filter((v: string) => v !== opt);
                                             setFormData({ ...formData, [fieldKey]: newValues });
                                           }}
-                                          className="w-5 h-5 rounded border-white/10 bg-black text-sky-500 focus:ring-sky-500/50"
+                                          className="w-5 h-5 rounded border-slate-300 bg-white text-sky-500 focus:ring-sky-500/50"
                                         />
-                                        <span className="text-slate-400 group-hover:text-white transition-colors">{opt}</span>
+                                        <span className="text-slate-600 group-hover:text-sky-600 transition-colors font-bold">{opt}</span>
                                       </label>
                                     ))}
                                   </div>
@@ -497,8 +497,8 @@ export default function EventDetails() {
                       )}
 
                       {event.password_protected && (
-                        <div className="space-y-3 pt-6 border-t border-white/5">
-                          <label className="text-xs font-black text-sky-500 uppercase tracking-widest flex items-center gap-2">
+                        <div className="space-y-3 pt-6 border-t border-slate-100">
+                          <label className="text-xs font-black text-sky-600 uppercase tracking-widest flex items-center gap-2">
                             <Lock size={14} /> Senha de Acesso
                           </label>
                           <input

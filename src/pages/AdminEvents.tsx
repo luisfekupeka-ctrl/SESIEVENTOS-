@@ -366,18 +366,18 @@ export default function AdminEvents() {
 
       <div className="flex flex-col md:flex-row gap-4 mb-10">
         <div className="relative flex-grow">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
           <input
             type="text"
             placeholder="Pesquisar por nome ou descrição..."
-            className="w-full pl-12 pr-6 py-4 bg-[#0A0A0A] border border-white/5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-white font-bold placeholder:text-slate-600"
+            className="w-full pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-sky-400/50 focus:border-sky-400 transition-all text-slate-900 font-bold placeholder:text-slate-400 shadow-sm"
             value={adminSearchTerm}
             onChange={(e) => setAdminSearchTerm(e.target.value)}
           />
         </div>
         <div className="relative">
           <select
-            className="w-full md:w-64 px-6 py-4 bg-[#0A0A0A] border border-white/5 rounded-2xl text-white font-bold focus:outline-none focus:border-sky-400 transition-all appearance-none cursor-pointer"
+            className="w-full md:w-64 px-6 py-4 bg-white border border-slate-200 rounded-2xl text-slate-900 font-bold focus:outline-none focus:border-sky-400 transition-all appearance-none cursor-pointer shadow-sm"
             value={adminCategoryFilter}
             onChange={(e) => setAdminCategoryFilter(e.target.value)}
           >
@@ -386,7 +386,7 @@ export default function AdminEvents() {
               <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
-          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
         </div>
       </div>
 
@@ -411,12 +411,33 @@ export default function AdminEvents() {
             </div>
             <div className="p-6 md:p-8 flex-grow flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-4 mb-4 min-h-[1.5rem]">
+                <div className="flex flex-wrap items-center gap-3 mb-4 min-h-[1.5rem]">
                   {event.password_protected && (
-                    <div className="flex items-center gap-2 text-slate-500 font-bold text-[10px] uppercase tracking-widest">
-                      <Lock size={14} className="text-sky-400" /> Protegido
+                    <div className="flex items-center gap-2 px-2.5 py-1 bg-amber-500/10 text-amber-600 font-black text-[10px] uppercase tracking-widest rounded-lg border border-amber-500/10">
+                      <Lock size={12} /> Protegido
                     </div>
                   )}
+                  {(() => {
+                    const restrictions = event.restrictions as any;
+                    if (restrictions?.type && restrictions.type !== 'all') {
+                      const typeLabels: Record<string, string> = {
+                        years: 'Anos',
+                        classes: 'Turmas',
+                        participant_types: 'Tipos',
+                        collaborators: 'Colaboradores'
+                      };
+                      return (
+                        <div className="flex items-center gap-2 px-2.5 py-1 bg-sky-500/10 text-sky-600 font-black text-[10px] uppercase tracking-widest rounded-lg border border-sky-500/10">
+                          <ShieldCheck size={12} /> {typeLabels[restrictions.type] || 'Restrito'}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="flex items-center gap-2 px-2.5 py-1 bg-slate-100 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-lg border border-slate-200">
+                        <Users size={12} /> Público
+                      </div>
+                    );
+                  })()}
                 </div>
                 <h3 className="text-xl font-black text-slate-900 mb-6 group-hover:text-sky-600 transition-colors tracking-tight leading-tight line-clamp-2">{event.name}</h3>
 
@@ -453,38 +474,38 @@ export default function AdminEvents() {
                 </div>
               </div>
 
-              <div className="mt-10 flex flex-wrap items-center justify-end gap-2 md:gap-3 pt-6 border-t border-white/5">
+              <div className="mt-10 flex flex-wrap items-center justify-end gap-2 md:gap-3 pt-6 border-t border-slate-100">
                 <Link
                   to={`/admin/events/${event.id}/registrations`}
-                  className="w-12 h-12 bg-black text-slate-400 hover:text-blue-400 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                  className="w-12 h-12 bg-white text-slate-400 hover:text-sky-600 rounded-2xl flex items-center justify-center transition-all border border-slate-200 shadow-sm"
                   title="Ver Inscritos"
                 >
                   <Users size={22} />
                 </Link>
                 <button
                   onClick={() => handleSaveAsTemplate(event)}
-                  className="w-12 h-12 bg-black text-slate-400 hover:text-green-500 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                  className="w-12 h-12 bg-white text-slate-400 hover:text-green-500 rounded-2xl flex items-center justify-center transition-all border border-slate-200 shadow-sm"
                   title="Salvar como Modelo"
                 >
                   <Bookmark size={22} />
                 </button>
                 <button
                   onClick={() => handleClone(event)}
-                  className="w-12 h-12 bg-black text-slate-400 hover:text-amber-500 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                  className="w-12 h-12 bg-white text-slate-400 hover:text-amber-500 rounded-2xl flex items-center justify-center transition-all border border-slate-200 shadow-sm"
                   title="Duplicar Evento"
                 >
                   <Copy size={22} />
                 </button>
                 <button
                   onClick={() => setQrEvent(event)}
-                  className="w-12 h-12 bg-black text-slate-400 hover:text-indigo-400 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                  className="w-12 h-12 bg-white text-slate-400 hover:text-indigo-600 rounded-2xl flex items-center justify-center transition-all border border-slate-200 shadow-sm"
                   title="Gerar QR Code"
                 >
                   <QrCode size={22} />
                 </button>
                 <button
                   onClick={() => handleOpenModal(event)}
-                  className="w-12 h-12 bg-black text-slate-400 hover:text-sky-500 rounded-2xl flex items-center justify-center transition-all border border-white/5"
+                  className="w-12 h-12 bg-white text-slate-400 hover:text-sky-600 rounded-2xl flex items-center justify-center transition-all border border-slate-200 shadow-sm"
                   title="Editar Evento"
                 >
                   <Edit2 size={20} />
@@ -756,14 +777,14 @@ export default function AdminEvents() {
                       <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                         <label className="text-[10px] font-black text-sky-400 uppercase tracking-widest px-2">
                           Selecionar {
-                            formData.restrictions.type === 'years' ? 'Anos' : 
-                            formData.restrictions.type === 'classes' ? 'Turmas' : 'Tipos'
+                            formData.restrictions?.type === 'years' ? 'Anos' : 
+                            formData.restrictions?.type === 'classes' ? 'Turmas' : 'Tipos'
                           }
                         </label>
                         <div className="flex flex-wrap gap-2">
                           {(
-                            formData.restrictions.type === 'years' ? GRADES : 
-                            formData.restrictions.type === 'classes' ? CLASSES : 
+                            formData.restrictions?.type === 'years' ? GRADES : 
+                            formData.restrictions?.type === 'classes' ? CLASSES : 
                             [
                               { label: 'Aluno', value: 'student' },
                               { label: 'Colaborador', value: 'collaborator' },
@@ -785,7 +806,10 @@ export default function AdminEvents() {
                                     : [...currentValues, val];
                                   setFormData({
                                     ...formData,
-                                    restrictions: { ...formData.restrictions!, values: newValues }
+                                    restrictions: { 
+                                      type: formData.restrictions?.type || 'all', 
+                                      values: newValues 
+                                    }
                                   });
                                 }}
                                 className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${isSelected

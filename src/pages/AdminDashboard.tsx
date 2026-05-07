@@ -461,7 +461,14 @@ export default function AdminDashboard() {
                       <Users size={24} />
                     </div>
                     <div>
-                      <p className="text-lg font-black text-white mb-1">{student?.name} {student?.surname}</p>
+                      <p className="text-lg font-black text-white mb-1">
+                        {(() => {
+                          const data = reg.form_data;
+                          const name = data?.nome_completo || data?.['nome completo'] || data?.nome || data?.Nome || data?.name || data?.Name;
+                          if (name) return name;
+                          return `${student?.name || ''} ${student?.surname || ''}`.trim() || 'Participante';
+                        })()}
+                      </p>
                       <p className="text-xs font-bold text-slate-300">Inscrito em: <span className="text-yellow-400">{events.find(e => e.id === reg.event_id)?.name}</span></p>
                     </div>
                   </div>

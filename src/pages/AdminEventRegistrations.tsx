@@ -42,8 +42,12 @@ export default function AdminEventRegistrations() {
 
         if (regsData) {
           const sortedRegs = (regsData as Registration[]).sort((a, b) => {
-            const nameA = (a.form_data?.nome || a.form_data?.Nome || '').toString().toLowerCase();
-            const nameB = (b.form_data?.nome || b.form_data?.Nome || '').toString().toLowerCase();
+            const getName = (data: any) => {
+              if (!data) return '';
+              return (data.nome_completo || data['nome completo'] || data.nome || data.Nome || data.name || data.Name || '').toString().toLowerCase().trim();
+            };
+            const nameA = getName(a.form_data);
+            const nameB = getName(b.form_data);
             return nameA.localeCompare(nameB);
           });
           setRegistrations(sortedRegs);

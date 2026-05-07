@@ -483,11 +483,12 @@ export default function AdminEvents() {
                     <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
                       Início: {(() => {
                         try {
+                          if (!event.start_date) return 'Sem data';
                           return format(new Date(event.start_date + 'T00:00:00'), "dd/MM/yyyy");
                         } catch (e) {
-                          return event.start_date;
+                          return event.start_date || 'Data inválida';
                         }
-                      })()} às {event.start_time}
+                      })()} às {event.start_time || '--:--'}
                     </span>
                   </div>
                   {event.end_date && (
@@ -498,11 +499,12 @@ export default function AdminEvents() {
                       <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
                         Limite: {(() => {
                           try {
+                            if (!event.end_date) return 'Sem limite';
                             return format(new Date(event.end_date + 'T00:00:00'), "dd/MM/yyyy");
                           } catch (e) {
-                            return event.end_date;
+                            return event.end_date || 'Data inválida';
                           }
-                        })()} às {event.end_time}
+                        })()} às {event.end_time || '--:--'}
                       </span>
                     </div>
                   )}

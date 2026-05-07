@@ -118,8 +118,17 @@ export default function AdminEventRegistrations() {
     if (profile?.status !== 'approved') return;
     try {
       const data = registrations.map(reg => {
+        let formattedDate = '-';
+        try {
+          if (reg.timestamp) {
+            formattedDate = format(new Date(reg.timestamp), "dd/MM/yyyy HH:mm");
+          }
+        } catch (e) {
+          console.error("Erro ao formatar data para Excel:", e);
+        }
+
         const row: any = {
-          'Data Inscrição': format(new Date(reg.timestamp), "dd/MM/yyyy HH:mm")
+          'Data Inscrição': formattedDate
         };
         
         event.form_fields.forEach(field => {
@@ -147,9 +156,19 @@ export default function AdminEventRegistrations() {
       pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
       
       const head = [['Data', ...event.form_fields.map(f => f.label)]];
-      const body = registrations.map(reg => [
-        format(new Date(reg.timestamp), "dd/MM/yyyy"),
-        ...event.form_fields.map(f => {
+      const body = registrations.map(reg => {
+        let formattedDate = '-';
+        try {
+          if (reg.timestamp) {
+            formattedDate = format(new Date(reg.timestamp), "dd/MM/yyyy");
+          }
+        } catch (e) {
+          console.error("Erro ao formatar data para PDF:", e);
+        }
+
+        return [
+          formattedDate,
+          ...event.form_fields.map(f => {
           const key = f.label.toLowerCase();
           return reg.form_data[key] || reg.form_data[f.label] || '-';
         })
@@ -177,8 +196,17 @@ export default function AdminEventRegistrations() {
     event.form_fields.forEach(field => headers.push(field.label));
     
     const rows = registrations.map(reg => {
+      let formattedDate = '-';
+      try {
+        if (reg.timestamp) {
+          formattedDate = format(new Date(reg.timestamp), "dd/MM/yyyy HH:mm");
+        }
+      } catch (e) {
+        console.error("Erro ao formatar data para Clipboard:", e);
+      }
+
       const row = [
-        format(new Date(reg.timestamp), "dd/MM/yyyy HH:mm")
+        formattedDate
       ];
       
       event.form_fields.forEach(field => {

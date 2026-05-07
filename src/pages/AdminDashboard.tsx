@@ -14,28 +14,20 @@ export default function AdminDashboard() {
   const [recentRegistrations, setRecentRegistrations] = useState<Registration[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [backgroundLoading, setBackgroundLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const fetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    fetchData();
-
-    const channel = supabase
-      .channel('dashboard_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => fetchData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'registrations' }, () => fetchData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'students' }, () => fetchData())
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (isBackground) {
+        setBackgroundLoading(true);
+      } else {
+        setLoading(true);
+      }
+      
       setError(null);
       const [eventsRes, regsRes, studentsRes] = await Promise.all([
         supabase.from('events').select('*'),
@@ -55,8 +47,32 @@ export default function AdminDashboard() {
       setError(`Erro no servidor (${err.message || '500'}). Verifique se o projeto no Supabase está ativo.`);
     } finally {
       setLoading(false);
+      setBackgroundLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+
+    const debouncedFetch = () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = setTimeout(() => {
+        fetchData(true);
+      }, 1000); // 1 second debounce
+    };
+
+    const channel = supabase
+      .channel('dashboard_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, debouncedFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'registrations' }, debouncedFetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'students' }, debouncedFetch)
+      .subscribe();
+
+    return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const [error, setError] = useState<string | null>(null);
 

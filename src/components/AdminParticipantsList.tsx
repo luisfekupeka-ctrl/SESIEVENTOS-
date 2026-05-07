@@ -33,25 +33,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     type: type
   });
 
-  useEffect(() => {
-    fetchParticipants();
-
-    const subscription = supabase
-      .channel(`public:students:${type}`)
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'students',
-        filter: `type=eq.${type}`
-      }, () => {
-        fetchParticipants();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, [type]);
+  const fetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const fetchParticipants = async (silent = false) => {
     if (!silent) setLoading(true);
@@ -75,6 +57,32 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
       setIsRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    fetchParticipants();
+
+    const debouncedFetch = () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = setTimeout(() => {
+        fetchParticipants(true);
+      }, 1500); // 1.5s debounce
+    };
+
+    const subscription = supabase
+      .channel(`public:students:${type}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'students',
+        filter: `type=eq.${type}`
+      }, debouncedFetch)
+      .subscribe();
+
+    return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      supabase.removeChannel(subscription);
+    };
+  }, [type]);
 
   const exportToExcel = () => {
     if (participants.length === 0) return;

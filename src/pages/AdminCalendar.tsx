@@ -29,22 +29,14 @@ export default function AdminCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [backgroundLoading, setBackgroundLoading] = useState(false);
+  const fetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    fetchEvents();
-
-    const channel = supabase
-      .channel('calendar_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => fetchEvents())
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
-  const fetchEvents = async () => {
+  const fetchEvents = async (isBackground = false) => {
     try {
+      if (!isBackground) setLoading(true);
+      else setBackgroundLoading(true);
+
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -56,8 +48,30 @@ export default function AdminCalendar() {
       console.error("Error fetching events for calendar:", err);
     } finally {
       setLoading(false);
+      setBackgroundLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchEvents();
+
+    const debouncedFetch = () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = setTimeout(() => {
+        fetchEvents(true);
+      }, 1500); // 1.5s debounce for calendar
+    };
+
+    const channel = supabase
+      .channel('calendar_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, debouncedFetch)
+      .subscribe();
+
+    return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));

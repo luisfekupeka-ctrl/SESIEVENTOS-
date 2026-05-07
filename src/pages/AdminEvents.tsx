@@ -55,30 +55,14 @@ export default function AdminEvents() {
     form_fields: []
   });
 
-  useEffect(() => {
-    fetchData();
+  const [backgroundLoading, setBackgroundLoading] = useState(false);
+  const fetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-    const eventsChannel = supabase.channel('events_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => fetchData())
-      .subscribe();
-
-    const categoriesChannel = supabase.channel('categories_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchData())
-      .subscribe();
-
-    const templatesChannel = supabase.channel('templates_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'event_templates' }, () => fetchData())
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(eventsChannel);
-      supabase.removeChannel(categoriesChannel);
-      supabase.removeChannel(templatesChannel);
-    };
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = async (isBackground = false) => {
     try {
+      if (isBackground) setBackgroundLoading(true);
+      else setLoading(true);
+
       const [eventsRes, catsRes, tempsRes] = await Promise.all([
         supabase.from('events').select('*').order('start_date', { ascending: false }),
         supabase.from('categories').select('*'),
@@ -96,8 +80,39 @@ export default function AdminEvents() {
       console.error("Error fetching admin data:", err);
     } finally {
       setLoading(false);
+      setBackgroundLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+
+    const debouncedFetch = () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      fetchTimeoutRef.current = setTimeout(() => {
+        fetchData(true);
+      }, 1200); // 1.2s debounce
+    };
+
+    const eventsChannel = supabase.channel('events_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, debouncedFetch)
+      .subscribe();
+
+    const categoriesChannel = supabase.channel('categories_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, debouncedFetch)
+      .subscribe();
+
+    const templatesChannel = supabase.channel('templates_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'event_templates' }, debouncedFetch)
+      .subscribe();
+
+    return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+      supabase.removeChannel(eventsChannel);
+      supabase.removeChannel(categoriesChannel);
+      supabase.removeChannel(templatesChannel);
+    };
+  }, []);
 
   const handleOpenModal = (event?: Event) => {
     if (event) {

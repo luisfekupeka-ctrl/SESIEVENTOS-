@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     console.log("[Auth] Session active for:", currentUser.email);
     setUser(currentUser);
-    
+    const userProfile = await fetchProfile(currentUser.id);
     const isOwner = currentUser.email === 'luisfe.kupeka@gmail.com';
     
     // Strict check: if no profile found or not approved (and not owner), force sign out

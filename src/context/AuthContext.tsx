@@ -71,11 +71,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("[Auth] Session active for:", currentUser.email);
     setUser(currentUser);
     
-    const userProfile = await fetchProfile(currentUser.id);
-    
     const isOwner = currentUser.email === 'luisfe.kupeka@gmail.com';
-    if (userProfile && userProfile.status !== 'approved' && !isOwner) {
-      console.log("[Auth] Profile not approved, signing out");
+    
+    // Strict check: if no profile found or not approved (and not owner), force sign out
+    if (!isOwner && (!userProfile || userProfile.status !== 'approved')) {
+      console.log("[Auth] Access denied: Profile missing or not approved");
       await supabase.auth.signOut();
       setUser(null);
       setProfile(null);
@@ -126,15 +126,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (data.user) {
         const userProfile = await fetchProfile(data.user.id);
-        if (userProfile) {
-          console.log("[Auth] User profile loaded:", userProfile.role, "Status:", userProfile.status);
-        }
+        const isOwner = data.user.email === 'luisfe.kupeka@gmail.com';
 
-        if (userProfile && userProfile.status !== 'approved' && !(data.user.email === 'luisfe.kupeka@gmail.com')) {
+        if (!isOwner && (!userProfile || userProfile.status !== 'approved')) {
           await supabase.auth.signOut();
           setUser(null);
           setProfile(null);
-          throw new Error("Seu cadastro ainda não foi aprovado. Aguarde a liberação do administrador.");
+          throw new Error(userProfile ? "Seu cadastro ainda não foi aprovado. Aguarde a liberação do administrador." : "Perfil administrativo não encontrado. Solicite acesso primeiro.");
         }
         
         setUser(data.user);

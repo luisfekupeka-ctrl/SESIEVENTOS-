@@ -119,7 +119,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="fixed inset-y-0 left-0 w-[280px] bg-[#020617] z-[101] shadow-2xl border-r border-slate-800 md:hidden flex flex-col"
+                className="fixed top-0 left-0 bottom-0 h-[100dvh] w-[280px] bg-[#020617] z-[101] shadow-2xl border-r border-slate-800 md:hidden flex flex-col"
               >
                 <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-[#020617]">
                   <div className="flex items-center gap-3">
@@ -133,7 +133,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   </button>
                 </div>
                 
-                <nav className="p-4 space-y-2 flex-grow overflow-y-auto custom-scrollbar">
+                <nav className="p-4 space-y-2 flex-grow overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar pb-6">
                   <div className="px-4 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Painel Principal</div>
                   <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label="Dashboard" active={location.pathname === '/admin'} onClick={toggleMobileMenu} />
                   <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label="Calendário" active={location.pathname === '/admin/calendar'} onClick={toggleMobileMenu} />

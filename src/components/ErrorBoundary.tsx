@@ -34,10 +34,10 @@ export class ErrorBoundary extends Component<Props, State> {
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             </div>
             
-            <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Sistema em Manutenção</h1>
+            <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Instabilidade no Sistema</h1>
             <p className="text-slate-400 mb-10 font-bold text-xl leading-relaxed">
-              Detectamos um problema técnico inesperado. <br/>
-              Nossa equipe já foi notificada.
+              Detectamos uma sobrecarga ou problema técnico. <br/>
+              Tente atualizar a página ou aguarde alguns instantes.
             </p>
             
             <div className="text-left bg-black p-8 rounded-3xl mb-10 overflow-auto max-h-48 border border-white/5">

@@ -17,15 +17,25 @@ export default function Home() {
   useEffect(() => {
     fetchData();
 
+    // Debounced fetch to avoid thundering herd during high concurrent registrations
+    let timeoutId: NodeJS.Timeout;
+    const debouncedFetch = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        fetchData();
+      }, 2000); // Wait 2s after last change
+    };
+
     // Subscribe to changes
     const channel = supabase
       .channel('home_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => fetchData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => fetchData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => debouncedFetch())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => debouncedFetch())
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      clearTimeout(timeoutId);
     };
   }, []);
 

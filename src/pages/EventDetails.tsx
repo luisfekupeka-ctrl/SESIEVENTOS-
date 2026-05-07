@@ -127,30 +127,59 @@ export default function EventDetails() {
         }
       }
 
-      const { data, error: rpcError } = await supabase.rpc('register_participant', {
-        p_event_id: id,
-        p_student_name: sName,
-        p_student_surname: sSurname,
-        p_student_grade: sGrade,
-        p_student_class: sClass,
-        p_participant_type: participantType,
-        p_form_data: { ...formData, status }
-      });
+    let attempts = 0;
+    const maxAttempts = 3;
+    let lastError = null;
 
-      if (rpcError) throw rpcError;
+    while (attempts < maxAttempts) {
+      try {
+        const { data, error: rpcError } = await supabase.rpc('register_participant', {
+          p_event_id: id,
+          p_student_name: sName,
+          p_student_surname: sSurname,
+          p_student_grade: sGrade,
+          p_student_class: sClass,
+          p_participant_type: participantType,
+          p_form_data: { ...formData, status }
+        });
 
-      if (!data?.success) {
-        const errorMsg = data?.error || "Erro ao processar inscrição. Tente novamente.";
-        if (errorMsg.toLowerCase().includes('dup') || errorMsg.toLowerCase().includes('já inscrito') || errorMsg.toLowerCase().includes('repetido')) {
-          setRestrictionError("Este aluno já está inscrito neste evento!");
-        } else {
-          setError(errorMsg);
+        if (rpcError) throw rpcError;
+
+        if (!data?.success) {
+          const errorMsg = data?.error || "Erro ao processar inscrição. Tente novamente.";
+          if (errorMsg.toLowerCase().includes('dup') || errorMsg.toLowerCase().includes('já inscrito') || errorMsg.toLowerCase().includes('repetido')) {
+            setRestrictionError("Este aluno já está inscrito neste evento!");
+          } else if (errorMsg.toLowerCase().includes('lotado')) {
+            setError("Desculpe, o evento acabou de lotar.");
+          } else {
+            setError(errorMsg);
+          }
+          setIsRegistering(false);
+          return;
         }
-        setIsRegistering(false);
-        return;
-      }
 
-      setRegistrationSuccess(true);
+        setRegistrationSuccess(true);
+        return; // Success!
+      } catch (err: any) {
+        lastError = err;
+        attempts++;
+        if (attempts < maxAttempts) {
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 500 * attempts));
+          continue;
+        }
+      }
+    }
+
+    if (lastError) {
+      console.error(lastError);
+      const msg = lastError.message?.toLowerCase() || '';
+      if (msg.includes('dup') || msg.includes('unique') || msg.includes('já existe') || msg.includes('already')) {
+        setRestrictionError("Este aluno já está inscrito neste evento!");
+      } else {
+        setError("O servidor está sob alta carga. Por favor, aguarde alguns segundos e tente novamente.");
+      }
+    }
     } catch (err: any) {
       console.error(err);
       const msg = err.message?.toLowerCase() || '';

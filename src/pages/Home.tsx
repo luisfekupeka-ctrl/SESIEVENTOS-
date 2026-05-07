@@ -42,8 +42,8 @@ export default function Home() {
   const fetchData = async () => {
     try {
       const [eventsRes, categoriesRes] = await Promise.all([
-        supabase.from('events').select('*').order('start_date', { ascending: true }),
-        supabase.from('categories').select('*')
+        supabase.from('events').select('*').order('name', { ascending: true }),
+        supabase.from('categories').select('*').order('name', { ascending: true })
       ]);
 
       if (eventsRes.data) setEvents(eventsRes.data as Event[]);

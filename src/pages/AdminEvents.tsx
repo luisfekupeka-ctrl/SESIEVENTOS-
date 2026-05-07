@@ -64,9 +64,9 @@ export default function AdminEvents() {
       else setLoading(true);
 
       const [eventsRes, catsRes, tempsRes] = await Promise.all([
-        supabase.from('events').select('*').order('start_date', { ascending: false }),
-        supabase.from('categories').select('*'),
-        supabase.from('event_templates').select('*')
+        supabase.from('events').select('*').order('name', { ascending: true }),
+        supabase.from('categories').select('*').order('name', { ascending: true }),
+        supabase.from('event_templates').select('*').order('name', { ascending: true })
       ]);
 
       if (eventsRes.error) console.error("Error fetching events:", eventsRes.error);

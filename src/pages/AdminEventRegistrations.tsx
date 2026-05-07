@@ -41,7 +41,12 @@ export default function AdminEventRegistrations() {
           .eq('event_id', id);
 
         if (regsData) {
-          setRegistrations(regsData as Registration[]);
+          const sortedRegs = (regsData as Registration[]).sort((a, b) => {
+            const nameA = (a.form_data?.nome || a.form_data?.Nome || '').toString().toLowerCase();
+            const nameB = (b.form_data?.nome || b.form_data?.Nome || '').toString().toLowerCase();
+            return nameA.localeCompare(nameB);
+          });
+          setRegistrations(sortedRegs);
         }
       } catch (error) {
         console.error("Erro ao carregar dados:", error);

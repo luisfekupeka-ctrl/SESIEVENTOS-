@@ -30,7 +30,7 @@ export default function AdminDashboard() {
       
       setError(null);
       const [eventsRes, regsRes, studentsRes] = await Promise.all([
-        supabase.from('events').select('*'),
+        supabase.from('events').select('*').order('name', { ascending: true }),
         supabase.from('registrations').select('*, students(*)').order('timestamp', { ascending: false }).limit(5),
         supabase.from('students').select('*')
       ]);

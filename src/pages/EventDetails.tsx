@@ -71,10 +71,16 @@ export default function EventDetails() {
       }
     }
 
-    const sName = formData['nome'] || formData['name'] || '';
-    const sSurname = formData['sobrenome'] || formData['surname'] || '';
-    const sGrade = formData['série'] || formData['grade'] || formData['ano'] || '';
-    const sClass = formData['turma'] || formData['class'] || '';
+    const formFields = (event.form_fields as any[]) || [];
+    const nameKey = formFields.find(f => f.label?.toLowerCase().includes('nome'))?.label?.toLowerCase() || 'nome';
+    const surnameKey = formFields.find(f => f.label?.toLowerCase().includes('sobrenome'))?.label?.toLowerCase() || 'sobrenome';
+    const gradeKey = formFields.find(f => f.label?.toLowerCase().includes('série') || f.label?.toLowerCase().includes('ano'))?.label?.toLowerCase() || 'série';
+    const classKey = formFields.find(f => f.label?.toLowerCase().includes('turma'))?.label?.toLowerCase() || 'turma';
+
+    const sName = formData[nameKey] || '';
+    const sSurname = formData[surnameKey] || '';
+    const sGrade = formData[gradeKey] || '';
+    const sClass = formData[classKey] || '';
 
     const restrictions = event.restrictions as any;
 
@@ -113,31 +119,6 @@ export default function EventDetails() {
     setRestrictionError(null);
 
     try {
-      const studentNameKey = (event.form_fields as any[] || []).find(f => f.label?.toLowerCase().includes('nome'))?.label || 'nome';
-      const studentSurnameKey = (event.form_fields as any[] || []).find(f => f.label?.toLowerCase().includes('sobrenome'))?.label || 'sobrenome';
-      const studentGradeKey = (event.form_fields as any[] || []).find(f => f.label?.toLowerCase().includes('série') || f.label?.toLowerCase().includes('ano'))?.label || 'série';
-
-      const checkName = formData[studentNameKey] || sName;
-      const checkSurname = formData[studentSurnameKey] || sSurname;
-      const checkGrade = formData[studentGradeKey] || sGrade;
-
-      if (checkName && checkSurname && checkGrade) {
-        const { data: existing } = await supabase
-          .from('registrations')
-          .select('id')
-          .eq('event_id', id)
-          .filter(`form_data->>${studentNameKey}`, 'eq', checkName)
-          .filter(`form_data->>${studentSurnameKey}`, 'eq', checkSurname)
-          .filter(`form_data->>${studentGradeKey}`, 'eq', checkGrade)
-          .maybeSingle();
-
-        if (existing) {
-          setRestrictionError("Este aluno já está inscrito neste evento!");
-          setIsRegistering(false);
-          return;
-        }
-      }
-      
       let status = 'approved';
       if (event.end_date && event.end_time) {
         const endDateTime = new Date(`${event.end_date}T${event.end_time}`);
@@ -158,8 +139,13 @@ export default function EventDetails() {
 
       if (rpcError) throw rpcError;
 
-      if (!data.success) {
-        setError(data.error);
+      if (!data?.success) {
+        const errorMsg = data?.error || "Erro ao processar inscrição. Tente novamente.";
+        if (errorMsg.toLowerCase().includes('dup') || errorMsg.toLowerCase().includes('já inscrito') || errorMsg.toLowerCase().includes('repetido')) {
+          setRestrictionError("Este aluno já está inscrito neste evento!");
+        } else {
+          setError(errorMsg);
+        }
         setIsRegistering(false);
         return;
       }
@@ -167,7 +153,12 @@ export default function EventDetails() {
       setRegistrationSuccess(true);
     } catch (err: any) {
       console.error(err);
-      setError("Erro ao processar inscrição. Tente novamente.");
+      const msg = err.message?.toLowerCase() || '';
+      if (msg.includes('dup') || msg.includes('unique') || msg.includes('já existe') || msg.includes('already')) {
+        setRestrictionError("Este aluno já está inscrito neste evento!");
+      } else {
+        setError("Erro ao processar inscrição. Tente novamente.");
+      }
     } finally {
       setIsRegistering(false);
     }
@@ -391,7 +382,7 @@ export default function EventDetails() {
                       </div>
 
                       {/* Custom Form Fields */}
-                      {(event.form_fields as any[]).map((field) => (
+                      {((event.form_fields as any[]) || []).map((field) => (
                         <div key={field.id} className="space-y-2">
                           <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">
                             {field.label} {field.required && <span className="text-yellow-400">*</span>}

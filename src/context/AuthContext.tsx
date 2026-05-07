@@ -60,7 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateAuthState = async (session: Session | null) => {
     const currentUser = session?.user ?? null;
     
-    // If no user, reset and stop loading
     if (!currentUser) {
       console.log("[Auth] No session found, resetting state");
       setUser(null);
@@ -69,11 +68,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    // If user changed or profile is missing, fetch it
     console.log("[Auth] Session active for:", currentUser.email);
     setUser(currentUser);
     
     const userProfile = await fetchProfile(currentUser.id);
+    
+    const isOwner = currentUser.email === 'luisfe.kupeka@gmail.com';
+    if (userProfile && userProfile.status !== 'approved' && !isOwner) {
+      console.log("[Auth] Profile not approved, signing out");
+      await supabase.auth.signOut();
+      setUser(null);
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+    
     setProfile(userProfile);
     setLoading(false);
     console.log("[Auth] Initialization complete for:", currentUser.email, "Status:", userProfile?.status);
@@ -106,7 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     console.log("[Auth] Attempting login for:", email);
-    setLoading(true); // Re-enter loading state during login
+    setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -120,6 +129,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (userProfile) {
           console.log("[Auth] User profile loaded:", userProfile.role, "Status:", userProfile.status);
         }
+
+        if (userProfile && userProfile.status !== 'approved' && !(data.user.email === 'luisfe.kupeka@gmail.com')) {
+          await supabase.auth.signOut();
+          setUser(null);
+          setProfile(null);
+          throw new Error("Seu cadastro ainda não foi aprovado. Aguarde a liberação do administrador.");
+        }
         
         setUser(data.user);
         setProfile(userProfile);
@@ -130,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -141,6 +157,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (error) throw error;
+
+    if (data?.user) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          full_name: fullName,
+          email: email,
+          status: 'pending',
+          role: 'admin',
+        });
+
+      if (profileError) {
+        console.error("Erro ao criar perfil pendente:", profileError);
+      }
+    }
   };
 
   const logout = async () => {
@@ -161,7 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{ 
       loading, 
-      isAdmin: !!user && (isOwner || effectiveProfile?.role === 'admin' || effectiveProfile?.role === 'super_admin'), 
+      isAdmin: !!user && (isOwner || (effectiveProfile?.status === 'approved' && (effectiveProfile?.role === 'admin' || effectiveProfile?.role === 'super_admin'))), 
       user, 
       profile: effectiveProfile as Profile,
       login, 

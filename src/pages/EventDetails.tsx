@@ -164,13 +164,6 @@ export default function EventDetails() {
         return;
       }
 
-      if (status === 'pending' && data.registration_id) {
-        await supabase
-          .from('registrations')
-          .update({ status: 'pending' })
-          .eq('id', data.registration_id);
-      }
-
       setRegistrationSuccess(true);
     } catch (err: any) {
       console.error(err);

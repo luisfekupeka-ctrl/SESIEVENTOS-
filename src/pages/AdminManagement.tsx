@@ -56,6 +56,21 @@ export default function AdminManagement() {
     }
   };
 
+  const updateRole = async (id: string, role: 'super_admin' | 'admin') => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role })
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchProfiles();
+    } catch (err: any) {
+      console.error(err);
+      alert("Erro ao atualizar função.");
+    }
+  };
+
   const deleteAdmin = async (id: string) => {
     if (!confirm("Tem certeza que deseja remover este administrador? Esta ação não pode ser desfeita.")) return;
     try {
@@ -185,14 +200,28 @@ export default function AdminManagement() {
                         </button>
                       )}
 
-                      {profile.id !== currentUserProfile?.id && (
-                        <button
-                          onClick={() => deleteAdmin(profile.id)}
-                          className="w-11 h-11 bg-red-500/5 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-transparent hover:border-red-500/20"
-                          title="Remover"
-                        >
-                          <Trash2 size={20} />
-                        </button>
+                      {currentUserProfile?.role === 'super_admin' && profile.id !== currentUserProfile?.id && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              const newRole = profile.role === 'super_admin' ? 'admin' : 'super_admin';
+                              if (confirm(`Deseja alterar a função de ${profile.full_name} para ${newRole === 'super_admin' ? 'Master' : 'Admin'}?`)) {
+                                updateRole(profile.id, newRole);
+                              }
+                            }}
+                            className="w-11 h-11 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-xl flex items-center justify-center transition-all border border-indigo-500/10"
+                            title="Alternar Função"
+                          >
+                            <Users size={20} />
+                          </button>
+                          <button
+                            onClick={() => deleteAdmin(profile.id)}
+                            className="w-11 h-11 bg-red-500/5 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-transparent hover:border-red-500/20"
+                            title="Remover permanentemente"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </td>

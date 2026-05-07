@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
+import { useAuth } from '../context/AuthContext';
 import { Event, Registration } from '../types';
-import { ChevronLeft, Download, Trash2, Users, FileSpreadsheet, FileText, Copy, CheckCircle2, Loader2, Calendar } from 'lucide-react';
+import { ChevronLeft, Download, Trash2, Users, FileSpreadsheet, FileText, Copy, CheckCircle2, Loader2, Calendar, ShieldAlert } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
@@ -12,6 +13,7 @@ import autoTable from 'jspdf-autotable';
 export default function AdminEventRegistrations() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [event, setEvent] = useState<Event | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,7 @@ export default function AdminEventRegistrations() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!deleteId) return;
+    if (!deleteId || profile?.status !== 'approved') return;
     try {
       const { error } = await supabase
         .from('registrations')
@@ -88,6 +90,7 @@ export default function AdminEventRegistrations() {
   };
 
   const handleApprove = async (regId: string) => {
+    if (profile?.status !== 'approved') return;
     try {
       const reg = registrations.find(r => r.id === regId);
       const newFormData = { ...reg?.form_data, status: 'approved' };
@@ -112,6 +115,7 @@ export default function AdminEventRegistrations() {
 
   const exportToExcel = () => {
     if (!event || registrations.length === 0) return;
+    if (profile?.status !== 'approved') return;
     try {
       const data = registrations.map(reg => {
         const row: any = {
@@ -137,6 +141,7 @@ export default function AdminEventRegistrations() {
 
   const exportToPDF = () => {
     if (!event || registrations.length === 0) return;
+    if (profile?.status !== 'approved') return;
     try {
       const pdfDoc = new jsPDF();
       pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
@@ -235,19 +240,30 @@ export default function AdminEventRegistrations() {
           <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
             <button
               onClick={exportToExcel}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/5"
+              disabled={profile?.status !== 'approved'}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/5 disabled:opacity-50 disabled:grayscale"
             >
               <FileSpreadsheet size={16} /> Excel
             </button>
             <button
               onClick={exportToPDF}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5"
+              disabled={profile?.status !== 'approved'}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5 disabled:opacity-50 disabled:grayscale"
             >
               <FileText size={16} /> PDF
             </button>
           </div>
         </div>
       </div>
+
+      {profile?.status !== 'approved' && (
+        <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-3xl mb-10 flex items-center gap-4 text-amber-500">
+          <ShieldAlert size={20} />
+          <p className="text-xs font-bold uppercase tracking-widest">
+            Exportação e Aprovação bloqueadas. Aguarde a aprovação da sua conta.
+          </p>
+        </div>
+      )}
 
       <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-sm">
         <div className="overflow-x-auto custom-scrollbar">

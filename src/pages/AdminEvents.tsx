@@ -465,22 +465,32 @@ export default function AdminEvents() {
                     <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-yellow-400">
                       <Calendar size={16} />
                     </div>
-                    <span className="uppercase tracking-widest text-xs font-bold text-slate-300">
-                      {(() => {
+                    <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
+                      Início: {(() => {
                         try {
                           return format(new Date(event.start_date + 'T00:00:00'), "dd/MM/yyyy");
                         } catch (e) {
                           return event.start_date;
                         }
-                      })()}
+                      })()} às {event.start_time}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-slate-300">
-                    <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-yellow-400">
-                      <Clock size={16} />
+                  {event.end_date && (
+                    <div className="flex items-center gap-3 text-slate-300">
+                      <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-red-400">
+                        <Clock size={16} />
+                      </div>
+                      <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
+                        Limite: {(() => {
+                          try {
+                            return format(new Date(event.end_date + 'T00:00:00'), "dd/MM/yyyy");
+                          } catch (e) {
+                            return event.end_date;
+                          }
+                        })()} às {event.end_time}
+                      </span>
                     </div>
-                    <span className="uppercase tracking-widest text-xs font-bold text-slate-300">{event.start_time} - {event.end_time}</span>
-                  </div>
+                  )}
                   <div className="flex items-center gap-3 text-slate-300">
                     <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400">
                       <Users size={16} />

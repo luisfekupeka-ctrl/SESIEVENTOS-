@@ -182,8 +182,8 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   };
 
   const filteredParticipants = participants.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.surname.toLowerCase().includes(searchTerm.toLowerCase())
+    (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (p.surname || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -257,9 +257,9 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                   <td className="px-6 md:px-10 py-6">
                     <div className="flex items-center gap-5">
                       <div className="w-12 h-12 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center font-black text-lg shadow-lg border border-yellow-400/10 group-hover:scale-105 transition-transform">
-                        {participant.name[0]}{participant.surname[0]}
+                        {(participant.name?.[0] || '')}{(participant.surname?.[0] || '')}
                       </div>
-                      <span className="font-black text-white text-lg tracking-tight">{participant.name} {participant.surname}</span>
+                      <span className="font-black text-white text-lg tracking-tight">{participant.name || ''} {participant.surname || ''}</span>
                     </div>
                   </td>
                   {type === 'student' && (

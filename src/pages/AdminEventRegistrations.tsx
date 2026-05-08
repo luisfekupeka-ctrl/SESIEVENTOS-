@@ -180,8 +180,9 @@ export default function AdminEventRegistrations() {
           ...event.form_fields.map(f => {
           const key = f.label.toLowerCase();
           return reg.form_data[key] || reg.form_data[f.label] || '-';
-        })
-      ]);
+          })
+        ];
+      });
 
       autoTable(pdfDoc, {
         head,

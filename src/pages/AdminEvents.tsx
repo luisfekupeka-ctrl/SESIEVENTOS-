@@ -425,10 +425,11 @@ export default function AdminEvents() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {events
+        {(events || [])
           .filter(event => {
-            const matchesSearch = event.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
-                                 event.description.toLowerCase().includes(adminSearchTerm.toLowerCase());
+            if (!event) return false;
+            const matchesSearch = (event.name || '').toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
+                                 (event.description || '').toLowerCase().includes(adminSearchTerm.toLowerCase());
             const matchesCategory = adminCategoryFilter === 'all' || event.category_id === adminCategoryFilter;
             return matchesSearch && matchesCategory;
           })

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Student } from '../types';
-import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle, Download, RefreshCw, FileSpreadsheet, Loader2, User } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Search, TrendingUp, AlertTriangle, Download, RefreshCw, FileSpreadsheet, Loader2, User, UploadCloud } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { GRADES, CLASSES } from '../constants';
 import { motion, AnimatePresence } from 'motion/react';
@@ -83,6 +83,63 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
       supabase.removeChannel(subscription);
     };
   }, [type]);
+
+  const importFromExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsRefreshing(true);
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: 'binary' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+
+        const studentsToInsert = data.map((row: any) => {
+          const name = row.Nome || row.nome || row.Name || row.name;
+          const grade = row.Série || row.serie || row.Ano || row.ano || row.Grade || row.grade;
+          
+          if (!name) return null;
+          
+          return {
+            name: name.toString().trim(),
+            surname: '',
+            grade: grade ? grade.toString().trim() : '',
+            class: '',
+            type: 'student'
+          };
+        }).filter(Boolean);
+
+        if (studentsToInsert.length === 0) {
+          setFeedback({ type: 'error', message: 'Nenhum dado válido encontrado no Excel.' });
+          return;
+        }
+
+        const batchSize = 100;
+        for (let i = 0; i < studentsToInsert.length; i += batchSize) {
+          const batch = studentsToInsert.slice(i, i + batchSize);
+          const { error } = await supabase
+            .from('students')
+            .upsert(batch, { onConflict: 'name, surname, grade, class' });
+          
+          if (error) throw error;
+        }
+
+        setFeedback({ type: 'success', message: `${studentsToInsert.length} alunos importados com sucesso!` });
+        fetchParticipants();
+      } catch (err) {
+        console.error("Erro na importação:", err);
+        setFeedback({ type: 'error', message: 'Falha ao importar arquivo Excel.' });
+      } finally {
+        setIsRefreshing(false);
+        e.target.value = '';
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
 
   const exportToExcel = () => {
     if (participants.length === 0) return;
@@ -211,6 +268,23 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           >
             <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
+          {type === 'student' && (
+            <div className="relative w-full sm:w-auto">
+              <input
+                type="file"
+                accept=".xlsx, .xls, .csv"
+                onChange={importFromExcel}
+                className="hidden"
+                id="excel-import"
+              />
+              <label
+                htmlFor="excel-import"
+                className={`w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg cursor-pointer ${isRefreshing ? 'opacity-50 pointer-events-none' : ''}`}
+              >
+                <UploadCloud size={18} className="text-yellow-400" /> Importar
+              </label>
+            </div>
+          )}
           <button
             onClick={exportToExcel}
             className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"

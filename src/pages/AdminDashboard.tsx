@@ -85,14 +85,14 @@ export default function AdminDashboard() {
     );
   }
 
-  const totalRegistrations = events.reduce((sum, event) => sum + (event.registration_count || 0), 0);
+  const totalRegistrations = (events || []).reduce((sum, event) => sum + (event?.registration_count || 0), 0);
 
   const stats = [
-    { label: 'Eventos', value: events.length, icon: <Calendar size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Eventos', value: (events || []).length, icon: <Calendar size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
     { label: 'Inscrições', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: 'Alunos', value: students.filter(s => s.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: 'Colaboradores', value: students.filter(s => s.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: 'Responsáveis', value: students.filter(s => s.type === 'responsible').length, icon: <School size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Alunos', value: (students || []).filter(s => s?.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Colaboradores', value: (students || []).filter(s => s?.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: 'Responsáveis', value: (students || []).filter(s => s?.type === 'responsible').length, icon: <School size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
   ];
 
   const handleReset = async () => {
@@ -452,7 +452,8 @@ export default function AdminDashboard() {
             <h3 className="text-xl font-black text-white">Últimas Inscrições</h3>
           </div>
           <div className="divide-y divide-slate-800">
-            {recentRegistrations.length > 0 ? recentRegistrations.map(reg => {
+            {(recentRegistrations || []).length > 0 ? (recentRegistrations || []).map(reg => {
+              if (!reg) return null;
               const student = (reg as any).students;
               return (
                 <div key={reg.id} className="p-6 flex items-center justify-between hover:bg-slate-800/50 transition-colors">

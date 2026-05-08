@@ -22,6 +22,10 @@ export default function EventDetails() {
   const [eventPassword, setEventPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [restrictionError, setRestrictionError] = useState<string | null>(null);
+  const [allStudents, setAllStudents] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [eventParticipants, setEventParticipants] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +59,24 @@ export default function EventDetails() {
       }
     };
     fetchData();
+
+    const fetchStudents = async () => {
+      const { data } = await supabase.from('students').select('*').eq('type', 'student');
+      if (data) setAllStudents(data);
+    };
+    fetchStudents();
+
+    const fetchParticipants = async () => {
+      if (!id) return;
+      const { data } = await supabase
+        .from('registrations')
+        .select('*, students(*)')
+        .eq('event_id', id)
+        .eq('status', 'approved')
+        .order('timestamp', { ascending: true });
+      if (data) setEventParticipants(data);
+    };
+    fetchParticipants();
   }, [id]);
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -159,6 +181,14 @@ export default function EventDetails() {
         }
 
         setRegistrationSuccess(true);
+        // Atualizar lista de inscritos após sucesso
+        const { data: newParticipants } = await supabase
+          .from('registrations')
+          .select('*, students(*)')
+          .eq('event_id', id)
+          .eq('status', 'approved')
+          .order('timestamp', { ascending: true });
+        if (newParticipants) setEventParticipants(newParticipants);
         return; // Success!
       } catch (err: any) {
         lastError = err;
@@ -419,7 +449,65 @@ export default function EventDetails() {
                           {(() => {
                             const fieldKey = field.label.toLowerCase();
                             const commonClasses = "w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-600 shadow-inner";
+                            const isNameField = fieldKey === 'nome' || fieldKey === 'nome completo';
                             
+                            if (isNameField && participantType === 'student') {
+                              return (
+                                <div className="relative">
+                                  <input
+                                    type="text"
+                                    required={field.required}
+                                    placeholder={`Digite seu nome...`}
+                                    autoComplete="off"
+                                    className={commonClasses}
+                                    value={formData[fieldKey] || ''}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setFormData({ ...formData, [fieldKey]: val });
+                                      if (val.length > 2) {
+                                        const filtered = allStudents.filter(s => 
+                                          s.name.toLowerCase().includes(val.toLowerCase())
+                                        ).slice(0, 5);
+                                        setSuggestions(filtered);
+                                        setShowSuggestions(true);
+                                      } else {
+                                        setShowSuggestions(false);
+                                      }
+                                    }}
+                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                  />
+                                  {showSuggestions && suggestions.length > 0 && (
+                                    <div className="absolute z-[110] left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                                      {suggestions.map(s => (
+                                        <button
+                                          key={s.id}
+                                          type="button"
+                                          className="w-full px-5 py-4 text-left hover:bg-slate-800 text-white font-bold transition-colors border-b border-slate-800 last:border-0"
+                                          onClick={() => {
+                                            const updatedForm = { ...formData };
+                                            updatedForm[fieldKey] = s.name;
+                                            
+                                            // Preenchimento automático de Série se o campo existir
+                                            const gradeField = ((event.form_fields as any[]) || []).find(f => 
+                                              f.label.toLowerCase().includes('série') || f.label.toLowerCase().includes('ano')
+                                            );
+                                            if (gradeField && s.grade) {
+                                              updatedForm[gradeField.label.toLowerCase()] = s.grade;
+                                            }
+                                            
+                                            setFormData(updatedForm);
+                                            setShowSuggestions(false);
+                                          }}
+                                        >
+                                          {s.name} <span className="text-yellow-400 text-[10px] ml-2 font-black uppercase tracking-widest bg-yellow-400/10 px-2 py-0.5 rounded">{s.grade}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+
                             switch (field.type) {
                               case 'textarea':
                                 return (
@@ -428,6 +516,7 @@ export default function EventDetails() {
                                     rows={4}
                                     placeholder={`Sua resposta...`}
                                     className={commonClasses}
+                                    value={formData[fieldKey] || ''}
                                     onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
                                   />
                                 );
@@ -436,6 +525,7 @@ export default function EventDetails() {
                                   <select
                                     required={field.required}
                                     className={`${commonClasses} appearance-none`}
+                                    value={formData[fieldKey] || ''}
                                     onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
                                   >
                                     <option value="" className="bg-slate-900">Selecione...</option>
@@ -451,6 +541,7 @@ export default function EventDetails() {
                                     required={field.required}
                                     placeholder={`Seu(a) ${field.label.toLowerCase()}...`}
                                     className={commonClasses}
+                                    value={formData[fieldKey] || ''}
                                     onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
                                   />
                                 );
@@ -520,6 +611,60 @@ export default function EventDetails() {
             </motion.div>
           </div>
         </div>
+      </div>
+
+      {/* Participants List Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="bg-slate-900/40 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] border border-slate-800 shadow-2xl"
+        >
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+            <h2 className="text-2xl md:text-4xl font-black text-white flex items-center gap-4">
+              <div className="w-1.5 h-10 bg-yellow-400 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.4)]"></div>
+              Participantes Inscritos
+            </h2>
+            <div className="bg-slate-950 px-6 py-3 rounded-2xl border border-slate-800 flex items-center gap-3">
+              <Users size={20} className="text-yellow-400" />
+              <span className="text-white font-black text-lg">{eventParticipants.length}</span>
+              <span className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Inscritos</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {eventParticipants.length > 0 ? (
+              eventParticipants.map((reg, idx) => {
+                const name = reg.form_data?.nome || reg.form_data?.['nome completo'] || reg.form_data?.Name || reg.form_data?.name || (reg.students?.name);
+                const grade = reg.form_data?.série || reg.form_data?.ano || reg.form_data?.Grade || (reg.students?.grade);
+                
+                return (
+                  <motion.div
+                    key={reg.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-4 group hover:border-yellow-400/30 transition-all"
+                  >
+                    <div className="w-10 h-10 bg-yellow-400/10 text-yellow-400 rounded-xl flex items-center justify-center font-black text-sm border border-yellow-400/10">
+                      {name?.[0] || 'P'}
+                    </div>
+                    <div className="flex-grow overflow-hidden">
+                      <p className="text-white font-bold truncate text-sm">{name}</p>
+                      <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{grade || 'Participante'}</p>
+                    </div>
+                    <CheckCircle2 size={16} className="text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="col-span-full py-12 text-center">
+                <p className="text-slate-500 font-bold text-lg">Ninguém se inscreveu ainda. Seja o primeiro!</p>
+              </div>
+            )}
+          </div>
+        </motion.section>
       </div>
     </div>
   );

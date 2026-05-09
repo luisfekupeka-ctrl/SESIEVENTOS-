@@ -232,7 +232,11 @@ export default function AdminEventRegistrations() {
 
       // 1. Get all students from DB for matching
       const { data: studentsFromDB } = await supabase.from('students').select('*');
-      if (!studentsFromDB) throw new Error('Não foi possível carregar banco de alunos.');
+      if (studentsFromDB.length === 0) {
+        setBatchFeedback('Erro: O banco de alunos está vazio. Por favor, importe os alunos na aba "Alunos" primeiro.');
+        setIsAdding(false);
+        return;
+      }
 
       const normalizedDB = studentsFromDB.map(s => ({
         ...s,
@@ -262,13 +266,16 @@ export default function AdminEventRegistrations() {
       }
 
       if (toRegister.length === 0) {
-        setBatchFeedback(`Concluído: Nenhum aluno novo encontrado para adicionar (de ${data.length} processados).`);
-        if (notFound.length > 0) console.log('Não encontrados:', notFound);
+        if (notFound.length > 0) {
+          setBatchFeedback(`Nenhum aluno novo encontrado. ${notFound.length} nomes da planilha não foram localizados no banco de Alunos.`);
+        } else {
+          setBatchFeedback(`Concluído: Todos os alunos da planilha já estão inscritos neste evento.`);
+        }
         setIsAdding(false);
         return;
       }
 
-      if (!confirm(`Encontramos ${toRegister.length} alunos na sua lista que ainda não estão inscritos neste evento. Deseja adicioná-los agora?`)) {
+      if (!confirm(`Sucesso! Encontramos ${toRegister.length} alunos para adicionar.\n\nObservação: ${notFound.length} nomes não foram encontrados no banco da escola.\n\nDeseja prosseguir?`)) {
         setIsAdding(false);
         setBatchFeedback(null);
         return;
@@ -732,7 +739,7 @@ export default function AdminEventRegistrations() {
               </div>
 
               {batchFeedback && (
-                <div className="p-4 bg-yellow-400/10 border border-yellow-400/20 rounded-xl text-yellow-400 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                <div className={`p-4 border rounded-xl text-[10px] font-black uppercase tracking-widest ${batchFeedback.includes('Erro') ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-yellow-400/10 border-yellow-400/20 text-yellow-400'} animate-pulse`}>
                   {batchFeedback}
                 </div>
               )}

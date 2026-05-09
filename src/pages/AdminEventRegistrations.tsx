@@ -25,6 +25,8 @@ export default function AdminEventRegistrations() {
   const [filterGrade, setFilterGrade] = useState('all');
   const [filterClass, setFilterClass] = useState('all');
   const [isAdding, setIsAdding] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkText, setBulkText] = useState('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
 
   useEffect(() => {
@@ -325,6 +327,99 @@ export default function AdminEventRegistrations() {
     }
   };
 
+  const handleBulkPasteImport = async () => {
+    if (profile?.status !== 'approved' || !event || isAdding || !bulkText.trim()) return;
+    setIsAdding(true);
+    setBatchFeedback('Processando lista colada...');
+
+    try {
+      const lines = bulkText.split('\n').filter(l => l.trim());
+      if (lines.length === 0) {
+        setBatchFeedback('Erro: Lista vazia.');
+        setIsAdding(false);
+        return;
+      }
+
+      // 1. Get all students from DB for matching
+      const { data: studentsFromDB } = await supabase.from('students').select('*');
+      if (!studentsFromDB || studentsFromDB.length === 0) {
+        setBatchFeedback('Erro: O banco de alunos está vazio. Importe os alunos primeiro.');
+        setIsAdding(false);
+        return;
+      }
+
+      const normalizedDB = studentsFromDB.map(s => ({
+        ...s,
+        normalized: normalizeName(`${s.name} ${s.surname || ''}`)
+      }));
+
+      // 2. Map names to students
+      const toRegister: any[] = [];
+      const notFound: string[] = [];
+      
+      for (const rawName of lines) {
+        const norm = normalizeName(rawName);
+        const match = normalizedDB.find(s => s.normalized === norm);
+
+        if (match) {
+          const alreadyInEvent = registrations.some(r => r.student_id === match.id);
+          if (!alreadyInEvent) {
+            toRegister.push(match);
+          }
+        } else {
+          notFound.push(rawName);
+        }
+      }
+
+      if (toRegister.length === 0) {
+        setBatchFeedback(`Concluído: Nenhum aluno novo encontrado para adicionar (de ${lines.length} nomes).`);
+        setIsAdding(false);
+        return;
+      }
+
+      const newRegs = toRegister.map(student => ({
+        event_id: id,
+        student_id: student.id,
+        status: 'approved',
+        form_data: {
+          nome: `${student.name} ${student.surname || ''}`.trim(),
+          'nome completo': `${student.name} ${student.surname || ''}`.trim(),
+          'série': student.grade,
+          'ano': student.grade,
+          'turma': student.class,
+          status: 'approved'
+        }
+      }));
+
+      const { error } = await supabase.from('registrations').insert(newRegs);
+      if (error) throw error;
+
+      // Update count
+      await supabase
+        .from('events')
+        .update({ registration_count: (event.registration_count || 0) + toRegister.length })
+        .eq('id', id);
+
+      setBatchFeedback(`${toRegister.length} alunos adicionados com sucesso!`);
+      setBulkText('');
+      setIsBulkModalOpen(false);
+      
+      // Refresh
+      const { data: updatedRegs } = await supabase
+        .from('registrations')
+        .select('*, students(*)')
+        .eq('event_id', id);
+      if (updatedRegs) setRegistrations(updatedRegs);
+      setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + toRegister.length } : null);
+
+    } catch (err: any) {
+      console.error(err);
+      setBatchFeedback('Erro ao processar lista.');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!deleteId || profile?.status !== 'approved') return;
     try {
@@ -577,6 +672,13 @@ export default function AdminEventRegistrations() {
               <FileText size={16} /> PDF
             </button>
           </div>
+          <button
+            onClick={() => setIsBulkModalOpen(true)}
+            disabled={profile?.status !== 'approved'}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg disabled:opacity-50"
+          >
+            <Plus size={16} /> Colar Lista
+          </button>
           <label className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-lg cursor-pointer disabled:opacity-50">
             <Download size={16} /> Importar Excel
             <input
@@ -794,6 +896,48 @@ export default function AdminEventRegistrations() {
                     );
                   })
                 }
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Paste Modal */}
+      {isBulkModalOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-800">
+            <div className="p-8 border-b border-slate-800 flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-black text-white tracking-tight">Colar Lista</h2>
+                <p className="text-slate-400 font-bold text-sm mt-1">Cole os nomes (um por linha) para adicionar ao evento.</p>
+              </div>
+              <button onClick={() => setIsBulkModalOpen(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
+                <ShieldAlert size={20} className="rotate-45" />
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-6">
+              <textarea
+                className="w-full h-64 px-6 py-6 bg-slate-950 border border-slate-800 rounded-3xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all resize-none custom-scrollbar"
+                placeholder="Exemplo:&#10;João Silva&#10;Maria Santos&#10;..."
+                value={bulkText}
+                onChange={(e) => setBulkText(e.target.value)}
+              />
+
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setIsBulkModalOpen(false)}
+                  className="px-8 py-4 text-slate-400 font-black uppercase text-xs tracking-widest hover:text-white transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleBulkPasteImport}
+                  disabled={isAdding || !bulkText.trim()}
+                  className="px-12 py-4 bg-yellow-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
+                >
+                  Adicionar à Lista do Evento
+                </button>
               </div>
             </div>
           </div>

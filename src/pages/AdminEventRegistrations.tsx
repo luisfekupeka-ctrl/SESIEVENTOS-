@@ -22,7 +22,10 @@ export default function AdminEventRegistrations() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [studentSearch, setStudentSearch] = useState('');
+  const [filterGrade, setFilterGrade] = useState('all');
+  const [filterClass, setFilterClass] = useState('all');
   const [isAdding, setIsAdding] = useState(false);
+  const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -130,6 +133,71 @@ export default function AdminEventRegistrations() {
       
     } catch (error) {
       console.error('Erro ao adicionar aluno:', error);
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleAddBatch = async () => {
+    if (profile?.status !== 'approved' || !event || isAdding) return;
+    
+    const filtered = allStudents.filter(s => {
+      const matchesSearch = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
+      const matchesGrade = filterGrade === 'all' || s.grade === filterGrade;
+      const matchesClass = filterClass === 'all' || s.class === filterClass;
+      return matchesSearch && matchesGrade && matchesClass;
+    });
+
+    const toAdd = filtered.filter(s => !registrations.some(r => r.student_id === s.id));
+
+    if (toAdd.length === 0) {
+      setBatchFeedback('Nenhum aluno novo para adicionar com estes filtros.');
+      return;
+    }
+
+    if (!confirm(`Deseja adicionar ${toAdd.length} alunos ao evento?`)) return;
+
+    setIsAdding(true);
+    setBatchFeedback(`Adicionando ${toAdd.length} alunos...`);
+
+    try {
+      const newRegs = toAdd.map(student => ({
+        event_id: id,
+        student_id: student.id,
+        status: 'approved',
+        form_data: {
+          nome: `${student.name} ${student.surname || ''}`.trim(),
+          'nome completo': `${student.name} ${student.surname || ''}`.trim(),
+          'série': student.grade,
+          'ano': student.grade,
+          'turma': student.class,
+          status: 'approved'
+        }
+      }));
+
+      const { error } = await supabase.from('registrations').insert(newRegs);
+      if (error) throw error;
+
+      // Update count
+      await supabase
+        .from('events')
+        .update({ registration_count: (event.registration_count || 0) + toAdd.length })
+        .eq('id', id);
+
+      setBatchFeedback(`${toAdd.length} alunos adicionados com sucesso!`);
+      setTimeout(() => setBatchFeedback(null), 3000);
+      
+      // Refresh
+      const { data: updatedRegs } = await supabase
+        .from('registrations')
+        .select('*, students(*)')
+        .eq('event_id', id);
+      if (updatedRegs) setRegistrations(updatedRegs);
+      setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + toAdd.length } : null);
+
+    } catch (err) {
+      console.error('Erro no batch:', err);
+      setBatchFeedback('Erro ao adicionar em massa.');
     } finally {
       setIsAdding(false);
     }
@@ -503,20 +571,70 @@ export default function AdminEventRegistrations() {
             </div>
             
             <div className="p-8 space-y-6">
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Pesquisar aluno por nome..."
-                  className="w-full pl-12 pr-6 py-4 bg-slate-950 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all"
-                  value={studentSearch}
-                  onChange={(e) => setStudentSearch(e.target.value)}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="relative md:col-span-1">
+                  <input
+                    type="text"
+                    placeholder="Nome..."
+                    className="w-full pl-6 pr-6 py-4 bg-slate-950 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all text-xs"
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                  />
+                </div>
+                <select 
+                  className="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-4 text-white text-xs font-bold outline-none"
+                  value={filterGrade}
+                  onChange={(e) => setFilterGrade(e.target.value)}
+                >
+                  <option value="all">Todos os Anos</option>
+                  {Array.from(new Set(allStudents.map(s => s.grade))).sort().map(g => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+                <select 
+                  className="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-4 text-white text-xs font-bold outline-none"
+                  value={filterClass}
+                  onChange={(e) => setFilterClass(e.target.value)}
+                >
+                  <option value="all">Todas as Turmas</option>
+                  {Array.from(new Set(allStudents.map(s => s.class))).sort().map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {batchFeedback && (
+                <div className="p-4 bg-yellow-400/10 border border-yellow-400/20 rounded-xl text-yellow-400 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                  {batchFeedback}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  Resultados: {allStudents.filter(s => {
+                    const ms = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
+                    const mg = filterGrade === 'all' || s.grade === filterGrade;
+                    const mc = filterClass === 'all' || s.class === filterClass;
+                    return ms && mg && mc;
+                  }).length} alunos
+                </p>
+                <button
+                  onClick={handleAddBatch}
+                  disabled={isAdding}
+                  className="px-6 py-3 bg-white text-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all shadow-lg shadow-white/5"
+                >
+                  Adicionar Todos Filtrados
+                </button>
               </div>
 
               <div className="overflow-y-auto max-h-[40vh] space-y-3 custom-scrollbar pr-2">
                 {allStudents
-                  .filter(s => `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase()))
+                  .filter(s => {
+                    const ms = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
+                    const mg = filterGrade === 'all' || s.grade === filterGrade;
+                    const mc = filterClass === 'all' || s.class === filterClass;
+                    return ms && mg && mc;
+                  })
                   .slice(0, 50)
                   .map(student => {
                     const isRegistered = registrations.some(r => r.student_id === student.id);

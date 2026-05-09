@@ -26,6 +26,7 @@ export default function EventDetails() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [eventParticipants, setEventParticipants] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -660,21 +661,44 @@ export default function EventDetails() {
           viewport={{ once: true }}
           className="bg-slate-900/40 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] border border-slate-800 shadow-2xl"
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
             <h2 className="text-2xl md:text-4xl font-black text-white flex items-center gap-4">
               <div className="w-1.5 h-10 bg-yellow-400 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.4)]"></div>
               Participantes Inscritos
             </h2>
-            <div className="bg-slate-950 px-6 py-3 rounded-2xl border border-slate-800 flex items-center gap-3">
-              <Users size={20} className="text-yellow-400" />
-              <span className="text-white font-black text-lg">{eventParticipants.length}</span>
-              <span className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Inscritos</span>
+            <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+              <div className="flex-grow md:flex-grow-0 relative group">
+                <input
+                  type="text"
+                  placeholder="Pesquisar seu nome..."
+                  className="w-full md:w-80 bg-slate-950 border border-slate-800 rounded-2xl px-6 py-3 text-white font-bold focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all placeholder:text-slate-600"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-yellow-400 transition-colors">
+                  <Clock size={18} className="animate-pulse" /> {/* Just a visual element */}
+                </div>
+              </div>
+              <div className="bg-slate-950 px-6 py-3 rounded-2xl border border-slate-800 flex items-center gap-3">
+                <Users size={20} className="text-yellow-400" />
+                <span className="text-white font-black text-lg">{eventParticipants.length}</span>
+                <span className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Inscritos</span>
+              </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            {eventParticipants.length > 0 ? (
-              eventParticipants.map((reg, idx) => {
+            {(() => {
+              const filtered = eventParticipants.filter(reg => {
+                const student = reg.students;
+                const name = (student ? `${student.name} ${student.surname || ''}`.trim() : (reg.form_data?.nome || reg.form_data?.['nome completo'] || reg.form_data?.Name || reg.form_data?.name || '')).toLowerCase();
+                const term = searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const nameNorm = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                return nameNorm.includes(term);
+              });
+
+              if (filtered.length > 0) {
+                return filtered.map((reg, idx) => {
                 const student = reg.students;
                 const name = student ? `${student.name} ${student.surname || ''}`.trim() : (reg.form_data?.nome || reg.form_data?.['nome completo'] || reg.form_data?.Name || reg.form_data?.name);
                 const grade = student?.grade || reg.form_data?.série || reg.form_data?.ano || reg.form_data?.Grade;
@@ -708,13 +732,28 @@ export default function EventDetails() {
                     </div>
                   </motion.div>
                 );
-              })
-            ) : (
-              <div className="py-20 text-center bg-slate-950/30 rounded-3xl border border-dashed border-slate-800">
-                <Users size={48} className="mx-auto text-slate-800 mb-4" />
-                <p className="text-slate-500 font-bold text-lg">Ninguém se inscreveu ainda. Seja o primeiro!</p>
-              </div>
-            )}
+              } else if (searchTerm) {
+                return (
+                  <div className="py-20 text-center bg-slate-950/30 rounded-3xl border border-dashed border-slate-800">
+                    <AlertTriangle size={48} className="mx-auto text-yellow-400/50 mb-4" />
+                    <p className="text-slate-500 font-bold text-lg">Nenhum participante encontrado com "{searchTerm}"</p>
+                    <button 
+                      onClick={() => setSearchTerm('')}
+                      className="mt-4 text-yellow-400 font-black uppercase text-[10px] tracking-widest hover:underline"
+                    >
+                      Limpar busca
+                    </button>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="py-20 text-center bg-slate-950/30 rounded-3xl border border-dashed border-slate-800">
+                    <Users size={48} className="mx-auto text-slate-800 mb-4" />
+                    <p className="text-slate-500 font-bold text-lg">Ninguém se inscreveu ainda. Seja o primeiro!</p>
+                  </div>
+                );
+              }
+            })()}
           </div>
         </motion.section>
       </div>

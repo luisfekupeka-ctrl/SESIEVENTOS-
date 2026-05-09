@@ -1143,6 +1143,14 @@ export default function AdminEventRegistrations() {
                 </div>
               )}
 
+              {batchFeedback && (
+                <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center animate-in fade-in slide-in-from-bottom-2 duration-300 ${
+                  batchFeedback.includes('sucesso') ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
+                }`}>
+                  {batchFeedback}
+                </div>
+              )}
+
               <div className="flex justify-end gap-4">
                 <button
                   onClick={() => {

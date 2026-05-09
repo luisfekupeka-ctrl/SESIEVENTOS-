@@ -26,6 +26,8 @@ export default function AdminEventRegistrations() {
   const [filterClass, setFilterClass] = useState('all');
   const [isAdding, setIsAdding] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkStep, setBulkStep] = useState<'input' | 'review'>('input');
+  const [bulkResults, setBulkResults] = useState<{ originalName: string; student: any | null }[]>([]);
   const [bulkText, setBulkText] = useState('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
 
@@ -320,10 +322,10 @@ export default function AdminEventRegistrations() {
     }
   };
 
-  const handleBulkPasteImport = async () => {
+  const handleReviewBulkPaste = async () => {
     if (profile?.status !== 'approved' || !event || isAdding || !bulkText.trim()) return;
     setIsAdding(true);
-    setBatchFeedback('Processando lista colada...');
+    setBatchFeedback('Analisando nomes...');
 
     try {
       const lines = bulkText.split('\n').filter(l => l.trim());
@@ -336,7 +338,7 @@ export default function AdminEventRegistrations() {
       // 1. Get all students from DB for matching
       const { data: studentsFromDB } = await supabase.from('students').select('*');
       if (!studentsFromDB || studentsFromDB.length === 0) {
-        setBatchFeedback('Erro: O banco de alunos está vazio. Importe os alunos primeiro.');
+        setBatchFeedback('Erro: O banco de alunos está vazio.');
         setIsAdding(false);
         return;
       }
@@ -346,37 +348,50 @@ export default function AdminEventRegistrations() {
         normalized: normalizeName(`${s.name} ${s.surname || ''}`)
       }));
 
-      // 2. Map names to students
-      const toRegister: any[] = [];
-      const notFound: string[] = [];
-      
-      for (const rawName of lines) {
+      // 2. Map names to results
+      const results = lines.map(rawName => {
         const norm = normalizeName(rawName);
         const match = normalizedDB.find(s => s.normalized === norm);
+        return {
+          originalName: rawName,
+          student: match || null
+        };
+      });
 
-        if (match) {
-          const alreadyInEvent = registrations.some(r => r.student_id === match.id);
-          const alreadyInToRegister = toRegister.some(s => s.id === match.id);
-          
-          if (!alreadyInEvent && !alreadyInToRegister) {
-            toRegister.push(match);
-          }
-        } else {
-          notFound.push(rawName);
-        }
-      }
+      setBulkResults(results);
+      setBulkStep('review');
+      setBatchFeedback(null);
+    } catch (err: any) {
+      console.error(err);
+      setBatchFeedback('Erro ao processar lista.');
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
-      if (toRegister.length === 0) {
-        if (notFound.length > 0) {
-          setBatchFeedback(`Nenhum aluno adicionado. ${notFound.length} nomes não foram encontrados: ${notFound.join(', ')}`);
-        } else {
-          setBatchFeedback(`Concluído: Todos os alunos da lista já estão inscritos.`);
-        }
+  const handleFinalizeBulk = async () => {
+    if (isAdding || !event) return;
+    const toRegister = bulkResults.filter(r => r.student !== null).map(r => r.student);
+    
+    if (toRegister.length === 0) {
+      setBatchFeedback('Nenhum aluno selecionado.');
+      return;
+    }
+
+    setIsAdding(true);
+    setBatchFeedback(`Inscrevendo ${toRegister.length} alunos...`);
+
+    try {
+      // Filter out those already in the event (local check)
+      const validToRegister = toRegister.filter(s => !registrations.some(r => r.student_id === s.id));
+
+      if (validToRegister.length === 0) {
+        setBatchFeedback('Todos os alunos selecionados já estão inscritos.');
         setIsAdding(false);
         return;
       }
 
-      const newRegs = toRegister.map(student => ({
+      const newRegs = validToRegister.map(student => ({
         event_id: id,
         student_id: student.id,
         status: 'approved',
@@ -393,12 +408,10 @@ export default function AdminEventRegistrations() {
       const { error } = await supabase.from('registrations').insert(newRegs);
       if (error) throw error;
 
-      let msg = `${toRegister.length} alunos adicionados com sucesso!`;
-      if (notFound.length > 0) {
-        msg += ` (${notFound.length} nomes não encontrados: ${notFound.slice(0, 3).join(', ')}${notFound.length > 3 ? '...' : ''})`;
-      }
-      setBatchFeedback(msg);
+      setBatchFeedback(`${newRegs.length} alunos adicionados com sucesso!`);
       setBulkText('');
+      setBulkResults([]);
+      setBulkStep('input');
       setIsBulkModalOpen(false);
       
       // Refresh
@@ -408,13 +421,12 @@ export default function AdminEventRegistrations() {
         .eq('event_id', id);
       if (updatedRegs) setRegistrations(updatedRegs);
       
-      // Update local event object to reflect the new count from DB
       const { data: eventUpdate } = await supabase.from('events').select('registration_count').eq('id', id).single();
       if (eventUpdate) setEvent(prev => prev ? { ...prev, registration_count: eventUpdate.registration_count } : null);
 
     } catch (err: any) {
       console.error(err);
-      setBatchFeedback('Erro ao processar lista.');
+      setBatchFeedback('Erro ao salvar inscrições.');
     } finally {
       setIsAdding(false);
     }
@@ -903,36 +915,121 @@ export default function AdminEventRegistrations() {
           <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-800">
             <div className="p-8 border-b border-slate-800 flex items-center justify-between">
               <div>
-                <h2 className="text-3xl font-black text-white tracking-tight">Colar Lista</h2>
-                <p className="text-slate-400 font-bold text-sm mt-1">Cole os nomes (um por linha) para adicionar ao evento.</p>
+                <h2 className="text-3xl font-black text-white tracking-tight">
+                  {bulkStep === 'input' ? 'Colar Lista' : 'Revisar Alunos'}
+                </h2>
+                <p className="text-slate-400 font-bold text-sm mt-1">
+                  {bulkStep === 'input' 
+                    ? 'Cole os nomes (um por linha) para adicionar ao evento.' 
+                    : `${bulkResults.length} nomes processados. Verifique abaixo.`}
+                </p>
               </div>
-              <button onClick={() => setIsBulkModalOpen(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
+              <button 
+                onClick={() => {
+                  setIsBulkModalOpen(false);
+                  setBulkStep('input');
+                  setBulkResults([]);
+                }} 
+                className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors"
+              >
                 <ShieldAlert size={20} className="rotate-45" />
               </button>
             </div>
             
             <div className="p-8 space-y-6">
-              <textarea
-                className="w-full h-64 px-6 py-6 bg-slate-950 border border-slate-800 rounded-3xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all resize-none custom-scrollbar"
-                placeholder="Exemplo:&#10;João Silva&#10;Maria Santos&#10;..."
-                value={bulkText}
-                onChange={(e) => setBulkText(e.target.value)}
-              />
+              {bulkStep === 'input' ? (
+                <textarea
+                  className="w-full h-64 px-6 py-6 bg-slate-950 border border-slate-800 rounded-3xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all resize-none custom-scrollbar"
+                  placeholder="Exemplo:&#10;João Silva&#10;Maria Santos&#10;..."
+                  value={bulkText}
+                  onChange={(e) => setBulkText(e.target.value)}
+                />
+              ) : (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
+                  {bulkResults.map((res, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-2xl group hover:border-slate-700 transition-all">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Nome na Planilha</span>
+                        <span className="text-white font-bold">{res.originalName}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-4">
+                        {res.student ? (
+                          <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-green-500 font-black uppercase tracking-widest flex items-center gap-1">
+                              <CheckCircle2 size={10} /> Encontrado
+                            </span>
+                            <span className="text-slate-300 text-xs font-bold">{res.student.name} {res.student.surname} ({res.student.grade})</span>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={async () => {
+                              // Simple search trigger: pick the first match for now, or just let them pick
+                              const searchName = prompt('Buscar nome correto do aluno:', res.originalName);
+                              if (searchName) {
+                                const { data } = await supabase
+                                  .from('students')
+                                  .select('*')
+                                  .ilike('name', `%${searchName}%`)
+                                  .limit(5);
+                                
+                                if (data && data.length > 0) {
+                                  // For simplicity in this step, we show a prompt-based selection or just pick first
+                                  const options = data.map((s, i) => `${i+1}. ${s.name} ${s.surname} (${s.grade})`).join('\n');
+                                  const pick = prompt(`Encontramos estes alunos. Escolha o número:\n\n${options}\n\n(Digite 0 para cancelar)`);
+                                  const idxPick = parseInt(pick || '0') - 1;
+                                  if (data[idxPick]) {
+                                    const newResults = [...bulkResults];
+                                    newResults[idx].student = data[idxPick];
+                                    setBulkResults(newResults);
+                                  }
+                                } else {
+                                  alert('Nenhum aluno encontrado com este nome.');
+                                }
+                              }
+                            }}
+                            className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                          >
+                            Não Encontrado (Clique p/ Buscar)
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="flex justify-end gap-4">
                 <button
-                  onClick={() => setIsBulkModalOpen(false)}
+                  onClick={() => {
+                    if (bulkStep === 'review') {
+                      setBulkStep('input');
+                    } else {
+                      setIsBulkModalOpen(false);
+                    }
+                  }}
                   className="px-8 py-4 text-slate-400 font-black uppercase text-xs tracking-widest hover:text-white transition-colors"
                 >
-                  Cancelar
+                  {bulkStep === 'review' ? 'Voltar' : 'Cancelar'}
                 </button>
-                <button
-                  onClick={handleBulkPasteImport}
-                  disabled={isAdding || !bulkText.trim()}
-                  className="px-12 py-4 bg-yellow-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
-                >
-                  Adicionar à Lista do Evento
-                </button>
+                
+                {bulkStep === 'input' ? (
+                  <button
+                    onClick={handleReviewBulkPaste}
+                    disabled={isAdding || !bulkText.trim()}
+                    className="px-12 py-4 bg-yellow-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
+                  >
+                    Analisar Lista
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleFinalizeBulk}
+                    disabled={isAdding || !bulkResults.some(r => r.student !== null)}
+                    className="px-12 py-4 bg-green-500 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-green-400 transition-all shadow-lg shadow-green-500/20 disabled:opacity-50"
+                  >
+                    Confirmar Inscrições
+                  </button>
+                )}
               </div>
             </div>
           </div>

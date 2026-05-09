@@ -724,64 +724,70 @@ export default function AdminEventRegistrations() {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 sm:flex items-center gap-2 md:gap-4">
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            disabled={profile?.status !== 'approved'}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
-          >
-            <Users size={16} /> Adicionar Aluno
-          </button>
-          <button
-            onClick={copyToClipboard}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg"
-          >
-            {copied ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-            {copied ? 'Copiado!' : 'Copiar Dados'}
-          </button>
-          <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-3 md:gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              disabled={profile?.status !== 'approved'}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
+            >
+              <Users size={16} /> Adicionar Aluno
+            </button>
+            <button
+              onClick={copyToClipboard}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg"
+            >
+              {copied ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
+              {copied ? 'Copiado!' : 'Copiar Dados'}
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 bg-slate-900/50 p-1.5 rounded-[1.25rem] border border-slate-800/50">
             <button
               onClick={exportToExcel}
               disabled={profile?.status !== 'approved'}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all shadow-lg shadow-green-500/5 disabled:opacity-50 disabled:grayscale"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500/10 border border-green-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all disabled:opacity-50"
             >
               <FileSpreadsheet size={16} /> Excel
             </button>
             <button
               onClick={exportToPDF}
               disabled={profile?.status !== 'approved'}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5 disabled:opacity-50 disabled:grayscale"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
             >
               <FileText size={16} /> PDF
             </button>
           </div>
-          <button
-            onClick={() => setIsBulkModalOpen(true)}
-            disabled={profile?.status !== 'approved'}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg disabled:opacity-50"
-          >
-            <Plus size={16} /> Colar Lista
-          </button>
-          <button
-            onClick={() => setIsDeleteAllModalOpen(true)}
-            disabled={profile?.status !== 'approved'}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5 disabled:opacity-50"
-          >
-            <Trash2 size={16} /> Limpar Tudo
-          </button>
-          <label className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-lg cursor-pointer disabled:opacity-50">
-            <Download size={16} /> Importar Excel
-            <input
-              type="file"
-              accept=".xlsx, .xls"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleImportExcel(file);
-              }}
-              disabled={profile?.status !== 'approved' || isAdding}
-            />
-          </label>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setIsBulkModalOpen(true)}
+              disabled={profile?.status !== 'approved'}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg disabled:opacity-50"
+            >
+              <Plus size={16} /> Colar Lista
+            </button>
+            <label className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-lg cursor-pointer disabled:opacity-50">
+              <Download size={16} /> Importar Excel
+              <input
+                type="file"
+                accept=".xlsx, .xls"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImportExcel(file);
+                }}
+                disabled={profile?.status !== 'approved' || isAdding}
+              />
+            </label>
+            <button
+              onClick={() => setIsDeleteAllModalOpen(true)}
+              disabled={profile?.status !== 'approved'}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5 disabled:opacity-50"
+            >
+              <Trash2 size={16} /> Limpar Tudo
+            </button>
+          </div>
         </div>
       </div>
 

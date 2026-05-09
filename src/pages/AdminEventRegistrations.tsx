@@ -34,6 +34,8 @@ export default function AdminEventRegistrations() {
   const [bulkText, setBulkText] = useState('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
   const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
+  const [participantTypeFilter, setParticipantTypeFilter] = useState('student');
+  const [bulkParticipantType, setBulkParticipantType] = useState<'student' | 'collaborator' | 'responsible' | 'other'>('student');
 
   useEffect(() => {
     if (!id) return;
@@ -154,7 +156,8 @@ export default function AdminEventRegistrations() {
       const matchesSearch = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
       const matchesGrade = filterGrade === 'all' || s.grade === filterGrade;
       const matchesClass = filterClass === 'all' || s.class === filterClass;
-      return matchesSearch && matchesGrade && matchesClass;
+      const matchesType = participantTypeFilter === 'all' || s.type === participantTypeFilter;
+      return matchesSearch && matchesGrade && matchesClass && matchesType;
     });
 
     const toAdd = filtered.filter(s => !registrations.some(r => r.student_id === s.id));
@@ -930,7 +933,7 @@ export default function AdminEventRegistrations() {
                 <div className="w-12 h-12 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center">
                   <Users size={24} />
                 </div>
-                <h3 className="text-3xl font-black text-white tracking-tight">Adicionar Aluno</h3>
+                <h3 className="text-3xl font-black text-white tracking-tight">Adicionar Participante</h3>
               </div>
               <button onClick={() => setIsAddModalOpen(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
                 <ShieldAlert size={20} className="rotate-45" /> {/* Close icon fallback */}
@@ -938,7 +941,7 @@ export default function AdminEventRegistrations() {
             </div>
             
             <div className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="relative md:col-span-1">
                   <input
                     type="text"
@@ -948,6 +951,17 @@ export default function AdminEventRegistrations() {
                     onChange={(e) => setStudentSearch(e.target.value)}
                   />
                 </div>
+                <select 
+                  className="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-4 text-white text-xs font-bold outline-none"
+                  value={participantTypeFilter}
+                  onChange={(e) => setParticipantTypeFilter(e.target.value)}
+                >
+                  <option value="all">Todos os Tipos</option>
+                  <option value="student">Aluno</option>
+                  <option value="collaborator">Colaborador</option>
+                  <option value="responsible">Responsável</option>
+                  <option value="other">Outro</option>
+                </select>
                 <select 
                   className="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-4 text-white text-xs font-bold outline-none"
                   value={filterGrade}
@@ -982,8 +996,9 @@ export default function AdminEventRegistrations() {
                     const ms = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
                     const mg = filterGrade === 'all' || s.grade === filterGrade;
                     const mc = filterClass === 'all' || s.class === filterClass;
-                    return ms && mg && mc;
-                  }).length} alunos
+                    const mt = participantTypeFilter === 'all' || s.type === participantTypeFilter;
+                    return ms && mg && mc && mt;
+                  }).length} pessoas
                 </p>
                 <button
                   onClick={handleAddBatch}
@@ -1000,7 +1015,8 @@ export default function AdminEventRegistrations() {
                     const ms = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
                     const mg = filterGrade === 'all' || s.grade === filterGrade;
                     const mc = filterClass === 'all' || s.class === filterClass;
-                    return ms && mg && mc;
+                    const mt = participantTypeFilter === 'all' || s.type === participantTypeFilter;
+                    return ms && mg && mc && mt;
                   })
                   .slice(0, 50)
                   .map(student => {
@@ -1009,7 +1025,9 @@ export default function AdminEventRegistrations() {
                       <div key={student.id} className="flex items-center justify-between p-4 bg-slate-800/40 rounded-2xl border border-slate-800 hover:border-yellow-400/30 transition-all">
                         <div>
                           <p className="text-white font-black">{student.name} {student.surname}</p>
-                          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{student.grade} • {student.class}</p>
+                          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
+                            {student.type === 'student' ? `${student.grade} • ${student.class}` : student.type.toUpperCase()}
+                          </p>
                         </div>
                         <button
                           onClick={() => handleAddStudent(student)}
@@ -1039,7 +1057,7 @@ export default function AdminEventRegistrations() {
             <div className="p-8 border-b border-slate-800 flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-black text-white tracking-tight">
-                  {bulkStep === 'input' ? 'Colar Lista' : 'Revisar Alunos'}
+                  {bulkStep === 'input' ? 'Colar Lista' : 'Revisar Participantes'}
                 </h2>
                 <p className="text-slate-400 font-bold text-sm mt-1">
                   {bulkStep === 'input' 
@@ -1049,7 +1067,7 @@ export default function AdminEventRegistrations() {
               </div>
               <div className="flex items-center gap-4">
                 <div className="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-black text-slate-400 border border-slate-700">
-                  {allStudents.length} ALUNOS CARREGADOS
+                  {allStudents.length} PESSOAS NO BANCO
                 </div>
                 <button 
                   onClick={() => {
@@ -1066,12 +1084,36 @@ export default function AdminEventRegistrations() {
             
             <div className="p-8 space-y-6">
               {bulkStep === 'input' ? (
-                <textarea
-                  className="w-full h-64 px-6 py-6 bg-slate-950 border border-slate-800 rounded-3xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all resize-none custom-scrollbar"
-                  placeholder="Exemplo:&#10;João Silva&#10;Maria Santos&#10;..."
-                  value={bulkText}
-                  onChange={(e) => setBulkText(e.target.value)}
-                />
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Tipo de Participantes da Lista</label>
+                    <div className="grid grid-cols-4 gap-3">
+                      {['student', 'collaborator', 'responsible', 'other'].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => setBulkParticipantType(type as any)}
+                          className={`py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
+                            bulkParticipantType === type 
+                              ? 'bg-yellow-400 border-yellow-400 text-black shadow-lg shadow-yellow-400/20' 
+                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600'
+                          }`}
+                        >
+                          {type === 'student' ? 'Alunos' : type === 'collaborator' ? 'Colaborad.' : type === 'responsible' ? 'Respons.' : 'Outros'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nomes (um por linha)</label>
+                    <textarea
+                      className="w-full h-64 px-6 py-6 bg-slate-950 border border-slate-800 rounded-3xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all resize-none custom-scrollbar"
+                      placeholder="Exemplo:&#10;João Silva&#10;Maria Santos&#10;..."
+                      value={bulkText}
+                      onChange={(e) => setBulkText(e.target.value)}
+                    />
+                  </div>
+                </div>
               ) : (
                 <div className="space-y-3 max-h-[450px] overflow-y-auto pr-4 custom-scrollbar">
                   {bulkResults.map((res, idx) => (
@@ -1088,13 +1130,15 @@ export default function AdminEventRegistrations() {
                               <span className="text-[10px] text-green-500 font-black uppercase tracking-widest flex items-center gap-1">
                                 <CheckCircle2 size={10} /> {reconcileIdx === idx ? 'Selecionado' : 'Encontrado'}
                               </span>
-                              <span className="text-slate-300 text-xs font-bold">{res.student.name} {res.student.surname} ({res.student.grade})</span>
+                              <span className="text-slate-300 text-xs font-bold">
+                                {res.student.name} {res.student.surname} ({res.student.type.toUpperCase()}{res.student.grade !== 'N/A' ? ` - ${res.student.grade}` : ''})
+                              </span>
                               {reconcileIdx === idx && (
                                 <button 
                                   onClick={() => setReconcileIdx(null)}
                                   className="text-[10px] text-yellow-400 font-bold hover:underline mt-1"
                                 >
-                                  Mudar Aluno
+                                  Mudar Pessoa
                                 </button>
                               )}
                             </div>
@@ -1132,7 +1176,7 @@ export default function AdminEventRegistrations() {
                           
                           {reconcileResults.length === 0 && reconcileQuery && (
                             <div className="py-10 text-center">
-                              <p className="text-slate-500 font-bold mb-4">Nenhum aluno encontrado para "{reconcileQuery}".</p>
+                              <p className="text-slate-500 font-bold mb-4">Nenhuma pessoa encontrada para "{reconcileQuery}".</p>
                               <button
                                 onClick={async () => {
                                   const fullName = bulkResults[reconcileIdx!].originalName;
@@ -1145,7 +1189,7 @@ export default function AdminEventRegistrations() {
                                     .insert({
                                       name,
                                       surname,
-                                      type: 'student',
+                                      type: bulkParticipantType,
                                       grade: 'N/A',
                                       class: 'N/A'
                                     })
@@ -1154,15 +1198,15 @@ export default function AdminEventRegistrations() {
                                   
                                   if (data) {
                                     const newResults = [...bulkResults];
-                                    newResults[reconcileIdx!].student = data;
+                                    newResults[reconcileIdx!] = { ...newResults[reconcileIdx!], student: data };
                                     setBulkResults(newResults);
                                     setReconcileIdx(null);
-                                    fetchStudents();
+                                    fetchStudents(); // Refresh global list
                                   }
                                 }}
-                                className="px-6 py-3 bg-indigo-500 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-400 transition-all"
+                                className="px-6 py-3 bg-yellow-400 text-black rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/10"
                               >
-                                Cadastrar "{bulkResults[reconcileIdx!].originalName}" como Novo Aluno
+                                Cadastrar como Novo ({bulkParticipantType === 'student' ? 'Aluno' : bulkParticipantType === 'collaborator' ? 'Colaborador' : bulkParticipantType === 'responsible' ? 'Responsável' : 'Outro'})
                               </button>
                             </div>
                           )}

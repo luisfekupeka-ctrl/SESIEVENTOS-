@@ -1180,6 +1180,7 @@ export default function AdminEventRegistrations() {
             </div>
           </div>
         </div>
+      )}
       {/* Delete All Confirmation Modal */}
       {isDeleteAllModalOpen && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">

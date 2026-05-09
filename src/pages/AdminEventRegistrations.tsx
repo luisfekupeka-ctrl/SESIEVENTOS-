@@ -202,7 +202,11 @@ export default function AdminEventRegistrations() {
   };
 
   const normalizeName = (name: string) => {
-    return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    return name.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, ' ') // Collapse multiple spaces
+      .trim();
   };
 
   const handleImportExcel = async (file: File) => {

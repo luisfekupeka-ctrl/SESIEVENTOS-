@@ -449,15 +449,25 @@ export default function AdminEventRegistrations() {
       // 2. Filter out those already in the event
       const validToRegister = toRegister.filter(s => !existingIds.has(s.id));
 
-      if (validToRegister.length === 0) {
-        setBatchFeedback('Todos os alunos selecionados já estão inscritos.');
+      // 3. Deduplicate validToRegister in case same student was matched multiple times
+      const uniqueToRegister = [];
+      const seenIds = new Set();
+      for (const s of validToRegister) {
+        if (!seenIds.has(s.id)) {
+          seenIds.add(s.id);
+          uniqueToRegister.push(s);
+        }
+      }
+
+      if (uniqueToRegister.length === 0) {
+        setBatchFeedback('Nenhum aluno novo selecionado.');
         setIsAdding(false);
         return;
       }
 
-      setBatchFeedback(`Inscrevendo ${validToRegister.length} alunos...`);
+      setBatchFeedback(`Inscrevendo ${uniqueToRegister.length} alunos...`);
 
-      const newRegs = validToRegister.map(student => ({
+      const newRegs = uniqueToRegister.map(student => ({
         event_id: id,
         student_id: student.id,
         status: 'approved',
@@ -472,7 +482,10 @@ export default function AdminEventRegistrations() {
       }));
 
       const { error } = await supabase.from('registrations').insert(newRegs);
-      if (error) throw error;
+      if (error) {
+        console.error('Erro no insert batch:', error);
+        throw error;
+      }
 
       setBatchFeedback(`${newRegs.length} alunos adicionados com sucesso!`);
       setBulkText('');
@@ -492,7 +505,7 @@ export default function AdminEventRegistrations() {
 
     } catch (err: any) {
       console.error(err);
-      setBatchFeedback('Erro ao salvar inscrições.');
+      setBatchFeedback(`Erro ao salvar: ${err.message || 'Erro desconhecido'}`);
     } finally {
       setIsAdding(false);
     }

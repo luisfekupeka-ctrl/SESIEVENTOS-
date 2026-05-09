@@ -28,9 +28,9 @@ export default function AdminEventRegistrations() {
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [bulkStep, setBulkStep] = useState<'input' | 'review'>('input');
   const [bulkResults, setBulkResults] = useState<{ originalName: string; student: any | null }[]>([]);
+  const [allStudents, setAllStudents] = useState<any[]>([]);
   const [reconcileIdx, setReconcileIdx] = useState<number | null>(null);
   const [reconcileQuery, setReconcileQuery] = useState('');
-  const [reconcileResults, setReconcileResults] = useState<any[]>([]);
   const [bulkText, setBulkText] = useState('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
 
@@ -339,12 +339,14 @@ export default function AdminEventRegistrations() {
       }
 
       // 1. Get all students from DB for matching
-      const { data: studentsFromDB } = await supabase.from('students').select('*');
+      const { data: studentsFromDB } = await supabase.from('students').select('*').order('name');
       if (!studentsFromDB || studentsFromDB.length === 0) {
         setBatchFeedback('Erro: O banco de alunos está vazio.');
         setIsAdding(false);
         return;
       }
+
+      setAllStudents(studentsFromDB);
 
       const normalizedDB = studentsFromDB.map(s => ({
         ...s,
@@ -372,19 +374,6 @@ export default function AdminEventRegistrations() {
     }
   };
 
-  const handleReconcileSearch = async (query: string) => {
-    setReconcileQuery(query);
-    if (query.length < 2) {
-      setReconcileResults([]);
-      return;
-    }
-    const { data } = await supabase
-      .from('students')
-      .select('*')
-      .or(`name.ilike.%${query}%,surname.ilike.%${query}%`)
-      .limit(5);
-    setReconcileResults(data || []);
-  };
 
   const handleFinalizeBulk = async () => {
     if (isAdding || !event) return;
@@ -1004,21 +993,27 @@ export default function AdminEventRegistrations() {
 
                       {reconcileIdx === idx && (
                         <div className="mt-2 p-4 bg-slate-900 rounded-xl border border-yellow-400/30 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
                             <Users size={16} className="text-yellow-400" />
                             <input 
                               type="text"
                               autoFocus
-                              placeholder="Digite o nome correto do aluno..."
+                              placeholder="Filtrar lista de alunos..."
                               className="bg-transparent text-white text-sm font-bold w-full focus:outline-none"
                               value={reconcileQuery}
-                              onChange={(e) => handleReconcileSearch(e.target.value)}
+                              onChange={(e) => setReconcileQuery(e.target.value)}
                             />
                           </div>
                           
-                          <div className="grid gap-2">
-                            {reconcileResults.length > 0 ? (
-                              reconcileResults.map((student) => (
+                          <div className="grid gap-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                            {allStudents
+                              .filter(s => {
+                                const q = normalizeName(reconcileQuery);
+                                if (!q) return true;
+                                return normalizeName(`${s.name} ${s.surname}`).includes(q);
+                              })
+                              .slice(0, reconcileQuery ? 50 : 20) // Show top 20 by default, 50 if filtering
+                              .map((student) => (
                                 <button
                                   key={student.id}
                                   onClick={() => {
@@ -1026,7 +1021,6 @@ export default function AdminEventRegistrations() {
                                     newResults[idx].student = student;
                                     setBulkResults(newResults);
                                     setReconcileIdx(null);
-                                    setReconcileResults([]);
                                   }}
                                   className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-lg hover:border-yellow-400 transition-colors text-left"
                                 >
@@ -1036,12 +1030,7 @@ export default function AdminEventRegistrations() {
                                   </div>
                                   <Plus size={14} className="text-yellow-400" />
                                 </button>
-                              ))
-                            ) : (
-                              <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest p-2">
-                                {reconcileQuery.length < 2 ? 'Digite 2 letras para buscar...' : 'Nenhum aluno encontrado.'}
-                              </p>
-                            )}
+                              ))}
                           </div>
                         </div>
                       )}

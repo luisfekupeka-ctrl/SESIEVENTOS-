@@ -264,6 +264,14 @@ export default function EventDetails() {
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent"></div>
+        {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity && (
+          <div className="absolute top-20 left-0 right-0 z-40 flex items-center justify-center animate-in fade-in zoom-in duration-500 px-4">
+            <div className="bg-red-600 text-white px-10 py-5 rounded-[2rem] font-black uppercase text-3xl md:text-5xl tracking-[0.3em] shadow-[0_20px_50px_rgba(220,38,38,0.6)] border-8 border-white/20 rotate-[-4deg] flex items-center gap-6">
+              <AlertTriangle size={48} className="text-white animate-pulse hidden md:block" />
+              ESGOTADO
+            </div>
+          </div>
+        )}
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
           <div className="max-w-7xl mx-auto">
             <motion.button

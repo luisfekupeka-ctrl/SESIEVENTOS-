@@ -29,6 +29,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
             <Lock size={18} />
           </div>
         )}
+        {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+            <div className="bg-red-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-xl tracking-[0.2em] shadow-2xl border-4 border-white/20 rotate-[-5deg] animate-bounce">
+              ESGOTADO
+            </div>
+          </div>
+        )}
         <div className="absolute top-5 left-5 right-5">
           <div className="flex items-center justify-between mb-4">
             <span className="px-3 py-1 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">

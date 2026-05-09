@@ -33,6 +33,7 @@ export default function AdminEventRegistrations() {
   const [reconcileResults, setReconcileResults] = useState<any[]>([]);
   const [bulkText, setBulkText] = useState('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
+  const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -524,6 +525,34 @@ export default function AdminEventRegistrations() {
     }
   };
 
+  const handleDeleteAll = async () => {
+    if (!id || profile?.status !== 'approved' || isAdding) return;
+    setIsAdding(true);
+    try {
+      const { error } = await supabase
+        .from('registrations')
+        .delete()
+        .eq('event_id', id);
+      
+      if (error) throw error;
+      
+      setRegistrations([]);
+      setIsDeleteAllModalOpen(false);
+      
+      // Update local event object count
+      const { data: eventUpdate } = await supabase.from('events').select('registration_count').eq('id', id).single();
+      if (eventUpdate) setEvent(prev => prev ? { ...prev, registration_count: eventUpdate.registration_count } : null);
+      
+      setBatchFeedback('Todos os alunos foram removidos.');
+      setTimeout(() => setBatchFeedback(null), 3000);
+    } catch (error) {
+      console.error("Erro ao remover todos:", error);
+      alert('Erro ao remover todos os alunos.');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
   const exportToExcel = () => {
     if (!event || registrations.length === 0) return;
     if (profile?.status !== 'approved') return;
@@ -732,6 +761,13 @@ export default function AdminEventRegistrations() {
             className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg disabled:opacity-50"
           >
             <Plus size={16} /> Colar Lista
+          </button>
+          <button
+            onClick={() => setIsDeleteAllModalOpen(true)}
+            disabled={profile?.status !== 'approved'}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5 disabled:opacity-50"
+          >
+            <Trash2 size={16} /> Limpar Tudo
           </button>
           <label className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-lg cursor-pointer disabled:opacity-50">
             <Download size={16} /> Importar Excel
@@ -1140,6 +1176,34 @@ export default function AdminEventRegistrations() {
                 className="py-4 bg-red-500 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
               >
                 Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      {/* Delete All Confirmation Modal */}
+      {isDeleteAllModalOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-slate-900 w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 border border-slate-800 text-center">
+            <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-8 mx-auto border border-red-500/10">
+              <Trash2 size={40} />
+            </div>
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Limpar Evento</h3>
+            <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">
+              Deseja remover TODOS os alunos deste evento? Esta ação não pode ser desfeita.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => setIsDeleteAllModalOpen(false)}
+                className="py-4 bg-slate-800 text-slate-300 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-700 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteAll}
+                disabled={isAdding}
+                className="py-4 bg-red-500 text-white font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20 disabled:opacity-50"
+              >
+                {isAdding ? 'Limpando...' : 'Limpar Tudo'}
               </button>
             </div>
           </div>

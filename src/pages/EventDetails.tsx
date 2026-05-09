@@ -27,6 +27,8 @@ export default function EventDetails() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [eventParticipants, setEventParticipants] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
+  const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +87,29 @@ export default function EventDetails() {
       }
     };
     fetchParticipants();
-  }, [id]);
+
+    const timer = setInterval(() => {
+      if (!event) return;
+      const startDateTime = new Date(`${event.start_date}T${event.start_time}`);
+      const now = new Date();
+      const diff = startDateTime.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeLeft(null);
+        setIsLive(true);
+        clearInterval(timer);
+      } else {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeLeft({ d, h, m, s });
+        setIsLive(false);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [id, event]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -445,6 +469,33 @@ export default function EventDetails() {
                           Ver outros eventos
                         </button>
                       </div>
+                    ) : timeLeft && !event.name.toLowerCase().includes('teste') ? (
+                      <div className="text-center py-6">
+                        <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg border border-yellow-400/10">
+                          <Clock size={32} className="animate-pulse" />
+                        </div>
+                        <h4 className="text-xl font-black text-white mb-8 tracking-widest uppercase">Abre em breve</h4>
+                        
+                        <div className="grid grid-cols-4 gap-3 mb-10">
+                          {[
+                            { label: 'Dias', val: timeLeft.d },
+                            { label: 'Hrs', val: timeLeft.h },
+                            { label: 'Min', val: timeLeft.m },
+                            { label: 'Seg', val: timeLeft.s }
+                          ].map(t => (
+                            <div key={t.label} className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                              <div className="text-xl font-black text-yellow-400 leading-none">{String(t.val).padStart(2, '0')}</div>
+                              <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1">{t.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="p-4 bg-yellow-400/5 border border-yellow-400/10 rounded-2xl">
+                          <p className="text-yellow-400/60 text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed">
+                            Prepare-se! As inscrições começam pontualmente em {event.start_time}.
+                          </p>
+                        </div>
+                      </div>
                     ) : (
                       <form onSubmit={handleRegister} className="space-y-6">
                       <div className="space-y-2">
@@ -522,7 +573,7 @@ export default function EventDetails() {
                                               if (gradeField && s.grade) {
                                                 updatedForm[gradeField.label.toLowerCase()] = s.grade;
                                               }
-
+ 
                                               const classField = formFields.find(f => 
                                                 f.label.toLowerCase().includes('turma')
                                               );
@@ -547,7 +598,7 @@ export default function EventDetails() {
                                 </div>
                               );
                             }
-
+ 
                             switch (field.type) {
                               case 'textarea':
                                 return (
@@ -589,7 +640,7 @@ export default function EventDetails() {
                           })()}
                         </div>
                       ))}
-
+ 
                       {restrictionError && (
                         <motion.div 
                           initial={{ opacity: 0, y: 10 }}
@@ -600,7 +651,7 @@ export default function EventDetails() {
                           <p>{restrictionError}</p>
                         </motion.div>
                       )}
-
+ 
                       {event.password_protected && (
                         <div className="space-y-3 pt-6 border-t border-slate-800">
                           <label className="text-[10px] font-black text-yellow-400 uppercase tracking-widest flex items-center gap-2 ml-1">
@@ -622,13 +673,13 @@ export default function EventDetails() {
                           {passwordError && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest ml-1">Senha incorreta</p>}
                         </div>
                       )}
-
+ 
                       {error && (
                         <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-2xl text-red-400 text-sm font-bold flex items-center gap-3">
                           <AlertTriangle size={18} /> {error}
                         </div>
                       )}
-
+ 
                       <button
                         type="submit"
                         disabled={isRegistering}

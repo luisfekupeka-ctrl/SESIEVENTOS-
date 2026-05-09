@@ -367,7 +367,11 @@ export default function AdminEventRegistrations() {
       }
 
       if (toRegister.length === 0) {
-        setBatchFeedback(`Concluído: Nenhum aluno novo encontrado para adicionar (de ${lines.length} nomes).`);
+        if (notFound.length > 0) {
+          setBatchFeedback(`Nenhum aluno adicionado. ${notFound.length} nomes não foram encontrados: ${notFound.join(', ')}`);
+        } else {
+          setBatchFeedback(`Concluído: Todos os alunos da lista já estão inscritos.`);
+        }
         setIsAdding(false);
         return;
       }
@@ -389,7 +393,11 @@ export default function AdminEventRegistrations() {
       const { error } = await supabase.from('registrations').insert(newRegs);
       if (error) throw error;
 
-      setBatchFeedback(`${toRegister.length} alunos adicionados com sucesso!`);
+      let msg = `${toRegister.length} alunos adicionados com sucesso!`;
+      if (notFound.length > 0) {
+        msg += ` (${notFound.length} nomes não encontrados: ${notFound.slice(0, 3).join(', ')}${notFound.length > 3 ? '...' : ''})`;
+      }
+      setBatchFeedback(msg);
       setBulkText('');
       setIsBulkModalOpen(false);
       

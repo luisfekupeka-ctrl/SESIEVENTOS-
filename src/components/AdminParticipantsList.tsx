@@ -240,10 +240,14 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     }
   };
 
-  const filteredParticipants = participants.filter(p => 
-    (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (p.surname || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [gradeFilter, setGradeFilter] = useState('all');
+
+  const filteredParticipants = participants.filter(p => {
+    const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (p.surname || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesGrade = gradeFilter === 'all' || p.grade === gradeFilter;
+    return matchesSearch && matchesGrade;
+  });
 
   if (loading) {
     return (
@@ -314,6 +318,21 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          {type === 'student' && (
+            <div className="relative">
+              <select
+                className="w-full md:w-64 px-6 py-4 bg-slate-950 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-inner"
+                value={gradeFilter}
+                onChange={(e) => setGradeFilter(e.target.value)}
+              >
+                <option value="all">Todos os Anos</option>
+                {GRADES.map(grade => (
+                  <option key={grade} value={grade} className="bg-slate-900">{grade}</option>
+                ))}
+              </select>
+              <TrendingUp className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+            </div>
+          )}
         </div>
 
         <div className="overflow-x-auto custom-scrollbar">

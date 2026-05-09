@@ -259,6 +259,15 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
+      if (deleteId === 'all') {
+        const { error } = await supabase.from('students').delete().eq('type', type);
+        if (error) throw error;
+        setParticipants([]);
+        setDeleteId(null);
+        setFeedback({ type: 'success', message: `Todos os ${labelPlural.toLowerCase()} foram removidos.` });
+        return;
+      }
+
       const { data: regs } = await supabase
         .from('registrations')
         .select('event_id')
@@ -269,7 +278,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         .delete()
         .eq('id', deleteId);
       if (error) throw error;
-
+      
       if (regs && regs.length > 0) {
         const eventIds = [...new Set(regs.map(r => r.event_id))];
         for (const eid of eventIds) {
@@ -297,8 +306,8 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   const [gradeFilter, setGradeFilter] = useState('all');
 
   const filteredParticipants = participants.filter(p => {
-    const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (p.surname || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const fullName = `${p.name || ''} ${p.surname || ''}`.toLowerCase();
+    const matchesSearch = fullName.includes(searchTerm.toLowerCase());
     const matchesGrade = gradeFilter === 'all' || p.grade === gradeFilter;
     return matchesSearch && matchesGrade;
   });
@@ -357,6 +366,12 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
               >
                 <Plus size={18} className="text-yellow-400" /> Colar Lista
+              </button>
+              <button
+                onClick={() => setDeleteId('all')}
+                className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-lg"
+              >
+                <Trash2 size={18} /> Limpar Tudo
               </button>
             </>
           )}

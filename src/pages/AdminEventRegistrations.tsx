@@ -368,12 +368,11 @@ export default function AdminEventRegistrations() {
         // Exact match first
         let match = normalizedDB.find(s => s.normalized === norm);
         
-        // Word-based match if no exact match (all words must match)
+        // Word-based match if no exact match (all words from search must be present in DB name)
         if (!match) {
           match = normalizedDB.find(s => {
-            const dbWords = s.normalized.split(' ').filter(w => w.length > 0).sort();
-            if (dbWords.length !== searchWords.length) return false;
-            return searchWords.every((w, i) => w === dbWords[i]);
+            const dbWords = s.normalized.split(' ').filter(w => w.length > 0);
+            return searchWords.every(word => dbWords.includes(word));
           });
         }
 
@@ -782,7 +781,10 @@ export default function AdminEventRegistrations() {
 
           <div className="flex flex-wrap items-center gap-3">
             <button
-              onClick={() => setIsBulkModalOpen(true)}
+              onClick={() => {
+                fetchStudents();
+                setIsBulkModalOpen(true);
+              }}
               disabled={profile?.status !== 'approved'}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg disabled:opacity-50"
             >

@@ -52,7 +52,8 @@ export default function AdminEvents() {
     password_protected: false,
     password: '',
     max_capacity: 0,
-    form_fields: []
+    form_fields: [],
+    enable_autocomplete: true
   });
 
   const [backgroundLoading, setBackgroundLoading] = useState(false);
@@ -134,7 +135,8 @@ export default function AdminEvents() {
         password_protected: false,
         password: '',
         max_capacity: 0,
-        form_fields: []
+        form_fields: [],
+        enable_autocomplete: true
       });
     }
     setIsModalOpen(true);
@@ -879,6 +881,22 @@ export default function AdminEvents() {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Auto-preenchimento</label>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Sugere nomes e preenche Série/Turma automaticamente</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, enable_autocomplete: !formData.enable_autocomplete })}
+                        className={`w-14 h-8 rounded-full transition-all relative ${formData.enable_autocomplete !== false ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                      >
+                        <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.enable_autocomplete !== false ? 'left-7' : 'left-1'}`}></div>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </section>

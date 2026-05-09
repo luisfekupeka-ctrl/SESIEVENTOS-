@@ -464,7 +464,7 @@ export default function EventDetails() {
                             const commonClasses = "w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-600 shadow-inner";
                             const isNameField = fieldKey === 'nome' || fieldKey === 'nome completo';
                             
-                            if (isNameField && participantType === 'student') {
+                            if (isNameField && participantType === 'student' && event.enable_autocomplete !== false) {
                               return (
                                 <div className="relative">
                                   <input

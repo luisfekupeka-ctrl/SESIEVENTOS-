@@ -33,6 +33,7 @@ export interface Event {
   form_fields: FormField[];
   max_capacity?: number;
   registration_count?: number;
+  enable_autocomplete?: boolean;
 }
 
 export interface Student {

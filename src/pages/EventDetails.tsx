@@ -790,7 +790,8 @@ export default function EventDetails() {
                       <span className="text-[10px] font-black uppercase tracking-widest">Confirmado</span>
                     </div>
                   </motion.div>
-                ));
+                );
+              });
               } else if (searchTerm) {
                 return (
                   <div className="py-20 text-center bg-slate-950/30 rounded-3xl border border-dashed border-slate-800">

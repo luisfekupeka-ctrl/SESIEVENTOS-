@@ -406,18 +406,23 @@ export default function AdminEventRegistrations() {
       return;
     }
 
-    const qNorm = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const qNorm = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s]/g, " ").trim();
     const searchWords = qNorm.split(/\s+/).filter(w => w.length > 0);
     
     // If state is empty but we have a query, try to use a local copy or refetch
     let source = allStudents;
     if (source.length === 0) {
+      console.log("allStudents vazio, tentando recarregar...");
       const fresh = await fetchStudents();
       source = fresh;
     }
 
     const filtered = source.filter(s => {
-      const fullName = `${s.name} ${s.surname || ''}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const nameNorm = (s.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s]/g, " ");
+      const surnameNorm = (s.surname || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s]/g, " ");
+      const fullName = `${nameNorm} ${surnameNorm}`.trim();
+      
+      // Permissive: if ANY word from search matches ANY word from name
       return searchWords.every(word => fullName.includes(word));
     });
 
@@ -1029,16 +1034,21 @@ export default function AdminEventRegistrations() {
                     : `${bulkResults.length} nomes processados. Verifique abaixo.`}
                 </p>
               </div>
-              <button 
-                onClick={() => {
-                  setIsBulkModalOpen(false);
-                  setBulkStep('input');
-                  setBulkResults([]);
-                }} 
-                className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors"
-              >
-                <ShieldAlert size={20} className="rotate-45" />
-              </button>
+              <div className="flex items-center gap-4">
+                <div className="px-3 py-1 bg-slate-800 rounded-full text-[10px] font-black text-slate-400 border border-slate-700">
+                  {allStudents.length} ALUNOS CARREGADOS
+                </div>
+                <button 
+                  onClick={() => {
+                    setIsBulkModalOpen(false);
+                    setBulkStep('input');
+                    setBulkResults([]);
+                  }} 
+                  className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors"
+                >
+                  <ShieldAlert size={20} />
+                </button>
+              </div>
             </div>
             
             <div className="p-8 space-y-6">
@@ -1100,9 +1110,49 @@ export default function AdminEventRegistrations() {
                               placeholder="Filtrar lista de alunos..."
                               className="bg-transparent text-white text-sm font-bold w-full focus:outline-none"
                               value={reconcileQuery}
-                              onChange={(e) => setReconcileQuery(e.target.value)}
+                              onChange={(e) => {
+                                setReconcileQuery(e.target.value);
+                                handleReconcileSearch(e.target.value);
+                              }}
                             />
                           </div>
+                          
+                          {reconcileResults.length === 0 && reconcileQuery && (
+                            <div className="py-10 text-center">
+                              <p className="text-slate-500 font-bold mb-4">Nenhum aluno encontrado para "{reconcileQuery}".</p>
+                              <button
+                                onClick={async () => {
+                                  const fullName = bulkResults[reconcileIdx!].originalName;
+                                  const parts = fullName.split(' ');
+                                  const name = parts[0];
+                                  const surname = parts.slice(1).join(' ');
+                                  
+                                  const { data, error } = await supabase
+                                    .from('students')
+                                    .insert({
+                                      name,
+                                      surname,
+                                      type: 'student',
+                                      grade: 'N/A',
+                                      class: 'N/A'
+                                    })
+                                    .select()
+                                    .single();
+                                  
+                                  if (data) {
+                                    const newResults = [...bulkResults];
+                                    newResults[reconcileIdx!].student = data;
+                                    setBulkResults(newResults);
+                                    setReconcileIdx(null);
+                                    fetchStudents();
+                                  }
+                                }}
+                                className="px-6 py-3 bg-indigo-500 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-400 transition-all"
+                              >
+                                Cadastrar "{bulkResults[reconcileIdx!].originalName}" como Novo Aluno
+                              </button>
+                            </div>
+                          )}
                           
                           <div className="grid gap-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
                             {reconcileResults.length > 0 ? (

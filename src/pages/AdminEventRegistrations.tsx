@@ -28,6 +28,9 @@ export default function AdminEventRegistrations() {
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [bulkStep, setBulkStep] = useState<'input' | 'review'>('input');
   const [bulkResults, setBulkResults] = useState<{ originalName: string; student: any | null }[]>([]);
+  const [reconcileIdx, setReconcileIdx] = useState<number | null>(null);
+  const [reconcileQuery, setReconcileQuery] = useState('');
+  const [reconcileResults, setReconcileResults] = useState<any[]>([]);
   const [bulkText, setBulkText] = useState('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
 
@@ -367,6 +370,20 @@ export default function AdminEventRegistrations() {
     } finally {
       setIsAdding(false);
     }
+  };
+
+  const handleReconcileSearch = async (query: string) => {
+    setReconcileQuery(query);
+    if (query.length < 2) {
+      setReconcileResults([]);
+      return;
+    }
+    const { data } = await supabase
+      .from('students')
+      .select('*')
+      .or(`name.ilike.%${query}%,surname.ilike.%${query}%`)
+      .limit(5);
+    setReconcileResults(data || []);
   };
 
   const handleFinalizeBulk = async () => {
@@ -945,55 +962,89 @@ export default function AdminEventRegistrations() {
                   onChange={(e) => setBulkText(e.target.value)}
                 />
               ) : (
-                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
+                <div className="space-y-3 max-h-[450px] overflow-y-auto pr-4 custom-scrollbar">
                   {bulkResults.map((res, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-2xl group hover:border-slate-700 transition-all">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Nome na Planilha</span>
-                        <span className="text-white font-bold">{res.originalName}</span>
+                    <div key={idx} className="flex flex-col gap-3 p-4 bg-slate-950 border border-slate-800 rounded-2xl group hover:border-slate-700 transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Nome na Planilha</span>
+                          <span className="text-white font-bold">{res.originalName}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-4">
+                          {res.student ? (
+                            <div className="flex flex-col items-end">
+                              <span className="text-[10px] text-green-500 font-black uppercase tracking-widest flex items-center gap-1">
+                                <CheckCircle2 size={10} /> {reconcileIdx === idx ? 'Selecionado' : 'Encontrado'}
+                              </span>
+                              <span className="text-slate-300 text-xs font-bold">{res.student.name} {res.student.surname} ({res.student.grade})</span>
+                              {reconcileIdx === idx && (
+                                <button 
+                                  onClick={() => setReconcileIdx(null)}
+                                  className="text-[10px] text-yellow-400 font-bold hover:underline mt-1"
+                                >
+                                  Mudar Aluno
+                                </button>
+                              )}
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setReconcileIdx(idx);
+                                setReconcileQuery(res.originalName);
+                                handleReconcileSearch(res.originalName);
+                              }}
+                              className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+                            >
+                              Não Encontrado (Clique p/ Buscar)
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center gap-4">
-                        {res.student ? (
-                          <div className="flex flex-col items-end">
-                            <span className="text-[10px] text-green-500 font-black uppercase tracking-widest flex items-center gap-1">
-                              <CheckCircle2 size={10} /> Encontrado
-                            </span>
-                            <span className="text-slate-300 text-xs font-bold">{res.student.name} {res.student.surname} ({res.student.grade})</span>
+
+                      {reconcileIdx === idx && (
+                        <div className="mt-2 p-4 bg-slate-900 rounded-xl border border-yellow-400/30 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                          <div className="flex items-center gap-3">
+                            <Users size={16} className="text-yellow-400" />
+                            <input 
+                              type="text"
+                              autoFocus
+                              placeholder="Digite o nome correto do aluno..."
+                              className="bg-transparent text-white text-sm font-bold w-full focus:outline-none"
+                              value={reconcileQuery}
+                              onChange={(e) => handleReconcileSearch(e.target.value)}
+                            />
                           </div>
-                        ) : (
-                          <button
-                            onClick={async () => {
-                              // Simple search trigger: pick the first match for now, or just let them pick
-                              const searchName = prompt('Buscar nome correto do aluno:', res.originalName);
-                              if (searchName) {
-                                const { data } = await supabase
-                                  .from('students')
-                                  .select('*')
-                                  .ilike('name', `%${searchName}%`)
-                                  .limit(5);
-                                
-                                if (data && data.length > 0) {
-                                  // For simplicity in this step, we show a prompt-based selection or just pick first
-                                  const options = data.map((s, i) => `${i+1}. ${s.name} ${s.surname} (${s.grade})`).join('\n');
-                                  const pick = prompt(`Encontramos estes alunos. Escolha o número:\n\n${options}\n\n(Digite 0 para cancelar)`);
-                                  const idxPick = parseInt(pick || '0') - 1;
-                                  if (data[idxPick]) {
+                          
+                          <div className="grid gap-2">
+                            {reconcileResults.length > 0 ? (
+                              reconcileResults.map((student) => (
+                                <button
+                                  key={student.id}
+                                  onClick={() => {
                                     const newResults = [...bulkResults];
-                                    newResults[idx].student = data[idxPick];
+                                    newResults[idx].student = student;
                                     setBulkResults(newResults);
-                                  }
-                                } else {
-                                  alert('Nenhum aluno encontrado com este nome.');
-                                }
-                              }
-                            }}
-                            className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
-                          >
-                            Não Encontrado (Clique p/ Buscar)
-                          </button>
-                        )}
-                      </div>
+                                    setReconcileIdx(null);
+                                    setReconcileResults([]);
+                                  }}
+                                  className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-lg hover:border-yellow-400 transition-colors text-left"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-white text-xs font-bold">{student.name} {student.surname}</span>
+                                    <span className="text-slate-500 text-[10px] font-black uppercase">{student.grade} - {student.class}</span>
+                                  </div>
+                                  <Plus size={14} className="text-yellow-400" />
+                                </button>
+                              ))
+                            ) : (
+                              <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest p-2">
+                                {reconcileQuery.length < 2 ? 'Digite 2 letras para buscar...' : 'Nenhum aluno encontrado.'}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

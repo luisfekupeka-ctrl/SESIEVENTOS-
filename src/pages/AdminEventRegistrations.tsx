@@ -28,7 +28,6 @@ export default function AdminEventRegistrations() {
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [bulkStep, setBulkStep] = useState<'input' | 'review'>('input');
   const [bulkResults, setBulkResults] = useState<{ originalName: string; student: any | null }[]>([]);
-  const [allStudents, setAllStudents] = useState<any[]>([]);
   const [reconcileIdx, setReconcileIdx] = useState<number | null>(null);
   const [reconcileQuery, setReconcileQuery] = useState('');
   const [reconcileResults, setReconcileResults] = useState<any[]>([]);
@@ -383,16 +382,38 @@ export default function AdminEventRegistrations() {
   const handleReconcileSearch = async (query: string) => {
     setReconcileQuery(query);
     
-    let queryBuilder = supabase.from('students').select('*');
+    // Fallback search: simply search by word across name and surname
+    const words = query.trim().split(/\s+/).filter(w => w.length > 0);
     
-    if (query.trim()) {
-      const words = query.trim().split(/\s+/).filter(w => w.length > 0);
-      const searchStr = words.map(w => `name.ilike.%${w}%,surname.ilike.%${w}%`).join(',');
-      queryBuilder = queryBuilder.or(searchStr);
+    if (words.length === 0) {
+      setReconcileResults(allStudents.slice(0, 50));
+      return;
     }
-    
-    const { data } = await queryBuilder.order('name').limit(100);
-    setReconcileResults(data || []);
+
+    // Try a more permissive search: 
+    // We filter the already loaded 'allStudents' in memory which is reliable
+    const filtered = allStudents.filter(s => {
+      const fullName = `${s.name} ${s.surname || ''}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const qNorm = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const searchWords = qNorm.split(/\s+/).filter(w => w.length > 0);
+      return searchWords.every(word => fullName.includes(word));
+    });
+
+    // Sort by relevance (starts with query)
+    const sorted = filtered.sort((a, b) => {
+      const nameA = `${a.name} ${a.surname || ''}`.toLowerCase();
+      const nameB = `${b.name} ${b.surname || ''}`.toLowerCase();
+      const q = query.toLowerCase();
+      
+      const startsA = nameA.startsWith(q);
+      const startsB = nameB.startsWith(q);
+      
+      if (startsA && !startsB) return -1;
+      if (!startsA && startsB) return 1;
+      return nameA.localeCompare(nameB);
+    });
+
+    setReconcileResults(sorted.slice(0, 100));
   };
 
   const handleFinalizeBulk = async () => {

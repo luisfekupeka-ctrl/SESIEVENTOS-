@@ -253,7 +253,9 @@ export default function AdminEventRegistrations() {
         if (match) {
           // Check if already registered
           const alreadyInEvent = registrations.some(r => r.student_id === match.id);
-          if (!alreadyInEvent) {
+          const alreadyInToRegister = toRegister.some(s => s.id === match.id);
+          
+          if (!alreadyInEvent && !alreadyInToRegister) {
             toRegister.push(match);
           }
         } else {
@@ -354,7 +356,9 @@ export default function AdminEventRegistrations() {
 
         if (match) {
           const alreadyInEvent = registrations.some(r => r.student_id === match.id);
-          if (!alreadyInEvent) {
+          const alreadyInToRegister = toRegister.some(s => s.id === match.id);
+          
+          if (!alreadyInEvent && !alreadyInToRegister) {
             toRegister.push(match);
           }
         } else {

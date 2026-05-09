@@ -395,7 +395,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                 onChange={(e) => setGradeFilter(e.target.value)}
               >
                 <option value="all">Todos os Anos</option>
-                {GRADES.map(grade => (
+                {Array.from(new Set(participants.map(p => p.grade).filter(Boolean))).sort().map(grade => (
                   <option key={grade} value={grade} className="bg-slate-900">{grade}</option>
                 ))}
               </select>

@@ -182,6 +182,20 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     }
   };
 
+  const downloadTemplate = () => {
+    const templateData = [{
+      'Nome': 'Exemplo: João',
+      'Sobrenome': 'Silva',
+      'Série': '9º Ano EF',
+      'Turma': 'A'
+    }];
+    
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Modelo Importação");
+    XLSX.writeFile(wb, "modelo_importacao_alunos.xlsx");
+  };
+
   const exportToExcel = () => {
     if (participants.length === 0) return;
     try {
@@ -330,6 +344,13 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                   <UploadCloud size={18} className="text-yellow-400" /> Excel
                 </label>
               </div>
+              <button
+                onClick={downloadTemplate}
+                className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
+                title="Baixar Planilha Modelo"
+              >
+                <Download size={18} className="text-yellow-400" /> Modelo
+              </button>
               <button
                 onClick={() => setIsBulkModalOpen(true)}
                 className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"

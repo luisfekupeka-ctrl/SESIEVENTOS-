@@ -91,7 +91,11 @@ export default function AdminEventRegistrations() {
 
   const fetchStudents = async () => {
     const { data } = await supabase.from('students').select('*').order('name');
-    if (data) setAllStudents(data);
+    if (data) {
+      setAllStudents(data);
+      return data;
+    }
+    return [];
   };
 
   const handleAddStudent = async (student: any) => {
@@ -345,15 +349,12 @@ export default function AdminEventRegistrations() {
         return;
       }
 
-      // 1. Get all students from DB for matching
-      const { data: studentsFromDB } = await supabase.from('students').select('*').order('name');
+      const studentsFromDB = await fetchStudents();
       if (!studentsFromDB || studentsFromDB.length === 0) {
         setBatchFeedback('Erro: O banco de alunos está vazio.');
         setIsAdding(false);
         return;
       }
-
-      setAllStudents(studentsFromDB);
 
       const normalizedDB = studentsFromDB.map(s => ({
         ...s,
@@ -405,30 +406,22 @@ export default function AdminEventRegistrations() {
       return;
     }
 
-    // Try a more permissive search: 
-    // We filter the already loaded 'allStudents' in memory which is reliable
-    const filtered = allStudents.filter(s => {
+    const qNorm = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const searchWords = qNorm.split(/\s+/).filter(w => w.length > 0);
+    
+    // If state is empty but we have a query, try to use a local copy or refetch
+    let source = allStudents;
+    if (source.length === 0) {
+      const fresh = await fetchStudents();
+      source = fresh;
+    }
+
+    const filtered = source.filter(s => {
       const fullName = `${s.name} ${s.surname || ''}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const qNorm = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const searchWords = qNorm.split(/\s+/).filter(w => w.length > 0);
       return searchWords.every(word => fullName.includes(word));
     });
 
-    // Sort by relevance (starts with query)
-    const sorted = filtered.sort((a, b) => {
-      const nameA = `${a.name} ${a.surname || ''}`.toLowerCase();
-      const nameB = `${b.name} ${b.surname || ''}`.toLowerCase();
-      const q = query.toLowerCase();
-      
-      const startsA = nameA.startsWith(q);
-      const startsB = nameB.startsWith(q);
-      
-      if (startsA && !startsB) return -1;
-      if (!startsA && startsB) return 1;
-      return nameA.localeCompare(nameB);
-    });
-
-    setReconcileResults(sorted.slice(0, 100));
+    setReconcileResults(filtered.slice(0, 100));
   };
 
   const handleFinalizeBulk = async () => {

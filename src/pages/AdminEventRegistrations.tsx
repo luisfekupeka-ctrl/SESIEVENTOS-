@@ -1014,7 +1014,9 @@ export default function AdminEventRegistrations() {
                               .filter(s => {
                                 const q = normalizeName(reconcileQuery);
                                 if (!q) return true;
-                                return normalizeName(`${s.name} ${s.surname}`).includes(q);
+                                const words = q.split(' ').filter(w => w.length > 0);
+                                const fullName = normalizeName(`${s.name} ${s.surname || ''}`);
+                                return words.every(word => fullName.includes(word));
                               })
                               .slice(0, reconcileQuery ? 50 : 20) // Show top 20 by default, 50 if filtering
                               .map((student) => (

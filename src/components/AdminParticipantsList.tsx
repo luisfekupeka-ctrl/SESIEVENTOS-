@@ -100,15 +100,17 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
 
         const studentsToInsert = data.map((row: any) => {
           const name = row.Nome || row.nome || row.Name || row.name;
+          const surname = row.Sobrenome || row.sobrenome || row.Surname || row.surname || '';
           const grade = row.Série || row.serie || row.Ano || row.ano || row.Grade || row.grade;
+          const classField = row.Turma || row.turma || row.Class || row.class || '';
           
           if (!name) return null;
           
           return {
             name: name.toString().trim(),
-            surname: '',
+            surname: surname.toString().trim(),
             grade: grade ? grade.toString().trim() : '',
-            class: '',
+            class: classField.toString().trim(),
             type: 'student'
           };
         }).filter(Boolean);

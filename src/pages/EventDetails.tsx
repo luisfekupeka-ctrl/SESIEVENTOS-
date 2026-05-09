@@ -661,30 +661,38 @@ export default function EventDetails() {
           viewport={{ once: true }}
           className="bg-slate-900/40 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] border border-slate-800 shadow-2xl"
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
             <h2 className="text-2xl md:text-4xl font-black text-white flex items-center gap-4">
               <div className="w-1.5 h-10 bg-yellow-400 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.4)]"></div>
               Participantes Inscritos
             </h2>
-            <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
-              <div className="flex-grow md:flex-grow-0 relative group">
-                <input
-                  type="text"
-                  placeholder="Pesquisar seu nome..."
-                  className="w-full md:w-80 bg-slate-950 border border-slate-800 rounded-2xl px-6 py-3 text-white font-bold focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all placeholder:text-slate-600"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-yellow-400 transition-colors">
-                  <Clock size={18} className="animate-pulse" /> {/* Just a visual element */}
-                </div>
-              </div>
-              <div className="bg-slate-950 px-6 py-3 rounded-2xl border border-slate-800 flex items-center gap-3">
-                <Users size={20} className="text-yellow-400" />
-                <span className="text-white font-black text-lg">{eventParticipants.length}</span>
-                <span className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Inscritos</span>
-              </div>
+            <div className="bg-slate-950 px-6 py-3 rounded-2xl border border-slate-800 flex items-center gap-3">
+              <Users size={20} className="text-yellow-400" />
+              <span className="text-white font-black text-lg">{eventParticipants.length}</span>
+              <span className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Inscritos</span>
             </div>
+          </div>
+
+          {/* Search Bar - New Row for Maximum Visibility */}
+          <div className="mb-8 relative group">
+            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-500 group-focus-within:text-yellow-400 transition-colors">
+              <Send size={20} className="rotate-90" />
+            </div>
+            <input
+              type="text"
+              placeholder="PESQUISAR SEU NOME NA LISTA..."
+              className="w-full bg-slate-950/80 border-2 border-slate-800 rounded-[1.5rem] pl-16 pr-6 py-5 text-white font-black placeholder:text-slate-700 focus:outline-none focus:border-yellow-400/50 focus:ring-4 focus:ring-yellow-400/10 transition-all text-sm tracking-widest uppercase"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button 
+                onClick={() => setSearchTerm('')}
+                className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest"
+              >
+                Limpar
+              </button>
+            )}
           </div>
 
           <div className="space-y-3">

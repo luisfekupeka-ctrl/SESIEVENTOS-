@@ -383,19 +383,15 @@ export default function AdminEventRegistrations() {
   const handleReconcileSearch = async (query: string) => {
     setReconcileQuery(query);
     
-    // Normalize and split query for multi-word search in Postgres
-    const words = query.trim().split(/\s+/).filter(w => w.length > 1);
-    
     let queryBuilder = supabase.from('students').select('*');
     
-    if (words.length > 0) {
-      // Create a search string like "name.ilike.%word1%,surname.ilike.%word1%..."
-      // But simpler: just search in both fields
+    if (query.trim()) {
+      const words = query.trim().split(/\s+/).filter(w => w.length > 0);
       const searchStr = words.map(w => `name.ilike.%${w}%,surname.ilike.%${w}%`).join(',');
       queryBuilder = queryBuilder.or(searchStr);
     }
     
-    const { data } = await queryBuilder.order('name').limit(20);
+    const { data } = await queryBuilder.order('name').limit(100);
     setReconcileResults(data || []);
   };
 
@@ -1052,7 +1048,7 @@ export default function AdminEventRegistrations() {
                               ))
                             ) : (
                               <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest p-4 text-center">
-                                {reconcileQuery.length < 2 ? 'Digite parte do nome para buscar...' : 'Nenhum aluno encontrado.'}
+                                {reconcileQuery.length === 0 ? 'Carregando lista...' : 'Nenhum aluno encontrado.'}
                               </p>
                             )}
                           </div>

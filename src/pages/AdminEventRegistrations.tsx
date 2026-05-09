@@ -31,6 +31,7 @@ export default function AdminEventRegistrations() {
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [reconcileIdx, setReconcileIdx] = useState<number | null>(null);
   const [reconcileQuery, setReconcileQuery] = useState('');
+  const [reconcileResults, setReconcileResults] = useState<any[]>([]);
   const [bulkText, setBulkText] = useState('');
   const [batchFeedback, setBatchFeedback] = useState<string | null>(null);
 
@@ -378,6 +379,25 @@ export default function AdminEventRegistrations() {
     }
   };
 
+
+  const handleReconcileSearch = async (query: string) => {
+    setReconcileQuery(query);
+    
+    // Normalize and split query for multi-word search in Postgres
+    const words = query.trim().split(/\s+/).filter(w => w.length > 1);
+    
+    let queryBuilder = supabase.from('students').select('*');
+    
+    if (words.length > 0) {
+      // Create a search string like "name.ilike.%word1%,surname.ilike.%word1%..."
+      // But simpler: just search in both fields
+      const searchStr = words.map(w => `name.ilike.%${w}%,surname.ilike.%${w}%`).join(',');
+      queryBuilder = queryBuilder.or(searchStr);
+    }
+    
+    const { data } = await queryBuilder.order('name').limit(20);
+    setReconcileResults(data || []);
+  };
 
   const handleFinalizeBulk = async () => {
     if (isAdding || !event) return;
@@ -1010,16 +1030,8 @@ export default function AdminEventRegistrations() {
                           </div>
                           
                           <div className="grid gap-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-                            {allStudents
-                              .filter(s => {
-                                const q = normalizeName(reconcileQuery);
-                                if (!q) return true;
-                                const words = q.split(' ').filter(w => w.length > 0);
-                                const fullName = normalizeName(`${s.name} ${s.surname || ''}`);
-                                return words.every(word => fullName.includes(word));
-                              })
-                              .slice(0, reconcileQuery ? 50 : 20) // Show top 20 by default, 50 if filtering
-                              .map((student) => (
+                            {reconcileResults.length > 0 ? (
+                              reconcileResults.map((student) => (
                                 <button
                                   key={student.id}
                                   onClick={() => {
@@ -1027,6 +1039,7 @@ export default function AdminEventRegistrations() {
                                     newResults[idx].student = student;
                                     setBulkResults(newResults);
                                     setReconcileIdx(null);
+                                    setReconcileResults([]);
                                   }}
                                   className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-lg hover:border-yellow-400 transition-colors text-left"
                                 >
@@ -1036,7 +1049,12 @@ export default function AdminEventRegistrations() {
                                   </div>
                                   <Plus size={14} className="text-yellow-400" />
                                 </button>
-                              ))}
+                              ))
+                            ) : (
+                              <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest p-4 text-center">
+                                {reconcileQuery.length < 2 ? 'Digite parte do nome para buscar...' : 'Nenhum aluno encontrado.'}
+                              </p>
+                            )}
                           </div>
                         </div>
                       )}

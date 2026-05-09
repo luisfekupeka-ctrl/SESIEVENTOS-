@@ -84,6 +84,9 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     };
   }, [type]);
 
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkText, setBulkText] = useState('');
+
   const importFromExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -99,10 +102,11 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         const data = XLSX.utils.sheet_to_json(ws);
 
         const studentsToInsert = data.map((row: any) => {
-          const name = row.Nome || row.nome || row.Name || row.name;
+          // Mapeamento super flexível de colunas
+          const name = row.Nome || row.nome || row.Name || row.name || row.ALUNO || row.Aluno || row['NOME DO ALUNO'] || row['Nome Completo'] || row['NOME'];
           const surname = row.Sobrenome || row.sobrenome || row.Surname || row.surname || '';
-          const grade = row.Série || row.serie || row.Ano || row.ano || row.Grade || row.grade;
-          const classField = row.Turma || row.turma || row.Class || row.class || '';
+          const grade = row.Série || row.serie || row.Ano || row.ano || row.Grade || row.grade || row.SERIE || row.Serie || row['SÉRIE'];
+          const classField = row.Turma || row.turma || row.Class || row.class || row.TURMA || row.Classe || row.CLASSE;
           
           if (!name) return null;
           
@@ -110,37 +114,72 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
             name: name.toString().trim(),
             surname: surname.toString().trim(),
             grade: grade ? grade.toString().trim() : '',
-            class: classField.toString().trim(),
+            class: classField ? classField.toString().trim() : '',
             type: 'student'
           };
         }).filter(Boolean);
 
         if (studentsToInsert.length === 0) {
-          setFeedback({ type: 'error', message: 'Nenhum dado válido encontrado no Excel.' });
+          setFeedback({ type: 'error', message: 'Nenhum dado válido encontrado. Verifique os nomes das colunas.' });
           return;
         }
 
-        const batchSize = 100;
-        for (let i = 0; i < studentsToInsert.length; i += batchSize) {
-          const batch = studentsToInsert.slice(i, i + batchSize);
-          const { error } = await supabase
-            .from('students')
-            .upsert(batch, { onConflict: 'name, surname, grade, class' });
-          
-          if (error) throw error;
-        }
+        const { error } = await supabase
+          .from('students')
+          .upsert(studentsToInsert, { onConflict: 'name, surname, grade, class' });
+        
+        if (error) throw error;
 
-        setFeedback({ type: 'success', message: `${studentsToInsert.length} alunos importados com sucesso!` });
+        setFeedback({ type: 'success', message: `${studentsToInsert.length} registros importados!` });
         fetchParticipants();
       } catch (err) {
         console.error("Erro na importação:", err);
-        setFeedback({ type: 'error', message: 'Falha ao importar arquivo Excel.' });
+        setFeedback({ type: 'error', message: 'Falha ao importar arquivo.' });
       } finally {
         setIsRefreshing(false);
         e.target.value = '';
       }
     };
     reader.readAsBinaryString(file);
+  };
+
+  const handleBulkImport = async () => {
+    if (!bulkText.trim()) return;
+    
+    setIsRefreshing(true);
+    try {
+      const lines = bulkText.split('\n').filter(l => l.trim());
+      const studentsToInsert = lines.map(line => {
+        // Tenta separar por ponto e vírgula, tabulação ou vírgula
+        const parts = line.split(/[;\t,]/).map(p => p.trim());
+        if (parts.length === 0 || !parts[0]) return null;
+        
+        return {
+          name: parts[0],
+          surname: parts.length > 3 ? parts[1] : '', // Se tiver 4 partes, assume Nome; Sobrenome; Série; Turma
+          grade: parts.length > 2 ? (parts.length === 3 ? parts[1] : parts[2]) : '',
+          class: parts.length > 2 ? (parts.length === 3 ? parts[2] : parts[3]) : '',
+          type: 'student'
+        };
+      }).filter(Boolean);
+
+      if (studentsToInsert.length === 0) throw new Error("Nenhum dado válido.");
+
+      const { error } = await supabase
+        .from('students')
+        .upsert(studentsToInsert, { onConflict: 'name, surname, grade, class' });
+      
+      if (error) throw error;
+
+      setFeedback({ type: 'success', message: `${studentsToInsert.length} registros adicionados!` });
+      setBulkText('');
+      setIsBulkModalOpen(false);
+      fetchParticipants();
+    } catch (err) {
+      setFeedback({ type: 'error', message: 'Erro ao processar texto colado.' });
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const exportToExcel = () => {
@@ -275,21 +314,29 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
             <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
           {type === 'student' && (
-            <div className="relative w-full sm:w-auto">
-              <input
-                type="file"
-                accept=".xlsx, .xls, .csv"
-                onChange={importFromExcel}
-                className="hidden"
-                id="excel-import"
-              />
-              <label
-                htmlFor="excel-import"
-                className={`w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg cursor-pointer ${isRefreshing ? 'opacity-50 pointer-events-none' : ''}`}
+            <>
+              <div className="relative w-full sm:w-auto">
+                <input
+                  type="file"
+                  accept=".xlsx, .xls, .csv"
+                  onChange={importFromExcel}
+                  className="hidden"
+                  id="excel-import"
+                />
+                <label
+                  htmlFor="excel-import"
+                  className={`w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg cursor-pointer ${isRefreshing ? 'opacity-50 pointer-events-none' : ''}`}
+                >
+                  <UploadCloud size={18} className="text-yellow-400" /> Excel
+                </label>
+              </div>
+              <button
+                onClick={() => setIsBulkModalOpen(true)}
+                className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
               >
-                <UploadCloud size={18} className="text-yellow-400" /> Importar
-              </label>
-            </div>
+                <Plus size={18} className="text-yellow-400" /> Colar Lista
+              </button>
+            </>
           )}
           <button
             onClick={exportToExcel}
@@ -507,6 +554,57 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
               >
                 Excluir
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Bulk Import Modal */}
+      {isBulkModalOpen && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-800">
+            <div className="p-8 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+              <div>
+                <h2 className="text-3xl font-black text-white tracking-tight">Colar Lista de Alunos</h2>
+                <p className="text-slate-400 font-bold text-sm mt-1">Cole os dados copiados de uma planilha ou PDF.</p>
+              </div>
+              <button onClick={() => setIsBulkModalOpen(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-6">
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6">
+                <h4 className="text-blue-400 font-black uppercase text-[10px] tracking-widest mb-3">Instruções de Formatação</h4>
+                <ul className="text-xs text-slate-300 space-y-2 font-bold list-disc ml-4">
+                  <li>Uma linha por aluno.</li>
+                  <li>Use ponto e vírgula (;) ou TAB para separar os campos.</li>
+                  <li>Formato aceito: <code className="text-yellow-400">Nome; Sobrenome; Série; Turma</code></li>
+                  <li>Ou simplificado: <code className="text-yellow-400">Nome; Série; Turma</code></li>
+                </ul>
+              </div>
+
+              <textarea
+                className="w-full h-64 px-6 py-5 bg-slate-950 border border-slate-800 rounded-[2rem] text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition-all placeholder:text-slate-600 custom-scrollbar"
+                placeholder="Exemplo:&#10;João Silva; 9º Ano; A&#10;Maria Oliveira; 8º Ano; B"
+                value={bulkText}
+                onChange={(e) => setBulkText(e.target.value)}
+              />
+
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setIsBulkModalOpen(false)}
+                  className="px-8 py-4 text-slate-400 font-black uppercase text-xs tracking-widest hover:text-white transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleBulkImport}
+                  disabled={!bulkText.trim() || isRefreshing}
+                  className="px-12 py-4 bg-yellow-400 text-black font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
+                >
+                  {isRefreshing ? 'Processando...' : 'Processar e Salvar'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -128,9 +128,9 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           return {
             name: name,
             surname: surname,
-            grade: grade ? grade.toString().trim() : '',
-            class: row.Turma || row.turma || '',
-            type: 'student'
+            grade: grade ? grade.toString().trim() : 'N/A',
+            class: row.Turma || row.turma || 'N/A',
+            type: type
           };
         }).filter(Boolean);
 
@@ -172,9 +172,9 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         return {
           name: parts[0],
           surname: parts.length > 3 ? parts[1] : '', // Se tiver 4 partes, assume Nome; Sobrenome; Série; Turma
-          grade: parts.length > 2 ? (parts.length === 3 ? parts[1] : parts[2]) : '',
-          class: parts.length > 2 ? (parts.length === 3 ? parts[2] : parts[3]) : '',
-          type: 'student'
+          grade: parts.length > 2 ? (parts.length === 3 ? parts[1] : parts[2]) : 'N/A',
+          class: parts.length > 2 ? (parts.length === 3 ? parts[2] : parts[3]) : 'N/A',
+          type: type
         };
       }).filter(Boolean);
 
@@ -337,44 +337,40 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           >
             <RefreshCw size={20} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
-          {type === 'student' && (
-            <>
-              <div className="relative w-full sm:w-auto">
-                <input
-                  type="file"
-                  accept=".xlsx, .xls, .csv"
-                  onChange={importFromExcel}
-                  className="hidden"
-                  id="excel-import"
-                />
-                <label
-                  htmlFor="excel-import"
-                  className={`w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg cursor-pointer ${isRefreshing ? 'opacity-50 pointer-events-none' : ''}`}
-                >
-                  <UploadCloud size={18} className="text-yellow-400" /> Excel
-                </label>
-              </div>
-              <button
-                onClick={downloadTemplate}
-                className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
-                title="Baixar Planilha Modelo"
-              >
-                <Download size={18} className="text-yellow-400" /> Modelo
-              </button>
-              <button
-                onClick={() => setIsBulkModalOpen(true)}
-                className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
-              >
-                <Plus size={18} className="text-yellow-400" /> Colar Lista
-              </button>
-              <button
-                onClick={() => setDeleteId('all')}
-                className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-lg"
-              >
-                <Trash2 size={18} /> Limpar Tudo
-              </button>
-            </>
-          )}
+          <div className="relative w-full sm:w-auto">
+            <input
+              type="file"
+              accept=".xlsx, .xls, .csv"
+              onChange={importFromExcel}
+              className="hidden"
+              id="excel-import"
+            />
+            <label
+              htmlFor="excel-import"
+              className={`w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg cursor-pointer ${isRefreshing ? 'opacity-50 pointer-events-none' : ''}`}
+            >
+              <UploadCloud size={18} className="text-yellow-400" /> Excel
+            </label>
+          </div>
+          <button
+            onClick={downloadTemplate}
+            className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
+            title="Baixar Planilha Modelo"
+          >
+            <Download size={18} className="text-yellow-400" /> Modelo
+          </button>
+          <button
+            onClick={() => setIsBulkModalOpen(true)}
+            className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
+          >
+            <Plus size={18} className="text-yellow-400" /> Colar Lista
+          </button>
+          <button
+            onClick={() => setDeleteId('all')}
+            className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 border border-red-500/20 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-lg"
+          >
+            <Trash2 size={18} /> Limpar Tudo
+          </button>
           <button
             onClick={exportToExcel}
             className="w-full sm:flex-grow flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-slate-300 border border-slate-800 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all shadow-lg"
@@ -576,7 +572,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
             </div>
             <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Remoção</h3>
             <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">
-              Deseja remover este aluno da lista? <br/>
+              Deseja remover {deleteId === 'all' ? `todos os ${labelPlural.toLowerCase()}` : `este ${labelSingular.toLowerCase()}`} da lista? <br/>
               <span className="text-yellow-400/80 text-sm italic">O histórico de participações nos eventos será preservado.</span>
             </p>
             <div className="grid grid-cols-2 gap-4">
@@ -602,7 +598,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-800">
             <div className="p-8 border-b border-slate-800 flex items-center justify-between bg-slate-900">
               <div>
-                <h2 className="text-3xl font-black text-white tracking-tight">Colar Lista de Alunos</h2>
+                <h2 className="text-3xl font-black text-white tracking-tight">Colar Lista de {labelPlural}</h2>
                 <p className="text-slate-400 font-bold text-sm mt-1">Cole os dados copiados de uma planilha ou PDF.</p>
               </div>
               <button onClick={() => setIsBulkModalOpen(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
@@ -614,16 +610,25 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6">
                 <h4 className="text-blue-400 font-black uppercase text-[10px] tracking-widest mb-3">Instruções de Formatação</h4>
                 <ul className="text-xs text-slate-300 space-y-2 font-bold list-disc ml-4">
-                  <li>Uma linha por aluno.</li>
+                  <li>Uma linha por {labelSingular.toLowerCase()}.</li>
                   <li>Use ponto e vírgula (;) ou TAB para separar os campos.</li>
-                  <li>Formato aceito: <code className="text-yellow-400">Nome; Sobrenome; Série; Turma</code></li>
-                  <li>Ou simplificado: <code className="text-yellow-400">Nome; Série; Turma</code></li>
+                  {type === 'student' ? (
+                    <>
+                      <li>Formato aceito: <code className="text-yellow-400">Nome; Sobrenome; Série; Turma</code></li>
+                      <li>Ou simplificado: <code className="text-yellow-400">Nome; Série; Turma</code></li>
+                    </>
+                  ) : (
+                    <>
+                      <li>Formato aceito: <code className="text-yellow-400">Nome; Sobrenome</code></li>
+                      <li>Ou apenas o <code className="text-yellow-400">Nome Completo</code></li>
+                    </>
+                  )}
                 </ul>
               </div>
 
               <textarea
                 className="w-full h-64 px-6 py-5 bg-slate-950 border border-slate-800 rounded-[2rem] text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400/50 transition-all placeholder:text-slate-600 custom-scrollbar"
-                placeholder="Exemplo:&#10;João Silva; 9º Ano; A&#10;Maria Oliveira; 8º Ano; B"
+                placeholder={type === 'student' ? "Exemplo:\nJoão Silva; 9º Ano; A\nMaria Oliveira; 8º Ano; B" : "Exemplo:\nJoão Silva\nMaria Oliveira"}
                 value={bulkText}
                 onChange={(e) => setBulkText(e.target.value)}
               />

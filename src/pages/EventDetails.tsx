@@ -72,9 +72,16 @@ export default function EventDetails() {
         .from('registrations')
         .select('*, students(*)')
         .eq('event_id', id)
-        .eq('status', 'approved')
-        .order('timestamp', { ascending: true });
-      if (data) setEventParticipants(data);
+        .eq('status', 'approved');
+      
+      if (data) {
+        const sorted = [...data].sort((a, b) => {
+          const nameA = (a.students?.name || a.form_data?.nome || a.form_data?.['nome completo'] || '').toLowerCase().trim();
+          const nameB = (b.students?.name || b.form_data?.nome || b.form_data?.['nome completo'] || '').toLowerCase().trim();
+          return nameA.localeCompare(nameB);
+        });
+        setEventParticipants(sorted);
+      }
     };
     fetchParticipants();
   }, [id]);
@@ -186,9 +193,15 @@ export default function EventDetails() {
           .from('registrations')
           .select('*, students(*)')
           .eq('event_id', id)
-          .eq('status', 'approved')
-          .order('timestamp', { ascending: true });
-        if (newParticipants) setEventParticipants(newParticipants);
+          .eq('status', 'approved');
+        if (newParticipants) {
+          const sorted = [...newParticipants].sort((a, b) => {
+            const nameA = (a.students?.name || a.form_data?.nome || a.form_data?.['nome completo'] || '').toLowerCase().trim();
+            const nameB = (b.students?.name || b.form_data?.nome || b.form_data?.['nome completo'] || '').toLowerCase().trim();
+            return nameA.localeCompare(nameB);
+          });
+          setEventParticipants(sorted);
+        }
         return; // Success!
       } catch (err: any) {
         lastError = err;
@@ -633,33 +646,46 @@ export default function EventDetails() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="space-y-3">
             {eventParticipants.length > 0 ? (
               eventParticipants.map((reg, idx) => {
-                const name = reg.form_data?.nome || reg.form_data?.['nome completo'] || reg.form_data?.Name || reg.form_data?.name || (reg.students?.name);
-                const grade = reg.form_data?.série || reg.form_data?.ano || reg.form_data?.Grade || (reg.students?.grade);
+                const student = reg.students;
+                const name = student ? `${student.name} ${student.surname || ''}`.trim() : (reg.form_data?.nome || reg.form_data?.['nome completo'] || reg.form_data?.Name || reg.form_data?.name);
+                const grade = student?.grade || reg.form_data?.série || reg.form_data?.ano || reg.form_data?.Grade;
                 
                 return (
                   <motion.div
                     key={reg.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="p-4 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-4 group hover:border-yellow-400/30 transition-all"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.03 }}
+                    className="p-5 bg-slate-950/50 border border-slate-800 rounded-2xl flex items-center gap-6 group hover:border-yellow-400/30 transition-all"
                   >
-                    <div className="w-10 h-10 bg-yellow-400/10 text-yellow-400 rounded-xl flex items-center justify-center font-black text-sm border border-yellow-400/10">
+                    <div className="w-12 h-12 bg-yellow-400/10 text-yellow-400 rounded-xl flex items-center justify-center font-black text-lg border border-yellow-400/10 group-hover:scale-110 transition-transform">
                       {name?.[0] || 'P'}
                     </div>
-                    <div className="flex-grow overflow-hidden">
-                      <p className="text-white font-bold truncate text-sm">{name}</p>
-                      <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{grade || 'Participante'}</p>
+                    <div className="flex-grow">
+                      <p className="text-white font-black text-lg tracking-tight">{name}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                          {grade || 'Participante'}
+                        </span>
+                        <span className="w-1 h-1 bg-slate-700 rounded-full"></span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                          {reg.students?.class || 'Inscrito'}
+                        </span>
+                      </div>
                     </div>
-                    <CheckCircle2 size={16} className="text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="flex items-center gap-2 px-4 py-2 bg-green-500/5 text-green-500 rounded-xl border border-green-500/10">
+                      <CheckCircle2 size={16} />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Confirmado</span>
+                    </div>
                   </motion.div>
                 );
               })
             ) : (
-              <div className="col-span-full py-12 text-center">
+              <div className="py-20 text-center bg-slate-950/30 rounded-3xl border border-dashed border-slate-800">
+                <Users size={48} className="mx-auto text-slate-800 mb-4" />
                 <p className="text-slate-500 font-bold text-lg">Ninguém se inscreveu ainda. Seja o primeiro!</p>
               </div>
             )}

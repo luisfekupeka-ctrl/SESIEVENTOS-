@@ -37,18 +37,19 @@ export default function AdminEventRegistrations() {
 
         const { data: regsData } = await supabase
           .from('registrations')
-          .select('*')
+          .select('*, students(*)')
           .eq('event_id', id);
 
         if (regsData) {
-          const sortedRegs = (regsData as Registration[]).sort((a, b) => {
-            const getName = (data: any) => {
-              if (!data) return '';
-              return (data.nome_completo || data['nome completo'] || data.nome || data.Nome || data.name || data.Name || '').toString().toLowerCase().trim();
-            };
-            const nameA = getName(a.form_data);
-            const nameB = getName(b.form_data);
-            return nameA.localeCompare(nameB);
+          const sortedRegs = (regsData as any[]).sort((a, b) => {
+            const nameA = `${a.students?.name || ''} ${a.students?.surname || ''}`.toLowerCase().trim();
+            const nameB = `${b.students?.name || ''} ${b.students?.surname || ''}`.toLowerCase().trim();
+            
+            // Fallback for form_data if student is missing
+            const fallbackA = (a.form_data?.nome || a.form_data?.['nome completo'] || '').toString().toLowerCase();
+            const fallbackB = (b.form_data?.nome || b.form_data?.['nome completo'] || '').toString().toLowerCase();
+            
+            return (nameA || fallbackA).localeCompare(nameB || fallbackB);
           });
           setRegistrations(sortedRegs);
         }
@@ -141,8 +142,17 @@ export default function AdminEventRegistrations() {
         };
         
         event.form_fields.forEach(field => {
-          const key = field.label.toLowerCase();
-          row[field.label] = reg.form_data[key] || reg.form_data[field.label] || '-';
+          const label = field.label.toLowerCase();
+          const student = (reg as any).students;
+          let value = reg.form_data[label] || reg.form_data[field.label] || '-';
+          
+          if (student) {
+            if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
+            else if (label.includes('série') || label.includes('ano')) value = student.grade || value;
+            else if (label.includes('turma')) value = student.class || value;
+          }
+          
+          row[field.label] = value;
         });
         
         return row;
@@ -178,8 +188,16 @@ export default function AdminEventRegistrations() {
         return [
           formattedDate,
           ...event.form_fields.map(f => {
-          const key = f.label.toLowerCase();
-          return reg.form_data[key] || reg.form_data[f.label] || '-';
+            const label = f.label.toLowerCase();
+            const student = (reg as any).students;
+            let value = reg.form_data[label] || reg.form_data[f.label] || '-';
+            
+            if (student) {
+              if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
+              else if (label.includes('série') || label.includes('ano')) value = student.grade || value;
+              else if (label.includes('turma')) value = student.class || value;
+            }
+            return value;
           })
         ];
       });
@@ -220,7 +238,16 @@ export default function AdminEventRegistrations() {
       ];
       
       event.form_fields.forEach(field => {
-        row.push(reg.form_data[field.label.toLowerCase()] || reg.form_data[field.label] || '-');
+        const label = field.label.toLowerCase();
+        const student = (reg as any).students;
+        let value = reg.form_data[label] || reg.form_data[field.label] || '-';
+        
+        if (student) {
+          if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
+          else if (label.includes('série') || label.includes('ano')) value = student.grade || value;
+          else if (label.includes('turma')) value = student.class || value;
+        }
+        row.push(value);
       });
       
       return row.join('\t');
@@ -319,16 +346,34 @@ export default function AdminEventRegistrations() {
             <tbody className="divide-y divide-slate-800">
               {registrations.map(reg => {
                 const regStatus = (reg as any).status || reg.form_data?.status || 'approved';
+                const student = (reg as any).students;
+                
                 return (
                   <tr key={reg.id} className="hover:bg-slate-800/30 transition-colors group">
                     <td className="px-6 md:px-10 py-6 text-xs text-slate-400 font-bold whitespace-nowrap uppercase tracking-widest">
                       {formatRegDate(reg.timestamp)}
                     </td>
-                    {event.form_fields.map(field => (
-                      <td key={field.id} className="px-6 md:px-10 py-6 text-sm text-white font-bold truncate max-w-[250px]">
-                        {reg.form_data[field.label.toLowerCase()] || reg.form_data[field.label] || '-'}
-                      </td>
-                    ))}
+                    {event.form_fields.map(field => {
+                      const label = field.label.toLowerCase();
+                      let value = reg.form_data[label] || reg.form_data[field.label] || '-';
+                      
+                      // Interceptar campos conhecidos para usar dados canônicos do banco
+                      if (student) {
+                        if (label.includes('nome')) {
+                          value = `${student.name} ${student.surname || ''}`.trim();
+                        } else if (label.includes('série') || label.includes('ano')) {
+                          value = student.grade || value;
+                        } else if (label.includes('turma')) {
+                          value = student.class || value;
+                        }
+                      }
+
+                      return (
+                        <td key={field.id} className="px-6 md:px-10 py-6 text-sm text-white font-bold truncate max-w-[250px]">
+                          {value}
+                        </td>
+                      );
+                    })}
                     <td className="px-6 md:px-10 py-6">
                       <div className="flex items-center gap-3">
                         <span className={`w-2.5 h-2.5 rounded-full ${regStatus === 'approved' ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-amber-500 animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.4)]'}`} />

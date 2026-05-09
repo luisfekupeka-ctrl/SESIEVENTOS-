@@ -559,9 +559,10 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
             <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mb-8 mx-auto border border-red-500/10">
               <Trash2 size={40} />
             </div>
-            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Exclusão</h3>
+            <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Confirmar Remoção</h3>
             <p className="text-slate-400 mb-10 font-bold text-lg leading-relaxed">
-              Deseja remover este registro? Esta ação é irreversível.
+              Deseja remover este aluno da lista? <br/>
+              <span className="text-yellow-400/80 text-sm italic">O histórico de participações nos eventos será preservado.</span>
             </p>
             <div className="grid grid-cols-2 gap-4">
               <button

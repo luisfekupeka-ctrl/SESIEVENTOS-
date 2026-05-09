@@ -203,10 +203,12 @@ export default function AdminEventRegistrations() {
   };
 
   const normalizeName = (name: string) => {
+    if (!name) return "";
     return name.toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, ' ') // Collapse multiple spaces
+      .replace(/[^\w\s]/g, " ") // Replace punctuation/special chars with space
+      .replace(/\s+/g, " ")
       .trim();
   };
 
@@ -358,10 +360,23 @@ export default function AdminEventRegistrations() {
         normalized: normalizeName(`${s.name} ${s.surname || ''}`)
       }));
 
-      // 2. Map names to results
+      // 2. Map names to results using a more robust matching logic
       const results = lines.map(rawName => {
         const norm = normalizeName(rawName);
-        const match = normalizedDB.find(s => s.normalized === norm);
+        const searchWords = norm.split(' ').filter(w => w.length > 0).sort();
+        
+        // Exact match first
+        let match = normalizedDB.find(s => s.normalized === norm);
+        
+        // Word-based match if no exact match (all words must match)
+        if (!match) {
+          match = normalizedDB.find(s => {
+            const dbWords = s.normalized.split(' ').filter(w => w.length > 0).sort();
+            if (dbWords.length !== searchWords.length) return false;
+            return searchWords.every((w, i) => w === dbWords[i]);
+          });
+        }
+
         return {
           originalName: rawName,
           student: match || null
@@ -430,14 +445,20 @@ export default function AdminEventRegistrations() {
     setBatchFeedback(`Inscrevendo ${toRegister.length} alunos...`);
 
     try {
-      // Filter out those already in the event (local check)
-      const validToRegister = toRegister.filter(s => !registrations.some(r => r.student_id === s.id));
+      // 1. Refetch registrations to ensure we have the absolute latest
+      const { data: currentRegs } = await supabase.from('registrations').select('student_id').eq('event_id', id);
+      const existingIds = new Set((currentRegs || []).map(r => r.student_id));
+
+      // 2. Filter out those already in the event
+      const validToRegister = toRegister.filter(s => !existingIds.has(s.id));
 
       if (validToRegister.length === 0) {
         setBatchFeedback('Todos os alunos selecionados já estão inscritos.');
         setIsAdding(false);
         return;
       }
+
+      setBatchFeedback(`Inscrevendo ${validToRegister.length} alunos...`);
 
       const newRegs = validToRegister.map(student => ({
         event_id: id,

@@ -118,12 +118,6 @@ export default function AdminEventRegistrations() {
 
       if (error) throw error;
 
-      // Update count
-      await supabase
-        .from('events')
-        .update({ registration_count: (event.registration_count || 0) + 1 })
-        .eq('id', id);
-
       // Refresh local state
       const { data: newRegs } = await supabase
         .from('registrations')
@@ -131,7 +125,10 @@ export default function AdminEventRegistrations() {
         .eq('event_id', id);
       
       if (newRegs) setRegistrations(newRegs);
-      setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + 1 } : null);
+      
+      // Update local event object to reflect the new count from DB
+      const { data: eventUpdate } = await supabase.from('events').select('registration_count').eq('id', id).single();
+      if (eventUpdate) setEvent(prev => prev ? { ...prev, registration_count: eventUpdate.registration_count } : null);
       
     } catch (error) {
       console.error('Erro ao adicionar aluno:', error);
@@ -180,12 +177,6 @@ export default function AdminEventRegistrations() {
       const { error } = await supabase.from('registrations').insert(newRegs);
       if (error) throw error;
 
-      // Update count
-      await supabase
-        .from('events')
-        .update({ registration_count: (event.registration_count || 0) + toAdd.length })
-        .eq('id', id);
-
       setBatchFeedback(`${toAdd.length} alunos adicionados com sucesso!`);
       setTimeout(() => setBatchFeedback(null), 3000);
       
@@ -195,7 +186,10 @@ export default function AdminEventRegistrations() {
         .select('*, students(*)')
         .eq('event_id', id);
       if (updatedRegs) setRegistrations(updatedRegs);
-      setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + toAdd.length } : null);
+      
+      // Update local event object to reflect the new count from DB
+      const { data: eventUpdate } = await supabase.from('events').select('registration_count').eq('id', id).single();
+      if (eventUpdate) setEvent(prev => prev ? { ...prev, registration_count: eventUpdate.registration_count } : null);
 
     } finally {
       setIsAdding(false);
@@ -302,12 +296,6 @@ export default function AdminEventRegistrations() {
       const { error } = await supabase.from('registrations').insert(newRegs);
       if (error) throw error;
 
-      // Update count
-      await supabase
-        .from('events')
-        .update({ registration_count: (event.registration_count || 0) + toRegister.length })
-        .eq('id', id);
-
       setBatchFeedback(`${toRegister.length} alunos inscritos com sucesso!`);
       setTimeout(() => setBatchFeedback(null), 3000);
       
@@ -317,7 +305,10 @@ export default function AdminEventRegistrations() {
         .select('*, students(*)')
         .eq('event_id', id);
       if (updatedRegs) setRegistrations(updatedRegs);
-      setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + toRegister.length } : null);
+      
+      // Update local event object to reflect the new count from DB
+      const { data: eventUpdate } = await supabase.from('events').select('registration_count').eq('id', id).single();
+      if (eventUpdate) setEvent(prev => prev ? { ...prev, registration_count: eventUpdate.registration_count } : null);
 
     } catch (err: any) {
       console.error(err);
@@ -394,12 +385,6 @@ export default function AdminEventRegistrations() {
       const { error } = await supabase.from('registrations').insert(newRegs);
       if (error) throw error;
 
-      // Update count
-      await supabase
-        .from('events')
-        .update({ registration_count: (event.registration_count || 0) + toRegister.length })
-        .eq('id', id);
-
       setBatchFeedback(`${toRegister.length} alunos adicionados com sucesso!`);
       setBulkText('');
       setIsBulkModalOpen(false);
@@ -410,7 +395,10 @@ export default function AdminEventRegistrations() {
         .select('*, students(*)')
         .eq('event_id', id);
       if (updatedRegs) setRegistrations(updatedRegs);
-      setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + toRegister.length } : null);
+      
+      // Update local event object to reflect the new count from DB
+      const { data: eventUpdate } = await supabase.from('events').select('registration_count').eq('id', id).single();
+      if (eventUpdate) setEvent(prev => prev ? { ...prev, registration_count: eventUpdate.registration_count } : null);
 
     } catch (err: any) {
       console.error(err);
@@ -430,17 +418,12 @@ export default function AdminEventRegistrations() {
       
       if (error) throw error;
       
-      if (event) {
-        await supabase
-          .from('events')
-          .update({ registration_count: Math.max(0, (event.registration_count || 0) - 1) })
-          .eq('id', id);
-        
-        setEvent(prev => prev ? { ...prev, registration_count: Math.max(0, (prev.registration_count || 0) - 1) } : null);
-      }
-      
       setRegistrations(prev => prev.filter(reg => reg.id !== deleteId));
       setDeleteId(null);
+
+      // Update local event object to reflect the new count from DB
+      const { data: eventUpdate } = await supabase.from('events').select('registration_count').eq('id', id).single();
+      if (eventUpdate) setEvent(prev => prev ? { ...prev, registration_count: eventUpdate.registration_count } : null);
     } catch (error) {
       console.error("Erro ao excluir:", error);
     }

@@ -195,9 +195,124 @@ export default function AdminEventRegistrations() {
       if (updatedRegs) setRegistrations(updatedRegs);
       setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + toAdd.length } : null);
 
-    } catch (err) {
-      console.error('Erro no batch:', err);
-      setBatchFeedback('Erro ao adicionar em massa.');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const normalizeName = (name: string) => {
+    return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  };
+
+  const handleImportExcel = async (file: File) => {
+    if (profile?.status !== 'approved' || !event || isAdding) return;
+    setIsAdding(true);
+    setBatchFeedback('Lendo arquivo Excel...');
+
+    try {
+      const reader = new FileReader();
+      const data = await new Promise<any[]>((resolve, reject) => {
+        reader.onload = (e) => {
+          const ab = e.target?.result;
+          const workbook = XLSX.read(ab, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          resolve(XLSX.utils.sheet_to_json(firstSheet));
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+
+      if (data.length === 0) {
+        setBatchFeedback('Arquivo vazio ou inválido.');
+        setIsAdding(false);
+        return;
+      }
+
+      setBatchFeedback(`Processando ${data.length} nomes...`);
+
+      // 1. Get all students from DB for matching
+      const { data: studentsFromDB } = await supabase.from('students').select('*');
+      if (!studentsFromDB) throw new Error('Não foi possível carregar banco de alunos.');
+
+      const normalizedDB = studentsFromDB.map(s => ({
+        ...s,
+        normalized: normalizeName(`${s.name} ${s.surname || ''}`)
+      }));
+
+      // 2. Map Excel names to students
+      const toRegister: any[] = [];
+      const notFound: string[] = [];
+      
+      for (const row of data) {
+        const rawName = row['Nome Completo'] || row['NOME COMPLETO'] || row['Nome'] || row['nome'] || Object.values(row)[0];
+        if (!rawName) continue;
+
+        const norm = normalizeName(rawName.toString());
+        const match = normalizedDB.find(s => s.normalized === norm);
+
+        if (match) {
+          // Check if already registered
+          const alreadyInEvent = registrations.some(r => r.student_id === match.id);
+          if (!alreadyInEvent) {
+            toRegister.push(match);
+          }
+        } else {
+          notFound.push(rawName.toString());
+        }
+      }
+
+      if (toRegister.length === 0) {
+        setBatchFeedback(`Concluído: Nenhum aluno novo encontrado para adicionar (de ${data.length} processados).`);
+        if (notFound.length > 0) console.log('Não encontrados:', notFound);
+        setIsAdding(false);
+        return;
+      }
+
+      if (!confirm(`Encontramos ${toRegister.length} alunos na sua lista que ainda não estão inscritos neste evento. Deseja adicioná-los agora?`)) {
+        setIsAdding(false);
+        setBatchFeedback(null);
+        return;
+      }
+
+      setBatchFeedback(`Inscrevendo ${toRegister.length} alunos...`);
+
+      const newRegs = toRegister.map(student => ({
+        event_id: id,
+        student_id: student.id,
+        status: 'approved',
+        form_data: {
+          nome: `${student.name} ${student.surname || ''}`.trim(),
+          'nome completo': `${student.name} ${student.surname || ''}`.trim(),
+          'série': student.grade,
+          'ano': student.grade,
+          'turma': student.class,
+          status: 'approved'
+        }
+      }));
+
+      const { error } = await supabase.from('registrations').insert(newRegs);
+      if (error) throw error;
+
+      // Update count
+      await supabase
+        .from('events')
+        .update({ registration_count: (event.registration_count || 0) + toRegister.length })
+        .eq('id', id);
+
+      setBatchFeedback(`${toRegister.length} alunos inscritos com sucesso!`);
+      setTimeout(() => setBatchFeedback(null), 3000);
+      
+      // Refresh
+      const { data: updatedRegs } = await supabase
+        .from('registrations')
+        .select('*, students(*)')
+        .eq('event_id', id);
+      if (updatedRegs) setRegistrations(updatedRegs);
+      setEvent(prev => prev ? { ...prev, registration_count: (prev.registration_count || 0) + toRegister.length } : null);
+
+    } catch (err: any) {
+      console.error(err);
+      setBatchFeedback(`Erro: ${err.message || 'Erro ao importar.'}`);
     } finally {
       setIsAdding(false);
     }
@@ -455,6 +570,19 @@ export default function AdminEventRegistrations() {
               <FileText size={16} /> PDF
             </button>
           </div>
+          <label className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-lg cursor-pointer disabled:opacity-50">
+            <Download size={16} /> Importar Excel
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImportExcel(file);
+              }}
+              disabled={profile?.status !== 'approved' || isAdding}
+            />
+          </label>
         </div>
       </div>
 

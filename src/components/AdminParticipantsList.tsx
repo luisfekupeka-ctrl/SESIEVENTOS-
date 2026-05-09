@@ -87,6 +87,18 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [bulkText, setBulkText] = useState('');
 
+  const downloadTemplate = () => {
+    const templateData = [{
+      'Nome Completo': 'João Silva Sauro',
+      'Ano': '9º Ano EF'
+    }];
+    
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Modelo Importação");
+    XLSX.writeFile(wb, "modelo_alunos_sesi.xlsx");
+  };
+
   const importFromExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -102,19 +114,22 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         const data = XLSX.utils.sheet_to_json(ws);
 
         const studentsToInsert = data.map((row: any) => {
-          // Mapeamento super flexível de colunas
-          const name = row.Nome || row.nome || row.Name || row.name || row.ALUNO || row.Aluno || row['NOME DO ALUNO'] || row['Nome Completo'] || row['NOME'];
-          const surname = row.Sobrenome || row.sobrenome || row.Surname || row.surname || '';
-          const grade = row.Série || row.serie || row.Ano || row.ano || row.Grade || row.grade || row.SERIE || row.Serie || row['SÉRIE'];
-          const classField = row.Turma || row.turma || row.Class || row.class || row.TURMA || row.Classe || row.CLASSE;
+          // Nome Completo em uma célula só
+          const fullName = row['Nome Completo'] || row.Nome || row.nome || row.Name || row.name || row.ALUNO || row.Aluno || row['NOME DO ALUNO'] || row['NOME'];
+          const grade = row.Ano || row.ano || row.Série || row.serie || row.Grade || row.grade || row.SERIE || row.Serie || row['SÉRIE'];
           
-          if (!name) return null;
+          if (!fullName) return null;
+
+          // Se o usuário mandou nome e sobrenome juntos, vamos tentar separar ou apenas usar o primeiro como name
+          const nameParts = fullName.toString().trim().split(' ');
+          const name = nameParts[0];
+          const surname = nameParts.slice(1).join(' ');
           
           return {
-            name: name.toString().trim(),
-            surname: surname.toString().trim(),
+            name: name,
+            surname: surname,
             grade: grade ? grade.toString().trim() : '',
-            class: classField ? classField.toString().trim() : '',
+            class: row.Turma || row.turma || '',
             type: 'student'
           };
         }).filter(Boolean);
@@ -180,20 +195,6 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     } finally {
       setIsRefreshing(false);
     }
-  };
-
-  const downloadTemplate = () => {
-    const templateData = [{
-      'Nome': 'Exemplo: João',
-      'Sobrenome': 'Silva',
-      'Série': '9º Ano EF',
-      'Turma': 'A'
-    }];
-    
-    const ws = XLSX.utils.json_to_sheet(templateData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Modelo Importação");
-    XLSX.writeFile(wb, "modelo_importacao_alunos.xlsx");
   };
 
   const exportToExcel = () => {

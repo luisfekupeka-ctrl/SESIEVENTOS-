@@ -211,7 +211,7 @@ export default function AdminEvents() {
       if (cleanEventToSave.end_date === '') cleanEventToSave.end_date = null;
       if (cleanEventToSave.start_time === '') cleanEventToSave.start_time = null;
       if (cleanEventToSave.end_time === '') cleanEventToSave.end_time = null;
-      if (cleanEventToSave.registration_open_at === '') cleanEventToSave.registration_open_at = null;
+      cleanEventToSave.registration_open_at = null; // Always use start_date and start_time
       if (cleanEventToSave.countdown_target_at === '') cleanEventToSave.countdown_target_at = null;
 
       if (editingEvent) {
@@ -1052,38 +1052,40 @@ export default function AdminEvents() {
                     <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                       <div className="space-y-4">
                         <div className="space-y-1">
-                          <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Abertura de Inscrições</label>
-                          <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Agende a data e hora em que as inscrições serão liberadas</p>
+                          <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Alerta Vermelho do Cronômetro</label>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Escolha quanto tempo antes do início o cronômetro deve ficar vermelho e chamar atenção.</p>
                         </div>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Data/Hora Agendada</label>
-                            <input
-                              type="datetime-local"
-                              className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold text-xs focus:outline-none focus:border-yellow-400 transition-all shadow-sm"
-                              value={formData.registration_open_at ? new Date(new Date(formData.registration_open_at).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-                              onChange={(e) => {
-                                const isoVal = e.target.value ? new Date(e.target.value).toISOString() : '';
-                                setFormData({ ...formData, registration_open_at: isoVal });
-                              }}
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Alerta Vermelho (minutos)</label>
-                            <input
-                              type="number"
-                              min="1"
-                              placeholder="Ex: 10"
-                              className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold text-xs focus:outline-none focus:border-red-500 transition-all shadow-sm"
-                              value={formData.countdown_target_at || ''}
-                              onChange={(e) => setFormData({ ...formData, countdown_target_at: e.target.value })}
-                            />
-                            <p className="text-[9px] text-slate-500 uppercase font-black">
-                              Quando faltar esse tempo, o cronômetro ficará vermelho.
-                            </p>
-                          </div>
+                        <div className="space-y-2">
+                          <select
+                            className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold text-xs focus:outline-none focus:border-red-500 transition-all shadow-sm"
+                            value={formData.countdown_target_at || '10'}
+                            onChange={(e) => {
+                              setFormData({ 
+                                ...formData, 
+                                countdown_target_at: e.target.value,
+                                registration_open_at: '' // clear this so it always uses start_date and start_time
+                              });
+                            }}
+                          >
+                            {[5, 10, 15, 20, 30, 45, 60, 120].map(mins => {
+                              let timeStr = '';
+                              if (formData.start_time) {
+                                const [h, m] = formData.start_time.split(':').map(Number);
+                                const totalMins = h * 60 + m - mins;
+                                if (totalMins >= 0) {
+                                  const newH = Math.floor(totalMins / 60);
+                                  const newM = totalMins % 60;
+                                  timeStr = ` (a partir das ${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')})`;
+                                }
+                              }
+                              return (
+                                <option key={mins} value={mins}>
+                                  {mins} minutos antes do evento{timeStr}
+                                </option>
+                              );
+                            })}
+                          </select>
                         </div>
                       </div>
                     </div>

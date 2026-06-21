@@ -984,8 +984,9 @@ export default function AdminEvents() {
                       </button>
                     </div>
                   </div>
+                </div>
 
-                  {/* Novos controles de dias da semana e agendamento */}
+                {/* Novos controles de dias da semana e agendamento */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-800/40">
                     <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                       <div className="flex items-center justify-between">
@@ -1108,7 +1109,6 @@ export default function AdminEvents() {
                       </div>
                     </div>
                   </div>
-                </div>
               </section>
 
               {/* Custom Form Fields */}

@@ -263,7 +263,6 @@ export default function AdminStudents() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-950/50 border-b border-slate-850">
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">ID</th>
                   <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">Nome Completo</th>
                   <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-wider">Ano Escolar</th>
                   <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-wider text-right">Ações</th>
@@ -272,7 +271,6 @@ export default function AdminStudents() {
               <tbody className="divide-y divide-slate-850/50">
                 {filteredStudents.map(student => (
                   <tr key={student.id} className="hover:bg-slate-800/25 transition-colors group">
-                    <td className="px-8 py-5 text-sm font-bold text-slate-500">#{student.id}</td>
                     <td className="px-8 py-5 flex items-center gap-4">
                       <div className="w-10 h-10 bg-yellow-400/10 text-yellow-400 rounded-xl flex items-center justify-center font-bold">
                         <User size={18} />

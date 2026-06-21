@@ -206,11 +206,13 @@ export default function AdminEvents() {
       delete (eventToSave as any).created_at;
       delete (eventToSave as any).registration_count;
 
-      const cleanEventToSave = { ...eventToSave };
-      if (cleanEventToSave.start_date === '') delete cleanEventToSave.start_date;
-      if (cleanEventToSave.end_date === '') delete cleanEventToSave.end_date;
-      if (cleanEventToSave.start_time === '') delete cleanEventToSave.start_time;
-      if (cleanEventToSave.end_time === '') delete cleanEventToSave.end_time;
+      const cleanEventToSave: any = { ...eventToSave };
+      if (cleanEventToSave.start_date === '') cleanEventToSave.start_date = null;
+      if (cleanEventToSave.end_date === '') cleanEventToSave.end_date = null;
+      if (cleanEventToSave.start_time === '') cleanEventToSave.start_time = null;
+      if (cleanEventToSave.end_time === '') cleanEventToSave.end_time = null;
+      if (cleanEventToSave.registration_open_at === '') cleanEventToSave.registration_open_at = null;
+      if (cleanEventToSave.countdown_target_at === '') cleanEventToSave.countdown_target_at = null;
 
       if (editingEvent) {
         const { error } = await supabase

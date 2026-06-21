@@ -44,6 +44,10 @@ export interface Event {
   enable_autocomplete?: boolean;
   is_paid?: number;
   restringir_duplicidade?: number;
+  restringir_dias?: number;
+  dias_semana?: string[] | string;
+  registration_open_at?: string;
+  countdown_target_at?: string;
 }
 
 export interface Student {

@@ -12,7 +12,28 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedDay, setSelectedDay] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+
+  const activeDays = React.useMemo(() => {
+    const daysSet = new Set<string>();
+    events.forEach(event => {
+      if (event.restringir_dias === 1 && event.dias_semana) {
+        let list: string[] = [];
+        if (Array.isArray(event.dias_semana)) {
+          list = event.dias_semana;
+        } else if (typeof event.dias_semana === 'string') {
+          try {
+            list = JSON.parse(event.dias_semana);
+          } catch {
+            list = [];
+          }
+        }
+        list.forEach(day => daysSet.add(day));
+      }
+    });
+    return Array.from(daysSet).sort();
+  }, [events]);
 
   useEffect(() => {
     fetchData();
@@ -60,16 +81,32 @@ export default function Home() {
                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || event.category_id === selectedCategory;
     
-    // Year filter logic: 
-    // 1. If 'all' is selected in filter, match all.
-    // 2. If an event is 'public' (restrictions.type === 'all'), it matches any year filter.
-    // 3. If an event is restricted by years, it must include the selected year.
     const restrictions = event.restrictions as any;
     const matchesYear = selectedYear === 'all' || 
                        restrictions.type === 'all' || 
                        (restrictions.type === 'years' && restrictions.values.includes(selectedYear));
 
-    return matchesSearch && matchesCategory && matchesYear;
+    // Day filter logic
+    let matchesDay = true;
+    if (selectedDay !== 'all') {
+      if (event.restringir_dias === 1 && event.dias_semana) {
+        let list: string[] = [];
+        if (Array.isArray(event.dias_semana)) {
+          list = event.dias_semana;
+        } else if (typeof event.dias_semana === 'string') {
+          try {
+            list = JSON.parse(event.dias_semana);
+          } catch {
+            list = [];
+          }
+        }
+        matchesDay = list.includes(selectedDay);
+      } else {
+        matchesDay = false;
+      }
+    }
+
+    return matchesSearch && matchesCategory && matchesYear && matchesDay;
   });
 
   return (
@@ -156,6 +193,38 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Filtros rápidos por Dia da Semana */}
+      {activeDays.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="flex flex-wrap gap-2 items-center bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4">
+            <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest pl-2 pr-4 border-r border-slate-850">Filtrar por Dia:</span>
+            <button
+              onClick={() => setSelectedDay('all')}
+              className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all border ${
+                selectedDay === 'all'
+                  ? 'bg-yellow-400 border-yellow-400 text-black shadow-sm'
+                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              Todos os Dias
+            </button>
+            {activeDays.map(day => (
+              <button
+                key={day}
+                onClick={() => setSelectedDay(day)}
+                className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all border ${
+                  selectedDay === day
+                    ? 'bg-yellow-400 border-yellow-400 text-black shadow-sm'
+                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                {day}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Events Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">

@@ -70,7 +70,11 @@ db.exec(`
     category_id INTEGER,
     subcategory_id INTEGER,
     is_paid INTEGER DEFAULT 0,
-    restringir_duplicidade INTEGER DEFAULT 0
+    restringir_duplicidade INTEGER DEFAULT 0,
+    restringir_dias INTEGER DEFAULT 0,
+    dias_semana TEXT DEFAULT '[]',
+    registration_open_at TEXT,
+    countdown_target_at TEXT
   );
 
   CREATE TABLE IF NOT EXISTS registrations (
@@ -109,7 +113,11 @@ const eventMigrations = [
   "ALTER TABLE events ADD COLUMN category_id INTEGER;",
   "ALTER TABLE events ADD COLUMN subcategory_id INTEGER;",
   "ALTER TABLE events ADD COLUMN is_paid INTEGER DEFAULT 0;",
-  "ALTER TABLE events ADD COLUMN restringir_duplicidade INTEGER DEFAULT 0;"
+  "ALTER TABLE events ADD COLUMN restringir_duplicidade INTEGER DEFAULT 0;",
+  "ALTER TABLE events ADD COLUMN restringir_dias INTEGER DEFAULT 0;",
+  "ALTER TABLE events ADD COLUMN dias_semana TEXT DEFAULT '[]';",
+  "ALTER TABLE events ADD COLUMN registration_open_at TEXT;",
+  "ALTER TABLE events ADD COLUMN countdown_target_at TEXT;"
 ];
 
 for (const query of eventMigrations) {
@@ -182,6 +190,7 @@ function parseRowJsonFields(table: string, row: any) {
   if (table === 'events' || table === 'event_templates') {
     if (parsed.restrictions) parsed.restrictions = safeJsonParse(parsed.restrictions);
     if (parsed.form_fields) parsed.form_fields = safeJsonParse(parsed.form_fields);
+    if (parsed.dias_semana) parsed.dias_semana = safeJsonParse(parsed.dias_semana);
   } else if (table === 'registrations') {
     if (parsed.form_data) parsed.form_data = safeJsonParse(parsed.form_data);
   }
@@ -266,6 +275,7 @@ app.post('/api/db', (req, res) => {
         if (table === 'events' || table === 'event_templates') {
           if (preparedItem.restrictions) preparedItem.restrictions = JSON.stringify(preparedItem.restrictions);
           if (preparedItem.form_fields) preparedItem.form_fields = JSON.stringify(preparedItem.form_fields);
+          if (preparedItem.dias_semana) preparedItem.dias_semana = JSON.stringify(preparedItem.dias_semana);
         } else if (table === 'registrations') {
           if (preparedItem.form_data) preparedItem.form_data = JSON.stringify(preparedItem.form_data);
         }
@@ -300,6 +310,7 @@ app.post('/api/db', (req, res) => {
       if (table === 'events' || table === 'event_templates') {
         if (preparedData.restrictions) preparedData.restrictions = JSON.stringify(preparedData.restrictions);
         if (preparedData.form_fields) preparedData.form_fields = JSON.stringify(preparedData.form_fields);
+        if (preparedData.dias_semana) preparedData.dias_semana = JSON.stringify(preparedData.dias_semana);
       } else if (table === 'registrations') {
         if (preparedData.form_data) preparedData.form_data = JSON.stringify(preparedData.form_data);
       }
@@ -565,6 +576,17 @@ app.delete('/api/subcategories/:id', (req, res) => {
   try {
     db.prepare("DELETE FROM subcategories WHERE id = ?").run(req.params.id);
     res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/events/:id/start-countdown', (req, res) => {
+  const eventId = req.params.id;
+  try {
+    const targetTime = new Date(Date.now() + 60 * 1000).toISOString();
+    db.prepare("UPDATE events SET countdown_target_at = ?, registration_open_at = NULL WHERE id = ?").run(targetTime, eventId);
+    res.json({ success: true, countdown_target_at: targetTime });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

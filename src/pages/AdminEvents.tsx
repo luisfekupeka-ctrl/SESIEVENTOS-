@@ -121,7 +121,27 @@ export default function AdminEvents() {
   const handleOpenModal = (event?: Event) => {
     if (event) {
       setEditingEvent(event);
-      setFormData(event);
+      
+      let diasSemanaParsed: string[] = [];
+      if (event.dias_semana) {
+        if (Array.isArray(event.dias_semana)) {
+          diasSemanaParsed = event.dias_semana;
+        } else if (typeof event.dias_semana === 'string') {
+          try {
+            diasSemanaParsed = JSON.parse(event.dias_semana);
+          } catch (e) {
+            diasSemanaParsed = [];
+          }
+        }
+      }
+
+      setFormData({
+        ...event,
+        dias_semana: diasSemanaParsed,
+        restringir_dias: event.restringir_dias || 0,
+        registration_open_at: event.registration_open_at || '',
+        countdown_target_at: event.countdown_target_at || ''
+      });
     } else {
       setEditingEvent(null);
       setFormData({
@@ -142,7 +162,11 @@ export default function AdminEvents() {
         form_fields: [],
         enable_autocomplete: true,
         is_paid: 0,
-        restringir_duplicidade: 0
+        restringir_duplicidade: 0,
+        restringir_dias: 0,
+        dias_semana: [],
+        registration_open_at: '',
+        countdown_target_at: ''
       });
     }
     setIsModalOpen(true);
@@ -958,6 +982,130 @@ export default function AdminEvents() {
                       >
                         <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.restringir_duplicidade === 1 ? 'left-7' : 'left-1'}`}></div>
                       </button>
+                    </div>
+                  </div>
+
+                  {/* Novos controles de dias da semana e agendamento */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-800/40">
+                    <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Exibir Dias da Semana</label>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Define se o evento exibe dias específicos na semana (Sexta, Sábado...)</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const active = formData.restringir_dias === 1 ? 0 : 1;
+                            setFormData({ 
+                              ...formData, 
+                              restringir_dias: active,
+                              dias_semana: active === 0 ? [] : (formData.dias_semana || [])
+                            });
+                          }}
+                          className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.restringir_dias === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                        >
+                          <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.restringir_dias === 1 ? 'left-7' : 'left-1'}`}></div>
+                        </button>
+                      </div>
+
+                      {formData.restringir_dias === 1 && (
+                        <div className="pt-4 border-t border-slate-800/50 space-y-3">
+                          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Dias Selecionados</label>
+                          <div className="flex flex-wrap gap-2">
+                            {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'].map(day => {
+                              const diasList = Array.isArray(formData.dias_semana) 
+                                ? formData.dias_semana 
+                                : [];
+                              const isSelected = diasList.includes(day);
+                              return (
+                                <button
+                                  type="button"
+                                  key={day}
+                                  onClick={() => {
+                                    let nextDays = [...diasList];
+                                    if (isSelected) {
+                                      nextDays = nextDays.filter(d => d !== day);
+                                    } else {
+                                      nextDays.push(day);
+                                    }
+                                    setFormData({ ...formData, dias_semana: nextDays });
+                                  }}
+                                  className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all border ${
+                                    isSelected 
+                                      ? 'bg-yellow-400 border-yellow-400 text-black shadow-sm' 
+                                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                                  }`}
+                                >
+                                  {day}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Abertura de Inscrições</label>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Agende a data e hora em que as inscrições serão liberadas</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Data/Hora Agendada</label>
+                            <input
+                              type="datetime-local"
+                              className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold text-xs focus:outline-none focus:border-yellow-400 transition-all shadow-sm"
+                              value={formData.registration_open_at ? new Date(new Date(formData.registration_open_at).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                              onChange={(e) => {
+                                const isoVal = e.target.value ? new Date(e.target.value).toISOString() : '';
+                                setFormData({ ...formData, registration_open_at: isoVal });
+                              }}
+                            />
+                          </div>
+
+                          {editingEvent && (
+                            <div className="space-y-2 flex flex-col justify-end">
+                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Controle Manual</label>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  try {
+                                    let targetTime = new Date(Date.now() + 60 * 1000).toISOString();
+                                    
+                                    const { error } = await supabase
+                                      .from('events')
+                                      .update({ 
+                                        countdown_target_at: targetTime,
+                                        registration_open_at: null
+                                      })
+                                      .eq('id', editingEvent.id);
+                                    
+                                    if (error) throw error;
+                                    
+                                    setFormData({
+                                      ...formData,
+                                      countdown_target_at: targetTime,
+                                      registration_open_at: undefined
+                                    });
+                                    
+                                    setFeedback({ type: 'success', message: 'Contagem regressiva de 1 minuto iniciada!' });
+                                  } catch (err: any) {
+                                    console.error(err);
+                                    setFeedback({ type: 'error', message: 'Erro ao iniciar contagem regressiva.' });
+                                  }
+                                }}
+                                className="w-full px-3 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-slate-300 font-black text-[9px] uppercase tracking-widest hover:bg-yellow-400 hover:text-black hover:border-yellow-400 transition-all shadow-sm flex items-center justify-center gap-1"
+                              >
+                                ⏱️ Iniciar 1 Min Regressivo
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

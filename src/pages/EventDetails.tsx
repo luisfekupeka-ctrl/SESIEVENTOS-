@@ -33,6 +33,10 @@ export default function EventDetails() {
   const [searchTerm, setSearchTerm] = useState('');
   const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
   const [isLive, setIsLive] = useState(false);
+  
+  // Registration countdown timer states
+  const [regCountdownTime, setRegCountdownTime] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
+  const [regUpcoming, setRegUpcoming] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +105,6 @@ export default function EventDetails() {
       if (diff <= 0) {
         setTimeLeft(null);
         setIsLive(true);
-        clearInterval(timer);
       } else {
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -109,6 +112,28 @@ export default function EventDetails() {
         const s = Math.floor((diff % (1000 * 60)) / 1000);
         setTimeLeft({ d, h, m, s });
         setIsLive(false);
+      }
+
+      // Check registration opening / countdown target
+      const targetTimeStr = event.countdown_target_at || event.registration_open_at;
+      if (targetTimeStr) {
+        const targetTime = new Date(targetTimeStr);
+        const diffReg = targetTime.getTime() - now.getTime();
+        
+        if (diffReg <= 0) {
+          setRegCountdownTime(null);
+          setRegUpcoming(false);
+        } else {
+          setRegUpcoming(true);
+          const d = Math.floor(diffReg / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diffReg % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((diffReg % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((diffReg % (1000 * 60)) / 1000);
+          setRegCountdownTime({ d, h, m, s });
+        }
+      } else {
+        setRegCountdownTime(null);
+        setRegUpcoming(false);
       }
     }, 1000);
 
@@ -119,14 +144,9 @@ export default function EventDetails() {
     e.preventDefault();
     if (!event || !id) return;
 
-    const isTest = event.name.toLowerCase().includes('teste') || category?.name.toLowerCase().includes('teste');
-    if (!isTest) {
-      const startDateTime = new Date(`${event.start_date}T${event.start_time}`);
-      const now = new Date();
-      if (now < startDateTime) {
-        setRestrictionError(`As inscrições para este evento só abrem em ${format(startDateTime, "dd/MM 'às' HH:mm", { locale: ptBR })}`);
-        return;
-      }
+    if (regUpcoming) {
+      setRestrictionError("As inscrições para este evento ainda não começaram.");
+      return;
     }
 
     const formFields = (event.form_fields as any[]) || [];
@@ -464,30 +484,33 @@ export default function EventDetails() {
                           Ver outros eventos
                         </button>
                       </div>
-                    ) : timeLeft && !event.name.toLowerCase().includes('teste') ? (
-                      <div className="text-center py-6">
-                        <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg border border-yellow-400/10">
-                          <Clock size={32} className="animate-pulse" />
+                    ) : regUpcoming && regCountdownTime ? (
+                      <div className="text-center py-8 space-y-6 bg-slate-950/40 border border-slate-800/80 p-8 rounded-[2rem] shadow-2xl">
+                        <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-full flex items-center justify-center mx-auto border border-yellow-400/20 animate-pulse text-2xl">
+                          ⏱️
                         </div>
-                        <h4 className="text-xl font-black text-white mb-8 tracking-widest uppercase">Abre em breve</h4>
-                        
-                        <div className="grid grid-cols-4 gap-3 mb-10">
+                        <div className="space-y-2">
+                          <h4 className="text-xl font-black text-white tracking-tight">Inscrições em Breve</h4>
+                          <p className="text-slate-400 font-bold text-xs uppercase tracking-wider">Abertura em contagem regressiva</p>
+                        </div>
+
+                        <div className="flex justify-center gap-2 max-w-xs mx-auto">
                           {[
-                            { label: 'Dias', val: timeLeft.d },
-                            { label: 'Hrs', val: timeLeft.h },
-                            { label: 'Min', val: timeLeft.m },
-                            { label: 'Seg', val: timeLeft.s }
+                            ...(regCountdownTime.d > 0 ? [{ val: regCountdownTime.d, label: 'dias' }] : []),
+                            ...(regCountdownTime.d > 0 || regCountdownTime.h > 0 ? [{ val: regCountdownTime.h, label: 'horas' }] : []),
+                            { val: regCountdownTime.m, label: 'min' },
+                            { val: regCountdownTime.s, label: 'seg' }
                           ].map(t => (
-                            <div key={t.label} className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                              <div className="text-xl font-black text-yellow-400 leading-none">{String(t.val).padStart(2, '0')}</div>
-                              <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1">{t.label}</div>
+                            <div key={t.label} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex-grow min-w-[70px]">
+                              <div className="text-2xl font-black text-yellow-400 leading-none">{String(t.val).padStart(2, '0')}</div>
+                              <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1.5">{t.label}</div>
                             </div>
                           ))}
                         </div>
                         
                         <div className="p-4 bg-yellow-400/5 border border-yellow-400/10 rounded-2xl">
                           <p className="text-yellow-400/60 text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed">
-                            Prepare-se! As inscrições começam pontualmente em {event.start_time}.
+                            Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.
                           </p>
                         </div>
                       </div>

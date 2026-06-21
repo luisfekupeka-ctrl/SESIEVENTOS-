@@ -77,7 +77,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
         )}
         <div className="absolute top-5 left-5 right-5">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 max-w-[80%]">
               <span className="px-3 py-1 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
                 {category?.name || 'Evento'}
               </span>
@@ -88,8 +88,38 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
               }`}>
                 {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
               </span>
+              {event.restringir_dias === 1 && (() => {
+                let list: string[] = [];
+                if (Array.isArray(event.dias_semana)) {
+                  list = event.dias_semana;
+                } else if (typeof event.dias_semana === 'string') {
+                  try {
+                    list = JSON.parse(event.dias_semana);
+                  } catch {
+                    list = [];
+                  }
+                }
+                if (list.length === 0) return null;
+                return (
+                  <span className="px-3 py-1 bg-slate-950/80 border border-slate-700/50 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
+                    {list.join(', ')}
+                  </span>
+                );
+              })()}
+              {(() => {
+                const target = event.countdown_target_at || event.registration_open_at;
+                const isUpcoming = target && new Date(target).getTime() > Date.now();
+                if (isUpcoming) {
+                  return (
+                    <span className="px-3 py-1 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm shadow-amber-500/25 animate-pulse">
+                      Em Breve
+                    </span>
+                  );
+                }
+                return null;
+              })()}
             </div>
-            <div className="flex items-center gap-1.5 text-yellow-400">
+            <div className="flex items-center gap-1.5 text-yellow-400 flex-shrink-0">
               <Users size={14} className="fill-yellow-400/20" />
               <span className="text-[10px] font-black uppercase tracking-tighter drop-shadow-md">{event.registration_count || 0} Inscritos</span>
             </div>

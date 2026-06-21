@@ -96,10 +96,18 @@ export default function EventDetails() {
     };
     fetchParticipants();
 
-    const timer = setInterval(() => {
+    const calculateTime = () => {
       if (!event) return;
-      const startDateTime = new Date(`${event.start_date}T${event.start_time}`);
+      
       const now = new Date();
+
+      // Fix start date time parsing for the overall event
+      let startDateTime = new Date();
+      if (event.start_date && event.start_time) {
+        const dateStr = `${event.start_date}T${event.start_time}:00`;
+        startDateTime = new Date(dateStr);
+      }
+      
       const diff = startDateTime.getTime() - now.getTime();
 
       if (diff <= 0) {
@@ -115,17 +123,16 @@ export default function EventDetails() {
       }
 
       // Check registration opening / countdown target
+      let targetTime: Date | null = null;
       let targetTimeStr = event.registration_open_at;
-      let targetTime: Date;
 
       if (!targetTimeStr && event.start_date && event.start_time) {
-        // Explicitly parse local time to avoid any ISO parsing bugs across browsers
-        const [year, month, day] = event.start_date.split('-').map(Number);
-        const [hour, minute] = event.start_time.split(':').map(Number);
-        targetTime = new Date(year, month - 1, day, hour, minute, 0);
+        targetTime = new Date(`${event.start_date}T${event.start_time}:00`);
       } else if (targetTimeStr) {
         targetTime = new Date(targetTimeStr);
-      } else {
+      }
+
+      if (!targetTime || isNaN(targetTime.getTime())) {
         setRegCountdownTime(null);
         setRegUpcoming(false);
         return;
@@ -144,7 +151,10 @@ export default function EventDetails() {
         const s = Math.floor((diffReg % (1000 * 60)) / 1000);
         setRegCountdownTime({ d, h, m, s });
       }
-    }, 1000);
+    };
+
+    calculateTime(); // run immediately!
+    const timer = setInterval(calculateTime, 1000);
 
     return () => clearInterval(timer);
   }, [id, event]);

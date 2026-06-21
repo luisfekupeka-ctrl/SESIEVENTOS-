@@ -673,7 +673,7 @@ app.post('/api/events/:id/register', (req, res) => {
         WHERE r.student_id = ? 
           AND r.event_id != ? 
           AND r.status = 'approved'
-      `).all(matchedStudentId) as any[];
+      `).all(matchedStudentId, eventId) as any[];
 
       // Check if any shares same category_id AND subcategory_id
       const conflict = registrations.find(r => 

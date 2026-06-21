@@ -33,7 +33,10 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS students (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    surname TEXT DEFAULT '',
     grade TEXT NOT NULL,
+    class TEXT,
+    type TEXT DEFAULT 'student',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -121,6 +124,26 @@ const eventMigrations = [
 ];
 
 for (const query of eventMigrations) {
+  try {
+    db.prepare(query).run();
+    console.log(`[Migration] Executed: ${query}`);
+  } catch (err: any) {
+    if (err.message.includes('duplicate column name') || err.message.includes('already exists')) {
+      // Column already exists, safe to ignore
+    } else {
+      console.warn(`[Migration] Warning for "${query}": ${err.message}`);
+    }
+  }
+}
+
+// Run migrations on students safely
+const studentMigrations = [
+  "ALTER TABLE students ADD COLUMN surname TEXT DEFAULT '';",
+  "ALTER TABLE students ADD COLUMN class TEXT;",
+  "ALTER TABLE students ADD COLUMN type TEXT DEFAULT 'student';"
+];
+
+for (const query of studentMigrations) {
   try {
     db.prepare(query).run();
     console.log(`[Migration] Executed: ${query}`);

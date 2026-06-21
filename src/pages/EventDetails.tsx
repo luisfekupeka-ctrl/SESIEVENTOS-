@@ -205,24 +205,18 @@ export default function EventDetails() {
         }
       }
 
-      const response = await fetch(`/api/events/${id}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          student_id: selectedStudentId,
-          name: sName,
-          surname: sSurname,
-          grade: sGrade,
-          class: sClass,
-          participant_type: participantType,
-          form_data: { ...formData, status }
-        })
+      const { data: resData, error: rpcError } = await supabase.rpc('register_participant', {
+        p_event_id: id,
+        p_student_name: sName,
+        p_student_surname: sSurname,
+        p_student_grade: sGrade,
+        p_student_class: sClass,
+        p_participant_type: participantType,
+        p_form_data: { ...formData, status }
       });
 
-      const resData = await response.json();
-
-      if (!response.ok || !resData.success) {
-        const errorMsg = resData.error || "Erro ao processar inscrição. Tente novamente.";
+      if (rpcError || !resData || !resData.success) {
+        const errorMsg = rpcError?.message || resData?.error || "Erro ao processar inscrição. Tente novamente.";
         if (errorMsg.toLowerCase().includes('dup') || errorMsg.toLowerCase().includes('já inscrito') || errorMsg.toLowerCase().includes('repetido') || errorMsg.toLowerCase().includes('duplicada') || errorMsg.toLowerCase().includes('inscrição não permitida')) {
           setRestrictionError(errorMsg);
         } else if (errorMsg.toLowerCase().includes('lotado')) {
@@ -579,31 +573,27 @@ export default function EventDetails() {
                                             className="w-full px-5 py-4 text-left hover:bg-slate-800 text-white font-bold transition-colors border-b border-slate-800 last:border-0 flex items-center justify-between group"
                                             onClick={() => {
                                               const updatedForm = { ...formData };
-                                              
-                                              // Split student name
-                                              const fullName = s.name.trim();
-                                              const firstSpace = fullName.indexOf(' ');
-                                              const firstName = firstSpace !== -1 ? fullName.substring(0, firstSpace) : fullName;
-                                              const lastName = firstSpace !== -1 ? fullName.substring(firstSpace + 1) : '';
-                                              
+                                              const fullName = `${s.name} ${s.surname || ''}`.trim();
                                               const formFields = ((event.form_fields as any[]) || []);
                                               
-                                              // Preencher Nome
-                                              const nameField = formFields.find(f => {
-                                                const labelLower = f.label.toLowerCase();
-                                                return labelLower.includes('nome') && !labelLower.includes('sobrenome') && !labelLower.includes('completo');
-                                              });
-                                              if (nameField) {
-                                                updatedForm[nameField.label.toLowerCase()] = firstName;
-                                              } else {
-                                                updatedForm[fieldKey] = firstName;
-                                              }
+                                              // Preencher o campo de Nome/Nome Completo clicado com o nome completo
+                                              updatedForm[fieldKey] = fullName;
                                               
-                                              // Preencher Sobrenome
-                                              const surnameField = formFields.find(f => f.label.toLowerCase().includes('sobrenome'));
-                                              if (surnameField) {
-                                                updatedForm[surnameField.label.toLowerCase()] = lastName;
-                                              }
+                                              // Preencher outros campos de nome se houver
+                                              formFields.forEach(f => {
+                                                const labelLower = f.label.toLowerCase();
+                                                if (labelLower.includes('nome') && !labelLower.includes('sobrenome')) {
+                                                  updatedForm[f.label.toLowerCase()] = fullName;
+                                                }
+                                              });
+
+                                              // Limpar sobrenome se existir para não confundir
+                                              formFields.forEach(f => {
+                                                const labelLower = f.label.toLowerCase();
+                                                if (labelLower.includes('sobrenome')) {
+                                                  updatedForm[f.label.toLowerCase()] = '';
+                                                }
+                                              });
                                               
                                               // Preencher Série / Ano
                                               const gradeField = formFields.find(f => 

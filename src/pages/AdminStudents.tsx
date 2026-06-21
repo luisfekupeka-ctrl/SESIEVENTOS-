@@ -57,7 +57,7 @@ export default function AdminStudents() {
     try {
       const { error: err } = await supabase
         .from('students')
-        .insert({ name: newStudentName.trim(), grade: newStudentGrade });
+        .insert({ name: newStudentName.trim(), grade: newStudentGrade, surname: '' });
       if (err) throw err;
       
       setNewStudentName('');
@@ -85,7 +85,8 @@ export default function AdminStudents() {
 
       const studentsToInsert = names.map(name => ({
         name,
-        grade: bulkGrade
+        grade: bulkGrade,
+        surname: ''
       }));
 
       const { error: err } = await supabase

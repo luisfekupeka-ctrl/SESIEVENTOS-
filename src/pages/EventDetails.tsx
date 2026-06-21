@@ -352,6 +352,72 @@ export default function EventDetails() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
+        
+        {regUpcoming && regCountdownTime && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mb-12 text-center py-12 md:py-16 space-y-8 ${
+              (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10')) 
+                ? 'bg-red-500/10 border-2 border-red-500/50 shadow-[0_0_80px_rgba(239,68,68,0.3)]' 
+                : 'bg-slate-900/60 border border-slate-800/80 shadow-2xl backdrop-blur-xl'
+            } p-8 rounded-[3rem] transition-all duration-1000 w-full`}
+          >
+            <div className={`w-28 h-28 md:w-32 md:h-32 rounded-[2.5rem] flex items-center justify-center mx-auto text-5xl md:text-6xl border-4 animate-pulse shadow-inner ${
+              (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
+                ? 'bg-red-500/20 text-red-500 border-red-500/40 shadow-[inset_0_0_40px_rgba(239,68,68,0.4)]'
+                : 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20'
+            }`}>
+              ⏱️
+            </div>
+            <div className="space-y-4">
+              <h4 className="text-4xl md:text-5xl font-black text-white tracking-tighter">Inscrições em Breve</h4>
+              <p className="text-slate-400 font-bold text-lg md:text-xl uppercase tracking-[0.3em]">Abertura em contagem regressiva</p>
+            </div>
+
+            <div className="flex justify-center gap-4 md:gap-6 max-w-2xl mx-auto pt-6">
+              {[
+                ...(regCountdownTime.d > 0 ? [{ val: regCountdownTime.d, label: 'dias' }] : []),
+                ...(regCountdownTime.d > 0 || regCountdownTime.h > 0 ? [{ val: regCountdownTime.h, label: 'horas' }] : []),
+                { val: regCountdownTime.m, label: 'minutos' },
+                { val: regCountdownTime.s, label: 'segundos' }
+              ].map(t => (
+                <div key={t.label} className={`flex-1 p-6 md:p-8 rounded-[2rem] border-2 transform transition-transform hover:scale-105 ${
+                  (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
+                    ? 'bg-gradient-to-b from-red-950/40 to-slate-950 border-red-500/40 shadow-[0_20px_40px_rgba(239,68,68,0.2)]'
+                    : 'bg-slate-950/80 border-slate-800'
+                }`}>
+                  <div className={`text-6xl md:text-8xl font-black leading-none tracking-tighter ${
+                    (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
+                      ? 'text-red-500 drop-shadow-[0_0_25px_rgba(239,68,68,0.8)]'
+                      : 'text-yellow-400'
+                  }`}>
+                    {String(t.val).padStart(2, '0')}
+                  </div>
+                  <div className={`text-xs md:text-sm font-black uppercase tracking-[0.3em] mt-6 ${
+                    (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
+                      ? 'text-red-400/80' : 'text-slate-500'
+                  }`}>{t.label}</div>
+                </div>
+              ))}
+            </div>
+            
+            <div className={`mt-10 p-8 rounded-3xl border-2 inline-block max-w-3xl mx-auto ${
+              (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
+                ? 'bg-red-500/10 border-red-500/20'
+                : 'bg-yellow-400/5 border-yellow-400/10'
+            }`}>
+              <p className={`text-sm md:text-base font-black uppercase tracking-[0.2em] leading-relaxed ${
+                (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
+                  ? 'text-red-400'
+                  : 'text-yellow-400/80'
+              }`}>
+                Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column: Details */}
           <div className={regUpcoming ? "lg:col-span-3 space-y-12" : "lg:col-span-2 space-y-12"}>

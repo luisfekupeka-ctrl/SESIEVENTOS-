@@ -122,22 +122,32 @@ export default function AdminCategories() {
 
   // Add subcategory to category
   const handleAddSubcategory = async (catId: string) => {
-    const subName = newSubNames[catId]?.trim();
-    if (!subName) return;
+    const rawName = newSubNames[catId];
+    if (!rawName) return;
+    
+    // Split by comma, semicolon or newline and filter empty
+    const subNames = rawName
+      .split(/[,;\n]+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    if (subNames.length === 0) return;
 
     setAddingSubId(catId);
     setError(null);
     try {
+      const inserts = subNames.map(name => ({ category_id: catId, name }));
       const { error: err } = await supabase
         .from('subcategories')
-        .insert({ category_id: catId, name: subName });
+        .insert(inserts);
+        
       if (err) throw err;
       
       setNewSubNames(prev => ({ ...prev, [catId]: '' }));
       fetchCategories();
     } catch (err: any) {
       console.error(err);
-      setError('Erro ao adicionar tipo/subcategoria.');
+      setError('Erro ao adicionar tipo(s)/subcategoria(s).');
     } finally {
       setAddingSubId(null);
     }
@@ -295,7 +305,7 @@ export default function AdminCategories() {
                 <div className="flex items-center gap-3 max-w-md pt-2">
                   <input
                     type="text"
-                    placeholder="Adicionar novo tipo (ex: Esporte, Música)..."
+                    placeholder="Adicionar tipos (separados por vírgula)..."
                     className="flex-grow px-4 py-2 text-xs bg-slate-950/50 border border-slate-850 rounded-xl focus:outline-none focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-600"
                     value={newSubNames[cat.id] || ''}
                     onChange={(e) => setNewSubNames(prev => ({ ...prev, [cat.id]: e.target.value }))}

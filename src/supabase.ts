@@ -1,6 +1,20 @@
-// Mock Supabase Client that redirects all DB operations to the local SQLite/Express backend
-// This allows running the entire application completely offline / locally with SQLite
+import { createClient } from '@supabase/supabase-js';
 
+const rawUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Auto-fix if user only provided the project ref (e.g. "abcde...") instead of the full URL
+const supabaseUrl = rawUrl.includes('.') 
+  ? (rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`)
+  : (rawUrl ? `https://${rawUrl}.supabase.co` : 'https://placeholder.supabase.co');
+
+if (!rawUrl || !supabaseAnonKey) {
+  console.warn('Supabase environment variables are missing. Some features may not work.');
+}
+
+const realSupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+
+// SQLite Mock Client (used locally when VITE_USE_SQLITE is 'true')
 class QueryBuilder {
   private table: string;
   private filters: any[] = [];
@@ -13,7 +27,6 @@ class QueryBuilder {
   }
 
   select(columns = '*') {
-    // We fetch all fields from our SQLite server and format joins on backend
     return this;
   }
 
@@ -42,7 +55,6 @@ class QueryBuilder {
     return this;
   }
 
-  // Allow the query builder to be awaited directly (thenable pattern)
   async then(onfulfilled: (res: { data: any; error: any }) => void) {
     try {
       const response = await fetch('/api/db', {
@@ -134,7 +146,7 @@ class QueryBuilder {
   }
 }
 
-export const supabase = {
+const sqliteMockClient: any = {
   from(table: string) {
     return new QueryBuilder(table);
   },
@@ -150,7 +162,6 @@ export const supabase = {
       if (!response.ok) {
         return { data: null, error: { message: data.error || 'RPC failed' } };
       }
-      // Return RPC format matching expected output
       if (name === 'register_participant') {
         return { data: { success: data.success, error: data.error }, error: null };
       }
@@ -193,16 +204,12 @@ export const supabase = {
     },
     
     onAuthStateChange(callback: any) {
-      // Mock triggers auth events
       const triggerAuthChange = () => {
         const sessionStr = localStorage.getItem('supabase.auth.token');
         callback(sessionStr ? 'SIGNED_IN' : 'SIGNED_OUT', sessionStr ? JSON.parse(sessionStr) : null);
       };
       
-      // Store trigger globally to trigger on login/logout
       (window as any)._triggerAuthChange = triggerAuthChange;
-      
-      // Return unsubscribe no-op
       return { data: { subscription: { unsubscribe() {} } } };
     },
 
@@ -276,3 +283,14 @@ export const supabase = {
 
   removeChannel(channel: any) {}
 };
+
+// Check if we are running in SQLite mode
+const useSQLite = import.meta.env.VITE_USE_SQLITE === 'true';
+
+if (useSQLite) {
+  console.log('[Supabase] Running locally in SQLite mock mode');
+} else {
+  console.log('[Supabase] Running in standard cloud mode');
+}
+
+export const supabase = useSQLite ? sqliteMockClient : realSupabaseClient;

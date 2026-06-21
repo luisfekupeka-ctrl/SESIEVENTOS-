@@ -69,7 +69,7 @@ export default function AdminEvents() {
 
       const [eventsRes, catsRes, tempsRes] = await Promise.all([
         supabase.from('events').select('*').order('name', { ascending: true }),
-        supabase.from('categories').select('*').order('name', { ascending: true }),
+        supabase.from('categories').select('*, subcategories(*)').order('name', { ascending: true }),
         supabase.from('event_templates').select('*').order('name', { ascending: true })
       ]);
 

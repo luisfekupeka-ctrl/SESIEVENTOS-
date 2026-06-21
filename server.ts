@@ -243,6 +243,14 @@ app.post('/api/db', (req, res) => {
         });
       }
 
+      if (table === 'categories') {
+        // Fetch nested subcategories data for categories
+        resultRows = resultRows.map(cat => {
+          const subcats = db.prepare("SELECT * FROM subcategories WHERE category_id = ? ORDER BY name ASC").all(cat.id);
+          return { ...cat, subcategories: subcats || [] };
+        });
+      }
+
       if (single) {
         return res.json(resultRows[0] || null);
       }

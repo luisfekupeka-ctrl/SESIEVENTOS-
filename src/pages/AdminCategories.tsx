@@ -21,9 +21,11 @@ export default function AdminCategories() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
-      if (!response.ok) throw new Error('Erro ao carregar categorias');
-      const data = await response.json();
+      const { data, error: err } = await supabase
+        .from('categories')
+        .select('*, subcategories(*)')
+        .order('name', { ascending: true });
+      if (err) throw err;
       setCategories(data || []);
     } catch (err: any) {
       console.error(err);
@@ -44,12 +46,10 @@ export default function AdminCategories() {
     setIsAdding(true);
     setError(null);
     try {
-      const response = await fetch('/api/categories', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newCategory.trim() })
-      });
-      if (!response.ok) throw new Error('Erro ao adicionar categoria');
+      const { error: err } = await supabase
+        .from('categories')
+        .insert({ name: newCategory.trim() });
+      if (err) throw err;
       
       setNewCategory('');
       fetchCategories();
@@ -67,11 +67,10 @@ export default function AdminCategories() {
     try {
       for (const cat of DEFAULT_CATEGORIES) {
         if (!categories.find(c => c.name.toLowerCase() === cat.toLowerCase())) {
-          await fetch('/api/categories', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: cat })
-          });
+          const { error: err } = await supabase
+            .from('categories')
+            .insert({ name: cat });
+          if (err) throw err;
         }
       }
       fetchCategories();
@@ -84,8 +83,11 @@ export default function AdminCategories() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      const response = await fetch(`/api/categories/${deleteId}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Erro ao excluir categoria');
+      const { error: err } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', deleteId);
+      if (err) throw err;
       setDeleteId(null);
       fetchCategories();
     } catch (error) {
@@ -126,12 +128,10 @@ export default function AdminCategories() {
     setAddingSubId(catId);
     setError(null);
     try {
-      const response = await fetch(`/api/categories/${catId}/subcategories`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: subName })
-      });
-      if (!response.ok) throw new Error('Erro ao criar subcategoria');
+      const { error: err } = await supabase
+        .from('subcategories')
+        .insert({ category_id: catId, name: subName });
+      if (err) throw err;
       
       setNewSubNames(prev => ({ ...prev, [catId]: '' }));
       fetchCategories();
@@ -147,8 +147,11 @@ export default function AdminCategories() {
   const handleDeleteSubcategory = async (subId: string) => {
     setError(null);
     try {
-      const response = await fetch(`/api/subcategories/${subId}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Erro ao excluir subcategoria');
+      const { error: err } = await supabase
+        .from('subcategories')
+        .delete()
+        .eq('id', subId);
+      if (err) throw err;
       fetchCategories();
     } catch (err) {
       console.error(err);

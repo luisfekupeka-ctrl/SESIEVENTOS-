@@ -14,7 +14,12 @@ ALTER TABLE events ADD COLUMN IF NOT EXISTS is_paid INTEGER DEFAULT 0;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS restringir_duplicidade INTEGER DEFAULT 0;
 
 -- 3. Seed "Esporte" and "Cultura" subcategories under the "After" category in Supabase
-INSERT INTO categories (name) VALUES ('After') ON CONFLICT (name) DO NOTHING;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM categories WHERE name = 'After') THEN
+    INSERT INTO categories (name) VALUES ('After');
+  END IF;
+END $$;
 
 DO $$
 DECLARE
@@ -22,13 +27,13 @@ DECLARE
 BEGIN
   SELECT id INTO v_after_id FROM categories WHERE name = 'After';
   IF v_after_id IS NOT NULL THEN
-    INSERT INTO subcategories (category_id, name) 
-    VALUES (v_after_id, 'Esporte')
-    ON CONFLICT (category_id, name) DO NOTHING;
+    IF NOT EXISTS (SELECT 1 FROM subcategories WHERE category_id = v_after_id AND name = 'Esporte') THEN
+      INSERT INTO subcategories (category_id, name) VALUES (v_after_id, 'Esporte');
+    END IF;
     
-    INSERT INTO subcategories (category_id, name) 
-    VALUES (v_after_id, 'Cultura')
-    ON CONFLICT (category_id, name) DO NOTHING;
+    IF NOT EXISTS (SELECT 1 FROM subcategories WHERE category_id = v_after_id AND name = 'Cultura') THEN
+      INSERT INTO subcategories (category_id, name) VALUES (v_after_id, 'Cultura');
+    END IF;
   END IF;
 END $$;
 

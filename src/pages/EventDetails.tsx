@@ -116,29 +116,33 @@ export default function EventDetails() {
 
       // Check registration opening / countdown target
       let targetTimeStr = event.registration_open_at;
+      let targetTime: Date;
+
       if (!targetTimeStr && event.start_date && event.start_time) {
-        // Appending :00 to ensure cross-browser compatibility (Safari/iOS)
-        targetTimeStr = `${event.start_date}T${event.start_time}:00`;
-      }
-      
-      if (targetTimeStr) {
-        const targetTime = new Date(targetTimeStr);
-        const diffReg = targetTime.getTime() - now.getTime();
-        
-        if (diffReg <= 0) {
-          setRegCountdownTime(null);
-          setRegUpcoming(false);
-        } else {
-          setRegUpcoming(true);
-          const d = Math.floor(diffReg / (1000 * 60 * 60 * 24));
-          const h = Math.floor((diffReg % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const m = Math.floor((diffReg % (1000 * 60 * 60)) / (1000 * 60));
-          const s = Math.floor((diffReg % (1000 * 60)) / 1000);
-          setRegCountdownTime({ d, h, m, s });
-        }
+        // Explicitly parse local time to avoid any ISO parsing bugs across browsers
+        const [year, month, day] = event.start_date.split('-').map(Number);
+        const [hour, minute] = event.start_time.split(':').map(Number);
+        targetTime = new Date(year, month - 1, day, hour, minute, 0);
+      } else if (targetTimeStr) {
+        targetTime = new Date(targetTimeStr);
       } else {
         setRegCountdownTime(null);
         setRegUpcoming(false);
+        return;
+      }
+      
+      const diffReg = targetTime.getTime() - now.getTime();
+      
+      if (diffReg <= 0) {
+        setRegCountdownTime(null);
+        setRegUpcoming(false);
+      } else {
+        setRegUpcoming(true);
+        const d = Math.floor(diffReg / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diffReg % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diffReg % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diffReg % (1000 * 60)) / 1000);
+        setRegCountdownTime({ d, h, m, s });
       }
     }, 1000);
 
@@ -350,7 +354,7 @@ export default function EventDetails() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           {/* Left Column: Details */}
-          <div className="lg:col-span-2 space-y-12">
+          <div className={regUpcoming ? "lg:col-span-3 space-y-12" : "lg:col-span-2 space-y-12"}>
             <motion.section 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -413,7 +417,8 @@ export default function EventDetails() {
           </div>
 
           {/* Right Column: Registration Form */}
-          <div className="lg:col-span-1">
+          {!regUpcoming && (
+            <div className="lg:col-span-1">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -480,62 +485,8 @@ export default function EventDetails() {
                           onClick={() => navigate('/')}
                           className="w-full bg-slate-800 text-white font-black py-4 rounded-2xl hover:bg-slate-700 transition-all border border-slate-700"
                         >
-                      </div>
-                    ) : regUpcoming && regCountdownTime ? (
-                      <div className={`text-center py-10 space-y-8 ${
-                        (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10')) 
-                          ? 'bg-red-500/10 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)]' 
-                          : 'bg-slate-950/40 border border-slate-800/80 shadow-2xl'
-                      } p-8 rounded-[2.5rem] transition-all duration-1000`}>
-                        <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto text-4xl border animate-pulse ${
-                          (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
-                            ? 'bg-red-500/20 text-red-500 border-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.4)]'
-                            : 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20'
-                        }`}>
-                          ⏱️
-                        </div>
-                        <div className="space-y-3">
-                          <h4 className="text-3xl font-black text-white tracking-tight">Inscrições em Breve</h4>
-                          <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">Abertura em contagem regressiva</p>
-                        </div>
-
-                        <div className="flex justify-center gap-3 max-w-sm mx-auto">
-                          {[
-                            ...(regCountdownTime.d > 0 ? [{ val: regCountdownTime.d, label: 'dias' }] : []),
-                            ...(regCountdownTime.d > 0 || regCountdownTime.h > 0 ? [{ val: regCountdownTime.h, label: 'horas' }] : []),
-                            { val: regCountdownTime.m, label: 'min' },
-                            { val: regCountdownTime.s, label: 'seg' }
-                          ].map(t => (
-                            <div key={t.label} className={`flex-grow min-w-[80px] p-5 rounded-[1.5rem] border transform transition-transform hover:scale-105 ${
-                              (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
-                                ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-red-500/40 shadow-[0_10px_30px_rgba(239,68,68,0.2)]'
-                                : 'bg-slate-950 border-slate-800'
-                            }`}>
-                              <div className={`text-4xl font-black leading-none ${
-                                (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
-                                  ? 'text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]'
-                                  : 'text-yellow-400'
-                              }`}>
-                                {String(t.val).padStart(2, '0')}
-                              </div>
-                              <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3">{t.label}</div>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <div className={`p-6 rounded-2xl border ${
-                          (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
-                            ? 'bg-red-500/10 border-red-500/20'
-                            : 'bg-yellow-400/5 border-yellow-400/10'
-                        }`}>
-                          <p className={`text-xs font-black uppercase tracking-[0.1em] leading-relaxed ${
-                            (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
-                              ? 'text-red-400/90'
-                              : 'text-yellow-400/70'
-                          }`}>
-                            Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.
-                          </p>
-                        </div>
+                          Voltar ao Início
+                        </button>
                       </div>
                     ) : (
                       <form onSubmit={handleRegister} className="space-y-6">
@@ -782,13 +733,14 @@ export default function EventDetails() {
                           </>
                         )}
                       </button>
-                    </form>
+                      </form>
                     )}
                   </motion.div>
                 )}
               </AnimatePresence>
             </motion.div>
           </div>
+          )}
         </div>
       </div>
 

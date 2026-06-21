@@ -482,12 +482,12 @@ export default function EventDetails() {
                       </div>
                     ) : regUpcoming && regCountdownTime ? (
                       <div className={`text-center py-10 space-y-8 ${
-                        (regCountdownTime.d === 0 && regCountdownTime.h === 0 && regCountdownTime.m < 10) 
+                        (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10')) 
                           ? 'bg-red-500/10 border border-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.2)]' 
                           : 'bg-slate-950/40 border border-slate-800/80 shadow-2xl'
                       } p-8 rounded-[2.5rem] transition-all duration-1000`}>
                         <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto text-4xl border animate-pulse ${
-                          (regCountdownTime.d === 0 && regCountdownTime.h === 0 && regCountdownTime.m < 10)
+                          (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
                             ? 'bg-red-500/20 text-red-500 border-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.4)]'
                             : 'bg-yellow-400/10 text-yellow-400 border-yellow-400/20'
                         }`}>
@@ -506,12 +506,12 @@ export default function EventDetails() {
                             { val: regCountdownTime.s, label: 'seg' }
                           ].map(t => (
                             <div key={t.label} className={`flex-grow min-w-[80px] p-5 rounded-[1.5rem] border transform transition-transform hover:scale-105 ${
-                              (regCountdownTime.d === 0 && regCountdownTime.h === 0 && regCountdownTime.m < 10)
+                              (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
                                 ? 'bg-gradient-to-b from-slate-900 to-slate-950 border-red-500/40 shadow-[0_10px_30px_rgba(239,68,68,0.2)]'
                                 : 'bg-slate-950 border-slate-800'
                             }`}>
                               <div className={`text-4xl font-black leading-none ${
-                                (regCountdownTime.d === 0 && regCountdownTime.h === 0 && regCountdownTime.m < 10)
+                                (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
                                   ? 'text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]'
                                   : 'text-yellow-400'
                               }`}>
@@ -523,12 +523,12 @@ export default function EventDetails() {
                         </div>
                         
                         <div className={`p-6 rounded-2xl border ${
-                          (regCountdownTime.d === 0 && regCountdownTime.h === 0 && regCountdownTime.m < 10)
+                          (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
                             ? 'bg-red-500/10 border-red-500/20'
                             : 'bg-yellow-400/5 border-yellow-400/10'
                         }`}>
                           <p className={`text-xs font-black uppercase tracking-[0.1em] leading-relaxed ${
-                            (regCountdownTime.d === 0 && regCountdownTime.h === 0 && regCountdownTime.m < 10)
+                            (regCountdownTime.d * 24 * 60 + regCountdownTime.h * 60 + regCountdownTime.m <= parseInt(event.countdown_target_at || '10'))
                               ? 'text-red-400/90'
                               : 'text-yellow-400/70'
                           }`}>

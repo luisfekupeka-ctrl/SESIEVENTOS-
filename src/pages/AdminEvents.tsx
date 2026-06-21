@@ -1069,6 +1069,21 @@ export default function AdminEvents() {
                               }}
                             />
                           </div>
+                          
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Alerta Vermelho (minutos)</label>
+                            <input
+                              type="number"
+                              min="1"
+                              placeholder="Ex: 10"
+                              className="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold text-xs focus:outline-none focus:border-red-500 transition-all shadow-sm"
+                              value={formData.countdown_target_at || ''}
+                              onChange={(e) => setFormData({ ...formData, countdown_target_at: e.target.value })}
+                            />
+                            <p className="text-[9px] text-slate-500 uppercase font-black">
+                              Quando faltar esse tempo, o cronômetro ficará vermelho.
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>

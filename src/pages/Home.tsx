@@ -17,22 +17,26 @@ export default function Home() {
 
   const activeDays = React.useMemo(() => {
     const daysSet = new Set<string>();
+    const ptDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    
     events.forEach(event => {
       if (event.restringir_dias === 1 && event.dias_semana) {
         let list: string[] = [];
         if (Array.isArray(event.dias_semana)) {
           list = event.dias_semana;
         } else if (typeof event.dias_semana === 'string') {
-          try {
-            list = JSON.parse(event.dias_semana);
-          } catch {
-            list = [];
-          }
+          try { list = JSON.parse(event.dias_semana); } catch { list = []; }
         }
         list.forEach(day => daysSet.add(day));
+      } else if (event.start_date) {
+        try {
+          const [y, m, d] = event.start_date.split('-').map(Number);
+          const date = new Date(y, m - 1, d);
+          daysSet.add(ptDays[date.getDay()]);
+        } catch(e) {}
       }
     });
-    return Array.from(daysSet).sort();
+    return Array.from(daysSet).sort((a, b) => ptDays.indexOf(a) - ptDays.indexOf(b));
   }, [events]);
 
   useEffect(() => {
@@ -83,27 +87,28 @@ export default function Home() {
     
     const restrictions = event.restrictions as any;
     const matchesYear = selectedYear === 'all' || 
-                       restrictions.type === 'all' || 
-                       (restrictions.type === 'years' && restrictions.values.includes(selectedYear));
+                       restrictions?.type === 'all' || 
+                       (restrictions?.type === 'years' && restrictions?.values?.includes(selectedYear));
 
     // Day filter logic
     let matchesDay = true;
     if (selectedDay !== 'all') {
+      let eventDays: string[] = [];
+      const ptDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+      
       if (event.restringir_dias === 1 && event.dias_semana) {
-        let list: string[] = [];
-        if (Array.isArray(event.dias_semana)) {
-          list = event.dias_semana;
-        } else if (typeof event.dias_semana === 'string') {
-          try {
-            list = JSON.parse(event.dias_semana);
-          } catch {
-            list = [];
-          }
+        if (Array.isArray(event.dias_semana)) eventDays = event.dias_semana;
+        else if (typeof event.dias_semana === 'string') {
+          try { eventDays = JSON.parse(event.dias_semana); } catch { eventDays = []; }
         }
-        matchesDay = list.includes(selectedDay);
-      } else {
-        matchesDay = false;
+      } else if (event.start_date) {
+        try {
+          const [y, m, d] = event.start_date.split('-').map(Number);
+          const date = new Date(y, m - 1, d);
+          eventDays = [ptDays[date.getDay()]];
+        } catch(e) {}
       }
+      matchesDay = eventDays.includes(selectedDay);
     }
 
     return matchesSearch && matchesCategory && matchesYear && matchesDay;
@@ -156,8 +161,8 @@ export default function Home() {
             />
           </div>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-            <div className="relative flex-grow md:w-64">
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto flex-wrap md:flex-nowrap">
+            <div className="relative flex-grow md:w-56">
               <Filter className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
               <select
                 className="w-full pl-14 pr-10 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all appearance-none cursor-pointer text-white font-bold"
@@ -174,7 +179,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative flex-grow md:w-64">
+            <div className="relative flex-grow md:w-56">
               <CalendarDays className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
               <select
                 className="w-full pl-14 pr-10 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all appearance-none cursor-pointer text-white font-bold"
@@ -190,41 +195,28 @@ export default function Home() {
                 <ChevronDown size={16} />
               </div>
             </div>
+
+            {activeDays.length > 0 && (
+              <div className="relative flex-grow md:w-56">
+                <CalendarDays className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
+                <select
+                  className="w-full pl-14 pr-10 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all appearance-none cursor-pointer text-white font-bold"
+                  value={selectedDay}
+                  onChange={(e) => setSelectedDay(e.target.value)}
+                >
+                  <option value="all">Todos os Dias</option>
+                  {activeDays.map(day => (
+                    <option key={day} value={day} className="bg-slate-950 text-white">{day}</option>
+                  ))}
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-yellow-400">
+                  <ChevronDown size={16} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Filtros rápidos por Dia da Semana */}
-      {activeDays.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-          <div className="flex flex-wrap gap-2 items-center bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4">
-            <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest pl-2 pr-4 border-r border-slate-850">Filtrar por Dia:</span>
-            <button
-              onClick={() => setSelectedDay('all')}
-              className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all border ${
-                selectedDay === 'all'
-                  ? 'bg-yellow-400 border-yellow-400 text-black shadow-sm'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              Todos os Dias
-            </button>
-            {activeDays.map(day => (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                className={`px-4 py-2 text-[10px] font-black uppercase rounded-xl transition-all border ${
-                  selectedDay === day
-                    ? 'bg-yellow-400 border-yellow-400 text-black shadow-sm'
-                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                }`}
-              >
-                {day}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Events Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">

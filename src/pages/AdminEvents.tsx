@@ -41,6 +41,7 @@ export default function AdminEvents() {
   const [formData, setFormData] = useState<Partial<Event>>({
     name: '',
     category_id: '',
+    subcategory_id: '',
     description: '',
     image_url: '',
     start_date: '',
@@ -53,7 +54,9 @@ export default function AdminEvents() {
     password: '',
     max_capacity: 0,
     form_fields: [],
-    enable_autocomplete: true
+    enable_autocomplete: true,
+    is_paid: 0,
+    restringir_duplicidade: 0
   });
 
   const [backgroundLoading, setBackgroundLoading] = useState(false);
@@ -124,6 +127,7 @@ export default function AdminEvents() {
       setFormData({
         name: '',
         category_id: categories[0]?.id || '',
+        subcategory_id: '',
         description: '',
         image_url: '',
         start_date: '',
@@ -136,7 +140,9 @@ export default function AdminEvents() {
         password: '',
         max_capacity: 0,
         form_fields: [],
-        enable_autocomplete: true
+        enable_autocomplete: true,
+        is_paid: 0,
+        restringir_duplicidade: 0
       });
     }
     setIsModalOpen(true);
@@ -659,7 +665,7 @@ export default function AdminEvents() {
                   <h3 className="text-2xl font-black text-white tracking-tight">Informações Básicas</h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="space-y-2">
                     <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Nome do Evento</label>
                     <input
@@ -676,11 +682,32 @@ export default function AdminEvents() {
                       required
                       className="w-full px-6 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400 transition-all text-white font-bold appearance-none placeholder:text-slate-600 shadow-sm"
                       value={formData.category_id}
-                      onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                      onChange={(e) => {
+                        const catId = e.target.value;
+                        setFormData({
+                          ...formData,
+                          category_id: catId,
+                          subcategory_id: '' // reset subcategory on category change
+                        });
+                      }}
                     >
                       <option value="" className="bg-slate-900">Selecione...</option>
                       {categories.map(cat => (
                         <option key={cat.id} value={cat.id} className="bg-slate-900">{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Tipo / Subcategoria</label>
+                    <select
+                      className="w-full px-6 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400 transition-all text-white font-bold appearance-none placeholder:text-slate-600 shadow-sm"
+                      value={formData.subcategory_id || ''}
+                      onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
+                      disabled={!formData.category_id}
+                    >
+                      <option value="" className="bg-slate-900">Selecione o Tipo...</option>
+                      {(categories.find(c => String(c.id) === String(formData.category_id))?.subcategories || []).map(sub => (
+                        <option key={sub.id} value={sub.id} className="bg-slate-900">{sub.name}</option>
                       ))}
                     </select>
                   </div>
@@ -883,8 +910,11 @@ export default function AdminEvents() {
                     )}
                   </div>
 
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between h-full">
                       <div className="space-y-1">
                         <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Auto-preenchimento</label>
                         <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Sugere nomes e preenche Série/Turma automaticamente</p>
@@ -892,9 +922,41 @@ export default function AdminEvents() {
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, enable_autocomplete: !formData.enable_autocomplete })}
-                        className={`w-14 h-8 rounded-full transition-all relative ${formData.enable_autocomplete !== false ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                        className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.enable_autocomplete !== false ? 'bg-yellow-400' : 'bg-slate-800'}`}
                       >
                         <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.enable_autocomplete !== false ? 'left-7' : 'left-1'}`}></div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
+                    <div className="flex items-center justify-between h-full">
+                      <div className="space-y-1">
+                        <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Atividade Paga</label>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Define se esta atividade possui taxa ou cobrança associada</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, is_paid: formData.is_paid === 1 ? 0 : 1 })}
+                        className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.is_paid === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                      >
+                        <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.is_paid === 1 ? 'left-7' : 'left-1'}`}></div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
+                    <div className="flex items-center justify-between h-full">
+                      <div className="space-y-1">
+                        <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Escolha Única</label>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Impede inscrições duplicadas nesta Categoria e Tipo</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, restringir_duplicidade: formData.restringir_duplicidade === 1 ? 0 : 1 })}
+                        className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.restringir_duplicidade === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                      >
+                        <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.restringir_duplicidade === 1 ? 'left-7' : 'left-1'}`}></div>
                       </button>
                     </div>
                   </div>

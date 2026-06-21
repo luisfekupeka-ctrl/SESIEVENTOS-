@@ -19,3 +19,9 @@ yarn-error.log*
 *.suo
 *.ntvs*
 *.njsproj
+
+# Local SQLite Database
+database.db*
+
+# Local uploads
+public/uploads/

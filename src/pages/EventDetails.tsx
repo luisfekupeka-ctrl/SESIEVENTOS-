@@ -6,6 +6,7 @@ import { Calendar, Clock, Tag, Users, ShieldCheck, ChevronLeft, Send, CheckCircl
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatYearRestrictions } from '../components/EventCard';
 
 export default function EventDetails() {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,9 @@ export default function EventDetails() {
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedStudentGrade, setSelectedStudentGrade] = useState<string>('');
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [paymentAccepted, setPaymentAccepted] = useState(false);
   const [eventParticipants, setEventParticipants] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
@@ -181,81 +185,54 @@ export default function EventDetails() {
         }
       }
 
-    let attempts = 0;
-    const maxAttempts = 3;
-    let lastError = null;
+      const response = await fetch(`/api/events/${id}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_id: selectedStudentId,
+          name: sName,
+          surname: sSurname,
+          grade: sGrade,
+          class: sClass,
+          participant_type: participantType,
+          form_data: { ...formData, status }
+        })
+      });
 
-    while (attempts < maxAttempts) {
-      try {
-        const { data, error: rpcError } = await supabase.rpc('register_participant', {
-          p_event_id: id,
-          p_student_name: sName,
-          p_student_surname: sSurname,
-          p_student_grade: sGrade,
-          p_student_class: sClass,
-          p_participant_type: participantType,
-          p_form_data: { ...formData, status }
+      const resData = await response.json();
+
+      if (!response.ok || !resData.success) {
+        const errorMsg = resData.error || "Erro ao processar inscrição. Tente novamente.";
+        if (errorMsg.toLowerCase().includes('dup') || errorMsg.toLowerCase().includes('já inscrito') || errorMsg.toLowerCase().includes('repetido') || errorMsg.toLowerCase().includes('duplicada') || errorMsg.toLowerCase().includes('inscrição não permitida')) {
+          setRestrictionError(errorMsg);
+        } else if (errorMsg.toLowerCase().includes('lotado')) {
+          setError("Desculpe, o evento acabou de lotar.");
+        } else {
+          setError(errorMsg);
+        }
+        setIsRegistering(false);
+        return;
+      }
+
+      setRegistrationSuccess(true);
+      // Atualizar lista de inscritos após sucesso
+      const { data: newParticipants } = await supabase
+        .from('registrations')
+        .select('*, students(*)')
+        .eq('event_id', id)
+        .eq('status', 'approved');
+      if (newParticipants) {
+        const sorted = [...newParticipants].sort((a, b) => {
+          const nameA = (a.students?.name || a.form_data?.nome || a.form_data?.['nome completo'] || '').toLowerCase().trim();
+          const nameB = (b.students?.name || b.form_data?.nome || b.form_data?.['nome completo'] || '').toLowerCase().trim();
+          return nameA.localeCompare(nameB);
         });
-
-        if (rpcError) throw rpcError;
-
-        if (!data?.success) {
-          const errorMsg = data?.error || "Erro ao processar inscrição. Tente novamente.";
-          if (errorMsg.toLowerCase().includes('dup') || errorMsg.toLowerCase().includes('já inscrito') || errorMsg.toLowerCase().includes('repetido')) {
-            setRestrictionError("Este aluno já está inscrito neste evento!");
-          } else if (errorMsg.toLowerCase().includes('lotado')) {
-            setError("Desculpe, o evento acabou de lotar.");
-          } else {
-            setError(errorMsg);
-          }
-          setIsRegistering(false);
-          return;
-        }
-
-        setRegistrationSuccess(true);
-        // Atualizar lista de inscritos após sucesso
-        const { data: newParticipants } = await supabase
-          .from('registrations')
-          .select('*, students(*)')
-          .eq('event_id', id)
-          .eq('status', 'approved');
-        if (newParticipants) {
-          const sorted = [...newParticipants].sort((a, b) => {
-            const nameA = (a.students?.name || a.form_data?.nome || a.form_data?.['nome completo'] || '').toLowerCase().trim();
-            const nameB = (b.students?.name || b.form_data?.nome || b.form_data?.['nome completo'] || '').toLowerCase().trim();
-            return nameA.localeCompare(nameB);
-          });
-          setEventParticipants(sorted);
-        }
-        return; // Success!
-      } catch (err: any) {
-        lastError = err;
-        attempts++;
-        if (attempts < maxAttempts) {
-          // Wait before retry (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, 500 * attempts));
-          continue;
-        }
+        setEventParticipants(sorted);
       }
-    }
-
-    if (lastError) {
-      console.error(lastError);
-      const msg = lastError.message?.toLowerCase() || '';
-      if (msg.includes('dup') || msg.includes('unique') || msg.includes('já existe') || msg.includes('already')) {
-        setRestrictionError("Este aluno já está inscrito neste evento!");
-      } else {
-        setError("O servidor está sob alta carga. Por favor, aguarde alguns segundos e tente novamente.");
-      }
-    }
+      return; // Success!
     } catch (err: any) {
       console.error(err);
-      const msg = err.message?.toLowerCase() || '';
-      if (msg.includes('dup') || msg.includes('unique') || msg.includes('já existe') || msg.includes('already')) {
-        setRestrictionError("Este aluno já está inscrito neste evento!");
-      } else {
-        setError("Erro ao processar inscrição. Tente novamente.");
-      }
+      setError("Erro ao processar inscrição. Tente novamente.");
     } finally {
       setIsRegistering(false);
     }
@@ -274,6 +251,14 @@ export default function EventDetails() {
       <button onClick={() => navigate('/')} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold border border-slate-800 hover:bg-slate-800 transition-all">Voltar para o início</button>
     </div>
   );
+
+  const restrictions = event.restrictions as any;
+  const isGradeInvalid = participantType === 'student' && 
+                         restrictions?.type === 'years' && 
+                         selectedStudentGrade && 
+                         !restrictions.values?.includes(selectedStudentGrade);
+
+  const isSubmitDisabled = isRegistering || (event.is_paid === 1 && !paymentAccepted) || isGradeInvalid;
 
   return (
     <div className="pb-20 bg-[#020617] text-white">
@@ -314,6 +299,16 @@ export default function EventDetails() {
             >
               <span className="bg-yellow-400/10 text-yellow-400 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] border border-yellow-400/20 backdrop-blur-md">
                 {category?.name || 'Evento'}
+              </span>
+              <span className={`text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] border backdrop-blur-md ${
+                event.is_paid === 1 
+                  ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                  : 'bg-green-500/10 text-green-400 border-green-500/20'
+              }`}>
+                {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
+              </span>
+              <span className="bg-sky-500/10 text-sky-400 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] border border-sky-500/20 backdrop-blur-md">
+                {formatYearRestrictions(event)}
               </span>
               {event.password_protected && (
                 <span className="bg-slate-900/60 backdrop-blur-md text-white text-[10px] font-black px-4 py-1.5 rounded-full flex items-center gap-1.5 border border-white/10 uppercase tracking-widest">
@@ -561,19 +556,42 @@ export default function EventDetails() {
                                             className="w-full px-5 py-4 text-left hover:bg-slate-800 text-white font-bold transition-colors border-b border-slate-800 last:border-0 flex items-center justify-between group"
                                             onClick={() => {
                                               const updatedForm = { ...formData };
-                                              // Preencher o campo de nome com o nome completo
-                                              updatedForm[fieldKey] = fullName;
                                               
-                                              // Preenchimento automático de Série e Turma
+                                              // Split student name
+                                              const fullName = s.name.trim();
+                                              const firstSpace = fullName.indexOf(' ');
+                                              const firstName = firstSpace !== -1 ? fullName.substring(0, firstSpace) : fullName;
+                                              const lastName = firstSpace !== -1 ? fullName.substring(firstSpace + 1) : '';
+                                              
                                               const formFields = ((event.form_fields as any[]) || []);
                                               
+                                              // Preencher Nome
+                                              const nameField = formFields.find(f => {
+                                                const labelLower = f.label.toLowerCase();
+                                                return labelLower.includes('nome') && !labelLower.includes('sobrenome') && !labelLower.includes('completo');
+                                              });
+                                              if (nameField) {
+                                                updatedForm[nameField.label.toLowerCase()] = firstName;
+                                              } else {
+                                                updatedForm[fieldKey] = firstName;
+                                              }
+                                              
+                                              // Preencher Sobrenome
+                                              const surnameField = formFields.find(f => f.label.toLowerCase().includes('sobrenome'));
+                                              if (surnameField) {
+                                                updatedForm[surnameField.label.toLowerCase()] = lastName;
+                                              }
+                                              
+                                              // Preencher Série / Ano
                                               const gradeField = formFields.find(f => 
                                                 f.label.toLowerCase().includes('série') || f.label.toLowerCase().includes('ano')
                                               );
                                               if (gradeField && s.grade) {
                                                 updatedForm[gradeField.label.toLowerCase()] = s.grade;
+                                                setSelectedStudentGrade(s.grade);
                                               }
- 
+
+                                              // Preencher Turma
                                               const classField = formFields.find(f => 
                                                 f.label.toLowerCase().includes('turma')
                                               );
@@ -581,6 +599,7 @@ export default function EventDetails() {
                                                 updatedForm[classField.label.toLowerCase()] = s.class;
                                               }
                                               
+                                              setSelectedStudentId(s.id);
                                               setFormData(updatedForm);
                                               setShowSuggestions(false);
                                             }}
@@ -617,7 +636,13 @@ export default function EventDetails() {
                                     required={field.required}
                                     className={`${commonClasses} appearance-none`}
                                     value={formData[fieldKey] || ''}
-                                    onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setFormData({ ...formData, [fieldKey]: val });
+                                      if (fieldKey.includes('série') || fieldKey.includes('ano')) {
+                                        setSelectedStudentGrade(val);
+                                      }
+                                    }}
                                   >
                                     <option value="" className="bg-slate-900">Selecione...</option>
                                     {field.options?.map((opt: string) => (
@@ -633,7 +658,13 @@ export default function EventDetails() {
                                     placeholder={`Seu(a) ${field.label.toLowerCase()}...`}
                                     className={commonClasses}
                                     value={formData[fieldKey] || ''}
-                                    onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setFormData({ ...formData, [fieldKey]: val });
+                                      if (fieldKey.includes('série') || fieldKey.includes('ano')) {
+                                        setSelectedStudentGrade(val);
+                                      }
+                                    }}
                                   />
                                 );
                             }
@@ -673,6 +704,36 @@ export default function EventDetails() {
                           {passwordError && <p className="text-[10px] font-black text-red-500 uppercase tracking-widest ml-1">Senha incorreta</p>}
                         </div>
                       )}
+                      
+                      {isGradeInvalid && (
+                        <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-2xl text-red-400 text-sm font-bold flex items-center gap-3">
+                          <AlertTriangle size={18} />
+                          Este aluno pertence ao ano escolar "{selectedStudentGrade}", mas o evento é restrito aos anos: {restrictions.values?.join(', ')}
+                        </div>
+                      )}
+
+                      {event.is_paid === 1 && (
+                        <div className="p-5 bg-yellow-500/10 border-2 border-yellow-500/20 rounded-2xl text-yellow-400 text-sm font-bold space-y-3">
+                          <div className="flex items-center gap-3">
+                            <AlertTriangle size={24} className="text-yellow-400" />
+                            <span className="uppercase tracking-wider font-black text-xs">Atividade Paga</span>
+                          </div>
+                          <p className="leading-relaxed text-xs">
+                            Atenção: Esta é uma atividade paga. Confirme a aceitação dos termos de cobrança no checkbox abaixo para prosseguir.
+                          </p>
+                          <label className="flex items-start gap-3 mt-4 cursor-pointer text-white">
+                            <input
+                              type="checkbox"
+                              className="mt-1 w-5 h-5 rounded bg-slate-950 border-slate-800 text-yellow-400 focus:ring-yellow-400"
+                              checked={paymentAccepted}
+                              onChange={(e) => setPaymentAccepted(e.target.checked)}
+                            />
+                            <span className="text-xs font-bold leading-tight select-none">
+                              Confirmo que estou ciente de que esta atividade é paga e concordo com a cobrança.
+                            </span>
+                          </label>
+                        </div>
+                      )}
  
                       {error && (
                         <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-2xl text-red-400 text-sm font-bold flex items-center gap-3">
@@ -682,8 +743,8 @@ export default function EventDetails() {
  
                       <button
                         type="submit"
-                        disabled={isRegistering}
-                        className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black uppercase tracking-[0.2em] text-xs py-5 px-10 rounded-2xl transition-all flex items-center justify-center gap-4 shadow-lg shadow-yellow-400/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                        disabled={isSubmitDisabled}
+                        className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black uppercase tracking-[0.2em] text-xs py-5 px-10 rounded-2xl transition-all flex items-center justify-center gap-4 shadow-lg shadow-yellow-400/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:active:scale-100"
                       >
                         {isRegistering ? (
                           <Loader2 className="w-6 h-6 animate-spin" />

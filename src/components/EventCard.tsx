@@ -4,6 +4,45 @@ import { Calendar, Tag, ChevronRight, Users, Lock } from 'lucide-react';
 import { Event, Category } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { GRADES } from '../constants';
+
+export function formatYearRestrictions(event: Event): string {
+  const restrictions = event.restrictions as any;
+  if (!restrictions || restrictions.type !== 'years' || !restrictions.values || restrictions.values.length === 0) {
+    return "Livre para todos os públicos";
+  }
+  
+  const values = restrictions.values;
+  
+  const ef2Years = ['6º Ano EF', '7º Ano EF', '8º Ano EF', '9º Ano EF'];
+  const emYears = ['1º Ano EM', '2º Ano EM', '3º Ano EM'];
+  
+  const hasAllEF2 = ef2Years.every(y => values.includes(y));
+  const hasAllEM = emYears.every(y => values.includes(y));
+  
+  const ef2Count = values.filter((v: string) => ef2Years.includes(v)).length;
+  const emCount = values.filter((v: string) => emYears.includes(v)).length;
+  
+  if (values.length === GRADES.length) {
+    return "Livre para todos os públicos";
+  }
+  
+  if (hasAllEF2 && ef2Count === values.length) {
+    return "Exclusivo: Ensino Fundamental 2";
+  }
+  
+  if (hasAllEM && emCount === values.length) {
+    return "Exclusivo: Ensino Médio";
+  }
+  
+  if (values.length === 1) {
+    const yearNumber = values[0].replace('º Ano EF', '° Ano').replace('º Ano EM', '° Ano EM').replace('1º', '1°').replace('2º', '2°').replace('3º', '3°');
+    return `Exclusivo: Somente ${yearNumber}`;
+  }
+  
+  const formattedYears = values.map((v: string) => v.replace('º Ano EF', '°').replace('º Ano EM', '° EM').replace('1º', '1°').replace('2º', '2°').replace('3º', '3°'));
+  return `Exclusivo: ${formattedYears.join(' e ')} Ano`;
+}
 
 interface EventCardProps {
   event: Event;
@@ -38,9 +77,18 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
         )}
         <div className="absolute top-5 left-5 right-5">
           <div className="flex items-center justify-between mb-4">
-            <span className="px-3 py-1 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
-              {category?.name || 'Evento'}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
+                {category?.name || 'Evento'}
+              </span>
+              <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm ${
+                event.is_paid === 1 
+                  ? 'bg-red-500 text-white shadow-lg shadow-red-500/25' 
+                  : 'bg-green-500 text-white shadow-lg shadow-green-500/25'
+              }`}>
+                {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
+              </span>
+            </div>
             <div className="flex items-center gap-1.5 text-yellow-400">
               <Users size={14} className="fill-yellow-400/20" />
               <span className="text-[10px] font-black uppercase tracking-tighter drop-shadow-md">{event.registration_count || 0} Inscritos</span>
@@ -80,7 +128,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
               <Tag size={20} />
             </div>
             <span className="text-sm font-black uppercase tracking-widest">
-              {(event.restrictions as any).type === 'all' ? 'Público Geral' : 'Público Restrito'}
+              {formatYearRestrictions(event)}
             </span>
           </div>
 

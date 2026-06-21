@@ -1,6 +1,13 @@
+export interface Subcategory {
+  id: string;
+  category_id: string;
+  name: string;
+}
+
 export interface Category {
   id: string;
   name: string;
+  subcategories?: Subcategory[];
 }
 
 export interface FormField {
@@ -20,6 +27,7 @@ export interface Event {
   id: string;
   name: string;
   category_id: string;
+  subcategory_id?: string;
   description: string;
   image_url: string;
   start_date: string;
@@ -34,6 +42,8 @@ export interface Event {
   max_capacity?: number;
   registration_count?: number;
   enable_autocomplete?: boolean;
+  is_paid?: number;
+  restringir_duplicidade?: number;
 }
 
 export interface Student {
@@ -52,6 +62,7 @@ export interface Registration {
   form_data: Record<string, any>;
   timestamp: string;
   status?: 'pending' | 'approved';
+  students?: Student | null; // Nested student relation
 }
 
 export interface EventTemplate extends Omit<Event, 'id' | 'registration_count'> {

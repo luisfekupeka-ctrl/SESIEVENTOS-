@@ -542,91 +542,15 @@ export default function EventDetails() {
                                   <input
                                     type="text"
                                     required={field.required}
-                                    placeholder={`Digite seu nome...`}
+                                    placeholder={`Digite seu nome completo...`}
                                     autoComplete="off"
                                     className={commonClasses}
                                     value={formData[fieldKey] || ''}
                                     onChange={(e) => {
                                       const val = e.target.value;
                                       setFormData({ ...formData, [fieldKey]: val });
-                                      if (val.length > 2) {
-                                        const filtered = allStudents.filter(s => 
-                                          s.name.toLowerCase().includes(val.toLowerCase())
-                                        ).slice(0, 5);
-                                        setSuggestions(filtered);
-                                        setShowSuggestions(true);
-                                      } else {
-                                        setShowSuggestions(false);
-                                      }
                                     }}
-                                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                                   />
-                                  {showSuggestions && suggestions.length > 0 && (
-                                    <div className="absolute z-[110] left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                                      <div className="px-4 py-2 bg-slate-950/50 border-b border-slate-800 text-[10px] font-black text-slate-500 uppercase tracking-widest">Alunos Encontrados</div>
-                                      {suggestions.map(s => {
-                                        const fullName = `${s.name} ${s.surname || ''}`.trim();
-                                        return (
-                                          <button
-                                            key={s.id}
-                                            type="button"
-                                            className="w-full px-5 py-4 text-left hover:bg-slate-800 text-white font-bold transition-colors border-b border-slate-800 last:border-0 flex items-center justify-between group"
-                                            onClick={() => {
-                                              const updatedForm = { ...formData };
-                                              const fullName = `${s.name} ${s.surname || ''}`.trim();
-                                              const formFields = ((event.form_fields as any[]) || []);
-                                              
-                                              // Preencher o campo de Nome/Nome Completo clicado com o nome completo
-                                              updatedForm[fieldKey] = fullName;
-                                              
-                                              // Preencher outros campos de nome se houver
-                                              formFields.forEach(f => {
-                                                const labelLower = f.label.toLowerCase();
-                                                if (labelLower.includes('nome') && !labelLower.includes('sobrenome')) {
-                                                  updatedForm[f.label.toLowerCase()] = fullName;
-                                                }
-                                              });
-
-                                              // Limpar sobrenome se existir para não confundir
-                                              formFields.forEach(f => {
-                                                const labelLower = f.label.toLowerCase();
-                                                if (labelLower.includes('sobrenome')) {
-                                                  updatedForm[f.label.toLowerCase()] = '';
-                                                }
-                                              });
-                                              
-                                              // Preencher Série / Ano
-                                              const gradeField = formFields.find(f => 
-                                                f.label.toLowerCase().includes('série') || f.label.toLowerCase().includes('ano')
-                                              );
-                                              if (gradeField && s.grade) {
-                                                updatedForm[gradeField.label.toLowerCase()] = s.grade;
-                                                setSelectedStudentGrade(s.grade);
-                                              }
-
-                                              // Preencher Turma
-                                              const classField = formFields.find(f => 
-                                                f.label.toLowerCase().includes('turma')
-                                              );
-                                              if (classField && s.class) {
-                                                updatedForm[classField.label.toLowerCase()] = s.class;
-                                              }
-                                              
-                                              setSelectedStudentId(s.id);
-                                              setFormData(updatedForm);
-                                              setShowSuggestions(false);
-                                            }}
-                                          >
-                                            <div className="flex flex-col">
-                                              <span className="group-hover:text-yellow-400 transition-colors">{fullName}</span>
-                                              <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest">{s.grade} • {s.class}</span>
-                                            </div>
-                                            <CheckCircle2 size={16} className="text-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  )}
                                 </div>
                               );
                             }

@@ -617,8 +617,14 @@ app.post('/api/events/:id/start-countdown', (req, res) => {
 
 // Event registrations with validations
 app.post('/api/events/:id/register', (req, res) => {
-  const eventId = req.params.id;
-  const { student_id, name, surname, grade, class: className, participant_type, form_data } = req.body;
+  const eventId = req.params.id || req.body.p_event_id;
+  const name = req.body.name || req.body.p_student_name;
+  const surname = req.body.surname || req.body.p_student_surname;
+  const grade = req.body.grade || req.body.p_student_grade;
+  const className = req.body.class || req.body.p_student_class;
+  const participant_type = req.body.participant_type || req.body.p_participant_type;
+  const form_data = req.body.form_data || req.body.p_form_data;
+  const student_id = req.body.student_id;
 
   try {
     // 1. Fetch Event
@@ -649,6 +655,11 @@ app.post('/api/events/:id/register', (req, res) => {
       const student = db.prepare("SELECT * FROM students WHERE LOWER(name) = LOWER(?)").get(fullName) as any;
       if (student) {
         matchedStudentId = student.id;
+        // Update grade and class if provided
+        db.prepare("UPDATE students SET grade = COALESCE(NULLIF(?, ''), grade), class = COALESCE(NULLIF(?, ''), class) WHERE id = ?").run(sGrade, className, student.id);
+      } else {
+        const result = db.prepare("INSERT INTO students (name, surname, grade, class, type) VALUES (?, ?, ?, ?, ?)").run(sName, sSurname, sGrade, className, participant_type || 'student');
+        matchedStudentId = result.lastInsertRowid;
       }
     }
 

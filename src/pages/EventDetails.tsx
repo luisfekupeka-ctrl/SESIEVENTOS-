@@ -553,8 +553,69 @@ export default function EventDetails() {
                                     onChange={(e) => {
                                       const val = e.target.value;
                                       setFormData({ ...formData, [fieldKey]: val });
+                                      
+                                      if (val.length >= 3) {
+                                        const matches = allStudents.filter(s => 
+                                          s.name.toLowerCase().includes(val.toLowerCase())
+                                        ).slice(0, 5);
+                                        setSuggestions(matches);
+                                        setShowSuggestions(true);
+                                      } else {
+                                        setSuggestions([]);
+                                        setShowSuggestions(false);
+                                      }
+                                    }}
+                                    onFocus={() => {
+                                      if (formData[fieldKey]?.length >= 3 && suggestions.length > 0) {
+                                        setShowSuggestions(true);
+                                      }
                                     }}
                                   />
+                                  {showSuggestions && suggestions.length > 0 && (
+                                    <div className="absolute z-50 w-full mt-2 bg-slate-900 border border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+                                      {suggestions.map(student => (
+                                        <button
+                                          key={student.id}
+                                          type="button"
+                                          className="w-full text-left px-5 py-4 text-white hover:bg-slate-800 transition-colors border-b border-slate-800/50 last:border-0"
+                                          onClick={() => {
+                                            const newFormData = { ...formData, [fieldKey]: student.name };
+                                            
+                                            // Autofill grade if exists
+                                            const gradeField = event.form_fields?.find((f: any) => 
+                                              f.label.toLowerCase().includes('série') || 
+                                              f.label.toLowerCase().includes('ano')
+                                            );
+                                            
+                                            if (gradeField && student.grade) {
+                                              newFormData[gradeField.label.toLowerCase()] = student.grade;
+                                              setSelectedStudentGrade(student.grade);
+                                            }
+                                            
+                                            // Autofill other fields
+                                            const surnameField = event.form_fields?.find((f: any) => f.label.toLowerCase() === 'sobrenome');
+                                            if (surnameField && student.surname) {
+                                              newFormData['sobrenome'] = student.surname;
+                                            }
+                                            
+                                            const classField = event.form_fields?.find((f: any) => f.label.toLowerCase() === 'turma');
+                                            if (classField && student.class) {
+                                              newFormData['turma'] = student.class;
+                                            }
+                                            
+                                            setFormData(newFormData);
+                                            setSelectedStudentId(student.id);
+                                            setShowSuggestions(false);
+                                          }}
+                                        >
+                                          <div className="font-bold">{student.name} {student.surname}</div>
+                                          <div className="text-xs text-slate-400 mt-1">
+                                            {student.grade} • Turma {student.class}
+                                          </div>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               );
                             }

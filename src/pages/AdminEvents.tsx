@@ -232,6 +232,11 @@ export default function AdminEvents() {
       fetchData();
     } catch (err: any) {
       console.error(err);
+      if (err.message && err.message.toLowerCase().includes('jwt')) {
+        await supabase.auth.signOut();
+        window.location.href = '/login';
+        return;
+      }
       setFeedback({ type: 'error', message: `Erro ao salvar: ${err.message || 'Tente novamente.'}` });
     } finally {
       setIsUploading(false);

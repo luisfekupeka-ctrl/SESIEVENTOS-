@@ -44,6 +44,11 @@ export default function AdminDashboard() {
       if (studentsRes.data) setStudents(studentsRes.data as Student[]);
     } catch (err: any) {
       console.error("Erro detalhado ao carregar dados do dashboard:", err);
+      if (err.message && err.message.toLowerCase().includes('jwt')) {
+        await supabase.auth.signOut();
+        window.location.href = '/login';
+        return;
+      }
       setError(`Erro no servidor (${err.message || '500'}). Verifique se o projeto no Supabase está ativo.`);
     } finally {
       setLoading(false);

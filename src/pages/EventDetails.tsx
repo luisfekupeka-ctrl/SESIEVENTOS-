@@ -361,7 +361,7 @@ export default function EventDetails() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 ${regUpcoming ? '-mt-4 md:-mt-8' : '-mt-20'}`}>
         
         {regUpcoming && regCountdownTime && (
           <motion.div 

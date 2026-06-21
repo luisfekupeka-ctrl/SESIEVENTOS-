@@ -1069,44 +1069,6 @@ export default function AdminEvents() {
                               }}
                             />
                           </div>
-
-                          {editingEvent && (
-                            <div className="space-y-2 flex flex-col justify-end">
-                              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Controle Manual</label>
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  try {
-                                    let targetTime = new Date(Date.now() + 60 * 1000).toISOString();
-                                    
-                                    const { error } = await supabase
-                                      .from('events')
-                                      .update({ 
-                                        countdown_target_at: targetTime,
-                                        registration_open_at: null
-                                      })
-                                      .eq('id', editingEvent.id);
-                                    
-                                    if (error) throw error;
-                                    
-                                    setFormData({
-                                      ...formData,
-                                      countdown_target_at: targetTime,
-                                      registration_open_at: undefined
-                                    });
-                                    
-                                    setFeedback({ type: 'success', message: 'Contagem regressiva de 1 minuto iniciada!' });
-                                  } catch (err: any) {
-                                    console.error(err);
-                                    setFeedback({ type: 'error', message: 'Erro ao iniciar contagem regressiva.' });
-                                  }
-                                }}
-                                className="w-full px-3 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-slate-300 font-black text-[9px] uppercase tracking-widest hover:bg-yellow-400 hover:text-black hover:border-yellow-400 transition-all shadow-sm flex items-center justify-center gap-1"
-                              >
-                                ⏱️ Iniciar 1 Min Regressivo
-                              </button>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>

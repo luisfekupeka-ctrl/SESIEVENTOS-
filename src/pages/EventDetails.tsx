@@ -115,7 +115,11 @@ export default function EventDetails() {
       }
 
       // Check registration opening / countdown target
-      const targetTimeStr = event.countdown_target_at || event.registration_open_at;
+      let targetTimeStr = event.registration_open_at;
+      if (!targetTimeStr && event.start_date && event.start_time) {
+        targetTimeStr = `${event.start_date}T${event.start_time}`;
+      }
+      
       if (targetTimeStr) {
         const targetTime = new Date(targetTimeStr);
         const diffReg = targetTime.getTime() - now.getTime();
@@ -480,31 +484,31 @@ export default function EventDetails() {
                       </div>
                     ) : regUpcoming && regCountdownTime ? (
                       <div className="text-center py-8 space-y-6 bg-slate-950/40 border border-slate-800/80 p-8 rounded-[2rem] shadow-2xl">
-                        <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-full flex items-center justify-center mx-auto border border-yellow-400/20 animate-pulse text-2xl">
+                        <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-500/20 animate-pulse text-3xl shadow-[0_0_30px_rgba(239,68,68,0.3)]">
                           ⏱️
                         </div>
                         <div className="space-y-2">
-                          <h4 className="text-xl font-black text-white tracking-tight">Inscrições em Breve</h4>
+                          <h4 className="text-2xl font-black text-white tracking-tight">Inscrições em Breve</h4>
                           <p className="text-slate-400 font-bold text-xs uppercase tracking-wider">Abertura em contagem regressiva</p>
                         </div>
 
-                        <div className="flex justify-center gap-2 max-w-xs mx-auto">
+                        <div className="flex justify-center gap-3 max-w-xs mx-auto">
                           {[
                             ...(regCountdownTime.d > 0 ? [{ val: regCountdownTime.d, label: 'dias' }] : []),
                             ...(regCountdownTime.d > 0 || regCountdownTime.h > 0 ? [{ val: regCountdownTime.h, label: 'horas' }] : []),
                             { val: regCountdownTime.m, label: 'min' },
                             { val: regCountdownTime.s, label: 'seg' }
                           ].map(t => (
-                            <div key={t.label} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex-grow min-w-[70px]">
-                              <div className="text-2xl font-black text-yellow-400 leading-none">{String(t.val).padStart(2, '0')}</div>
-                              <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mt-1.5">{t.label}</div>
+                            <div key={t.label} className="bg-gradient-to-b from-slate-900 to-slate-950 p-4 rounded-2xl border border-red-500/30 flex-grow min-w-[75px] shadow-[0_5px_20px_rgba(239,68,68,0.15)] transform transition-transform hover:scale-105">
+                              <div className="text-3xl font-black text-red-500 leading-none drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">{String(t.val).padStart(2, '0')}</div>
+                              <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">{t.label}</div>
                             </div>
                           ))}
                         </div>
                         
-                        <div className="p-4 bg-yellow-400/5 border border-yellow-400/10 rounded-2xl">
-                          <p className="text-yellow-400/60 text-[10px] font-black uppercase tracking-[0.2em] leading-relaxed">
-                            Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.
+                        <div className="p-5 bg-red-500/5 border border-red-500/10 rounded-2xl">
+                          <p className="text-red-400/80 text-[11px] font-black uppercase tracking-[0.1em] leading-relaxed">
+                            Prepare-se! As inscrições serão liberadas automaticamente.
                           </p>
                         </div>
                       </div>

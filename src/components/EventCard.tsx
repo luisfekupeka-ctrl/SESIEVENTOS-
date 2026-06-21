@@ -107,7 +107,10 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
                 );
               })()}
               {(() => {
-                const target = event.countdown_target_at || event.registration_open_at;
+                let target = event.registration_open_at;
+                if (!target && event.start_date && event.start_time) {
+                  target = `${event.start_date}T${event.start_time}`;
+                }
                 const isUpcoming = target && new Date(target).getTime() > Date.now();
                 if (isUpcoming) {
                   return (

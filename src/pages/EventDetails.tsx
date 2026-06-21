@@ -117,7 +117,8 @@ export default function EventDetails() {
       // Check registration opening / countdown target
       let targetTimeStr = event.registration_open_at;
       if (!targetTimeStr && event.start_date && event.start_time) {
-        targetTimeStr = `${event.start_date}T${event.start_time}`;
+        // Appending :00 to ensure cross-browser compatibility (Safari/iOS)
+        targetTimeStr = `${event.start_date}T${event.start_time}:00`;
       }
       
       if (targetTimeStr) {

@@ -146,12 +146,12 @@ export default function EventDetails() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (regUpcoming) return;
+    
+    if (isSubmitDisabled) return;
+
     if (!event || !id) return;
 
-    if (regUpcoming) {
-      setRestrictionError("As inscrições para este evento ainda não começaram.");
-      return;
-    }
 
     const formFields = (event.form_fields as any[]) || [];
     const nameKey = formFields.find(f => f.label?.toLowerCase().includes('nome'))?.label?.toLowerCase() || 'nome';
@@ -482,36 +482,6 @@ export default function EventDetails() {
                           Ver outros eventos
                         </button>
                       </div>
-                    ) : regUpcoming && regCountdownTime ? (
-                      <div className="text-center py-8 space-y-6 bg-slate-950/40 border border-slate-800/80 p-8 rounded-[2rem] shadow-2xl">
-                        <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-500/20 animate-pulse text-3xl shadow-[0_0_30px_rgba(239,68,68,0.3)]">
-                          ⏱️
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="text-2xl font-black text-white tracking-tight">Inscrições em Breve</h4>
-                          <p className="text-slate-400 font-bold text-xs uppercase tracking-wider">Abertura em contagem regressiva</p>
-                        </div>
-
-                        <div className="flex justify-center gap-3 max-w-xs mx-auto">
-                          {[
-                            ...(regCountdownTime.d > 0 ? [{ val: regCountdownTime.d, label: 'dias' }] : []),
-                            ...(regCountdownTime.d > 0 || regCountdownTime.h > 0 ? [{ val: regCountdownTime.h, label: 'horas' }] : []),
-                            { val: regCountdownTime.m, label: 'min' },
-                            { val: regCountdownTime.s, label: 'seg' }
-                          ].map(t => (
-                            <div key={t.label} className="bg-gradient-to-b from-slate-900 to-slate-950 p-4 rounded-2xl border border-red-500/30 flex-grow min-w-[75px] shadow-[0_5px_20px_rgba(239,68,68,0.15)] transform transition-transform hover:scale-105">
-                              <div className="text-3xl font-black text-red-500 leading-none drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">{String(t.val).padStart(2, '0')}</div>
-                              <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">{t.label}</div>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <div className="p-5 bg-red-500/5 border border-red-500/10 rounded-2xl">
-                          <p className="text-red-400/80 text-[11px] font-black uppercase tracking-[0.1em] leading-relaxed">
-                            Prepare-se! As inscrições serão liberadas automaticamente.
-                          </p>
-                        </div>
-                      </div>
                     ) : (
                       <form onSubmit={handleRegister} className="space-y-6">
                       <div className="space-y-2">
@@ -743,20 +713,52 @@ export default function EventDetails() {
                         </div>
                       )}
  
-                      <button
-                        type="submit"
-                        disabled={isSubmitDisabled}
-                        className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black uppercase tracking-[0.2em] text-xs py-5 px-10 rounded-2xl transition-all flex items-center justify-center gap-4 shadow-lg shadow-yellow-400/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:active:scale-100"
-                      >
-                        {isRegistering ? (
-                          <Loader2 className="w-6 h-6 animate-spin" />
-                        ) : (
-                          <>
-                            <CheckCircle2 size={20} />
-                            Confirmar Inscrição
-                          </>
-                        )}
-                      </button>
+                      {regUpcoming && regCountdownTime ? (
+                        <div className="text-center py-8 space-y-6 bg-slate-950/40 border border-slate-800/80 p-8 rounded-[2rem] shadow-2xl mt-8">
+                          <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-500/20 animate-pulse text-3xl shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+                            ⏱️
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-2xl font-black text-white tracking-tight">Inscrições em Breve</h4>
+                            <p className="text-slate-400 font-bold text-xs uppercase tracking-wider">Abertura em contagem regressiva</p>
+                          </div>
+
+                          <div className="flex justify-center gap-3 max-w-xs mx-auto">
+                            {[
+                              ...(regCountdownTime.d > 0 ? [{ val: regCountdownTime.d, label: 'dias' }] : []),
+                              ...(regCountdownTime.d > 0 || regCountdownTime.h > 0 ? [{ val: regCountdownTime.h, label: 'horas' }] : []),
+                              { val: regCountdownTime.m, label: 'min' },
+                              { val: regCountdownTime.s, label: 'seg' }
+                            ].map(t => (
+                              <div key={t.label} className="bg-gradient-to-b from-slate-900 to-slate-950 p-4 rounded-2xl border border-red-500/30 flex-grow min-w-[75px] shadow-[0_5px_20px_rgba(239,68,68,0.15)] transform transition-transform hover:scale-105">
+                                <div className="text-3xl font-black text-red-500 leading-none drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]">{String(t.val).padStart(2, '0')}</div>
+                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2">{t.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="p-5 bg-red-500/5 border border-red-500/10 rounded-2xl">
+                            <p className="text-red-400/80 text-[11px] font-black uppercase tracking-[0.1em] leading-relaxed">
+                              Preencha os dados acima! As inscrições serão liberadas automaticamente.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="submit"
+                          disabled={isSubmitDisabled}
+                          className="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-black uppercase tracking-[0.2em] text-xs py-5 px-10 rounded-2xl transition-all flex items-center justify-center gap-4 shadow-lg shadow-yellow-400/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:active:scale-100"
+                        >
+                          {isRegistering ? (
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                          ) : (
+                            <>
+                              <CheckCircle2 size={20} />
+                              Confirmar Inscrição
+                            </>
+                          )}
+                        </button>
+                      )}
                     </form>
                     )}
                   </motion.div>

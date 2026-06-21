@@ -31,9 +31,11 @@ export default function AdminStudents() {
     else setIsRefreshing(true);
     
     try {
-      const response = await fetch('/api/students');
-      if (!response.ok) throw new Error('Erro ao buscar alunos');
-      const data = await response.json();
+      const { data, error: err } = await supabase
+        .from('students')
+        .select('*')
+        .order('name', { ascending: true });
+      if (err) throw err;
       setStudents(data || []);
     } catch (err: any) {
       console.error(err);
@@ -53,12 +55,10 @@ export default function AdminStudents() {
     if (!newStudentName.trim() || !newStudentGrade) return;
 
     try {
-      const response = await fetch('/api/students', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newStudentName.trim(), grade: newStudentGrade })
-      });
-      if (!response.ok) throw new Error('Erro ao cadastrar aluno');
+      const { error: err } = await supabase
+        .from('students')
+        .insert({ name: newStudentName.trim(), grade: newStudentGrade });
+      if (err) throw err;
       
       setNewStudentName('');
       setIsNewModalOpen(false);
@@ -83,12 +83,15 @@ export default function AdminStudents() {
         return;
       }
 
-      const response = await fetch('/api/students/bulk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ grade: bulkGrade, names })
-      });
-      if (!response.ok) throw new Error('Erro na importação em lote');
+      const studentsToInsert = names.map(name => ({
+        name,
+        grade: bulkGrade
+      }));
+
+      const { error: err } = await supabase
+        .from('students')
+        .insert(studentsToInsert);
+      if (err) throw err;
 
       setBulkText('');
       setIsBulkModalOpen(false);
@@ -103,8 +106,11 @@ export default function AdminStudents() {
     if (!deleteId) return;
 
     try {
-      const response = await fetch(`/api/students/${deleteId}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Erro ao excluir aluno');
+      const { error: err } = await supabase
+        .from('students')
+        .delete()
+        .eq('id', deleteId);
+      if (err) throw err;
 
       setStudents(prev => prev.filter(s => String(s.id) !== String(deleteId)));
       setDeleteId(null);

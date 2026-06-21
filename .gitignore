@@ -25,3 +25,6 @@ database.db*
 
 # Local uploads
 public/uploads/
+
+# Scratch files
+scratch/

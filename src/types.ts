@@ -48,6 +48,8 @@ export interface Event {
   dias_semana?: string[] | string;
   registration_open_at?: string;
   countdown_target_at?: string;
+  limitar_vagas_por_ano?: number;
+  vagas_por_ano?: number;
 }
 
 export interface Student {

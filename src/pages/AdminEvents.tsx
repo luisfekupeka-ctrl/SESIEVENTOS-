@@ -56,7 +56,9 @@ export default function AdminEvents() {
     form_fields: [],
     enable_autocomplete: true,
     is_paid: 0,
-    restringir_duplicidade: 0
+    restringir_duplicidade: 0,
+    limitar_vagas_por_ano: 0,
+    vagas_por_ano: undefined
   });
 
   const [backgroundLoading, setBackgroundLoading] = useState(false);
@@ -165,6 +167,8 @@ export default function AdminEvents() {
         restringir_duplicidade: 0,
         restringir_dias: 0,
         dias_semana: [],
+        limitar_vagas_por_ano: 0,
+        vagas_por_ano: undefined,
         registration_open_at: '',
         countdown_target_at: ''
       });
@@ -512,6 +516,11 @@ export default function AdminEvents() {
                       </div>
                     );
                   })()}
+                  {event.limitar_vagas_por_ano === 1 && (
+                    <div className="flex items-center gap-2 px-2.5 py-1 bg-blue-500/10 text-blue-400 font-black text-[10px] uppercase tracking-widest rounded-lg border border-blue-500/10">
+                      <Users size={12} /> {event.vagas_por_ano} vagas/ano
+                    </div>
+                  )}
                 </div>
                 <h3 className="text-xl font-black text-white mb-6 group-hover:text-yellow-400 transition-colors tracking-tight leading-tight line-clamp-2">{event.name}</h3>
 
@@ -943,7 +952,7 @@ export default function AdminEvents() {
 
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                     <div className="flex items-center justify-between h-full">
                       <div className="space-y-1">
@@ -974,6 +983,39 @@ export default function AdminEvents() {
                         <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.is_paid === 1 ? 'left-7' : 'left-1'}`}></div>
                       </button>
                     </div>
+                  </div>
+
+                  <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Limite por Ano</label>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Define um limite individual de vagas por ano escolar</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ 
+                          ...formData, 
+                          limitar_vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? 0 : 1,
+                          vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? undefined : (formData.vagas_por_ano || 5)
+                        })}
+                        className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.limitar_vagas_por_ano === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                      >
+                        <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.limitar_vagas_por_ano === 1 ? 'left-7' : 'left-1'}`}></div>
+                      </button>
+                    </div>
+                    {formData.limitar_vagas_por_ano === 1 && (
+                      <div className="pt-2 border-t border-slate-800/50 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Vagas por Ano</label>
+                        <input
+                          type="number"
+                          min={1}
+                          required
+                          value={formData.vagas_por_ano || ''}
+                          onChange={e => setFormData({ ...formData, vagas_por_ano: parseInt(e.target.value) || 0 })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl outline-none focus:border-yellow-400 text-slate-100 text-xs font-bold"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">

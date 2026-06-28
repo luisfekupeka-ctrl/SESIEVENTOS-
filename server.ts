@@ -77,7 +77,9 @@ db.exec(`
     restringir_dias INTEGER DEFAULT 0,
     dias_semana TEXT DEFAULT '[]',
     registration_open_at TEXT,
-    countdown_target_at TEXT
+    countdown_target_at TEXT,
+    limitar_vagas_por_ano INTEGER DEFAULT 0,
+    vagas_por_ano INTEGER DEFAULT NULL
   );
 
   CREATE TABLE IF NOT EXISTS registrations (
@@ -120,7 +122,9 @@ const eventMigrations = [
   "ALTER TABLE events ADD COLUMN restringir_dias INTEGER DEFAULT 0;",
   "ALTER TABLE events ADD COLUMN dias_semana TEXT DEFAULT '[]';",
   "ALTER TABLE events ADD COLUMN registration_open_at TEXT;",
-  "ALTER TABLE events ADD COLUMN countdown_target_at TEXT;"
+  "ALTER TABLE events ADD COLUMN countdown_target_at TEXT;",
+  "ALTER TABLE events ADD COLUMN limitar_vagas_por_ano INTEGER DEFAULT 0;",
+  "ALTER TABLE events ADD COLUMN vagas_por_ano INTEGER DEFAULT NULL;"
 ];
 
 for (const query of eventMigrations) {
@@ -686,6 +690,39 @@ app.post('/api/events/:id/register', (req, res) => {
           success: false,
           error: `Inscrição não permitida. O aluno já está inscrito no evento "${conflict.event_name}" da mesma categoria e tipo/subcategoria.`
         });
+      }
+    }
+
+    // Year-specific spots limit check
+    if (event.limitar_vagas_por_ano === 1 && event.vagas_por_ano !== null && event.vagas_por_ano !== undefined) {
+      const studentGrade = (sGrade || '').trim().toLowerCase();
+      if (studentGrade) {
+        // Fetch all active registrations for this event, including student grade
+        const eventRegistrations = db.prepare(`
+          SELECT r.*, s.grade as student_grade
+          FROM registrations r
+          LEFT JOIN students s ON r.student_id = s.id
+          WHERE r.event_id = ? AND r.status = 'approved'
+        `).all(eventId) as any[];
+
+        const normalizeYear = (y: any) => {
+          if (typeof y !== 'string') return '';
+          return y.trim().toLowerCase().replace(/º/g, '°');
+        };
+
+        const targetGradeNormalized = normalizeYear(studentGrade);
+
+        const yearCount = eventRegistrations.filter(r => {
+          const regGrade = r.student_grade || safeJsonParse(r.form_data)?.['série'] || safeJsonParse(r.form_data)?.['ano'] || '';
+          return normalizeYear(regGrade) === targetGradeNormalized;
+        }).length;
+
+        if (yearCount >= event.vagas_por_ano) {
+          return res.status(400).json({ 
+            success: false, 
+            error: `Infelizmente, o limite de ${event.vagas_por_ano} vagas para o ${sGrade} já foi preenchido.` 
+          });
+        }
       }
     }
 

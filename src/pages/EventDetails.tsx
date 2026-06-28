@@ -788,6 +788,18 @@ export default function EventDetails() {
                           </label>
                         </div>
                       )}
+                      
+                      {event.limitar_vagas_por_ano === 1 && event.vagas_por_ano !== undefined && (
+                        <div className="p-5 bg-blue-500/10 border-2 border-blue-500/20 rounded-2xl text-blue-400 text-sm font-bold space-y-1">
+                          <div className="flex items-center gap-3">
+                            <Users size={18} className="text-blue-400" />
+                            <span className="uppercase tracking-wider font-black text-xs">Vagas Limitadas por Ano</span>
+                          </div>
+                          <p className="leading-relaxed text-xs">
+                            Há um limite individual de <strong>{event.vagas_por_ano} vagas</strong> para cada ano escolar permitido.
+                          </p>
+                        </div>
+                      )}
  
                       {error && (
                         <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-2xl text-red-400 text-sm font-bold flex items-center gap-3">

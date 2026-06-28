@@ -96,6 +96,44 @@ export default function EventDetails() {
     };
     fetchParticipants();
 
+    // Subscribe to realtime database updates
+    const channel = supabase
+      .channel(`realtime-event-details-${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'events',
+          filter: `id=eq.${id}`
+        },
+        (payload) => {
+          if (payload.new) {
+            setEvent(payload.new as Event);
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'registrations',
+          filter: `event_id=eq.${id}`
+        },
+        () => {
+          fetchParticipants();
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id]);
+
+  useEffect(() => {
     const calculateTime = () => {
       if (!event) return;
       
@@ -157,7 +195,7 @@ export default function EventDetails() {
     const timer = setInterval(calculateTime, 1000);
 
     return () => clearInterval(timer);
-  }, [id, event]);
+  }, [event]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();

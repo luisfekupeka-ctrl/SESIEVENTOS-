@@ -858,7 +858,7 @@ export default function AdminEvents() {
                   <h3 className="text-2xl font-black text-white tracking-tight">Segurança e Restrições</h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 gap-8">
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Proteção por Senha</label>
@@ -965,7 +965,7 @@ export default function AdminEvents() {
 
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                     <div className="flex items-center justify-between h-full">
                       <div className="space-y-1">
@@ -998,68 +998,6 @@ export default function AdminEvents() {
                     </div>
                   </div>
 
-                  <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Limite por Ano</label>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Define um limite individual de vagas por ano escolar</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setFormData({ 
-                          ...formData, 
-                          limitar_vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? 0 : 1,
-                          vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? undefined : {}
-                        })}
-                        className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.limitar_vagas_por_ano === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
-                      >
-                        <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.limitar_vagas_por_ano === 1 ? 'left-7' : 'left-1'}`}></div>
-                      </button>
-                    </div>
-                    {formData.limitar_vagas_por_ano === 1 && (
-                      <div className="pt-4 border-t border-slate-800/50 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200 max-h-[250px] overflow-y-auto pr-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Definir Vagas:</label>
-                        <div className="space-y-2">
-                          {(() => {
-                            const gradesToShow = formData.restrictions?.type === 'years' && Array.isArray(formData.restrictions?.values) && formData.restrictions.values.length > 0
-                              ? formData.restrictions.values
-                              : GRADES;
-
-                            const limits = (typeof formData.vagas_por_ano === 'object' && formData.vagas_por_ano !== null)
-                              ? (formData.vagas_por_ano as Record<string, number>)
-                              : {};
-
-                            return gradesToShow.map((grade) => {
-                              const val = limits[grade] !== undefined ? limits[grade] : '';
-                              return (
-                                <div key={grade} className="flex items-center justify-between gap-3 bg-slate-900/60 p-2 rounded-xl border border-slate-800/60">
-                                  <span className="text-[11px] font-bold text-slate-300 truncate">{grade}</span>
-                                  <input
-                                    type="number"
-                                    min={1}
-                                    placeholder="Ilimitado"
-                                    value={val}
-                                    onChange={(e) => {
-                                      const numVal = parseInt(e.target.value);
-                                      const updatedLimits = { ...limits };
-                                      if (isNaN(numVal) || numVal <= 0) {
-                                        delete updatedLimits[grade];
-                                      } else {
-                                        updatedLimits[grade] = numVal;
-                                      }
-                                      setFormData({ ...formData, vagas_por_ano: updatedLimits });
-                                    }}
-                                    className="w-20 px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg outline-none focus:border-yellow-400 text-slate-100 text-xs font-black text-center"
-                                  />
-                                </div>
-                              );
-                            });
-                          })()}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                     <div className="flex items-center justify-between h-full">
                       <div className="space-y-1">
@@ -1077,8 +1015,8 @@ export default function AdminEvents() {
                   </div>
                 </div>
 
-                {/* Novos controles de dias da semana e agendamento */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-800/40">
+                {/* Novos controles de dias da semana, agendamento e limite por ano */}
+                  <div className="grid grid-cols-1 gap-6 pt-6 border-t border-slate-800/40">
                     <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                       <div className="flex items-center justify-between">
                         <div className="space-y-1">
@@ -1177,6 +1115,71 @@ export default function AdminEvents() {
                           </select>
                         </div>
                       </div>
+                    </div>
+
+                    <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-4 flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Limite por Ano</label>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase leading-tight">Define um limite individual de vagas por ano escolar</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ 
+                            ...formData, 
+                            limitar_vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? 0 : 1,
+                            vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? undefined : {}
+                          })}
+                          className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.limitar_vagas_por_ano === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                        >
+                          <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.limitar_vagas_por_ano === 1 ? 'left-7' : 'left-1'}`}></div>
+                        </button>
+                      </div>
+                      {formData.limitar_vagas_por_ano === 1 && (
+                        <div className="pt-4 border-t border-slate-800/50 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Definir Vagas por Ano:</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            {(() => {
+                              const gradesToShow = formData.restrictions?.type === 'years' && Array.isArray(formData.restrictions?.values) && formData.restrictions.values.length > 0
+                                ? formData.restrictions.values
+                                : GRADES;
+
+                              const limits = (typeof formData.vagas_por_ano === 'object' && formData.vagas_por_ano !== null)
+                                ? (formData.vagas_por_ano as Record<string, number>)
+                                : {};
+
+                              return gradesToShow.map((grade) => {
+                                const val = limits[grade] !== undefined ? limits[grade] : '';
+                                const shortGrade = grade.replace(' EF', '').replace(' EM', '');
+                                return (
+                                  <div key={grade} className="flex flex-col gap-2 bg-slate-900/60 p-3 rounded-2xl border border-slate-800/60 hover:border-yellow-400/20 transition-all items-center">
+                                    <span className="text-[11px] font-bold text-slate-300 text-center truncate w-full">{shortGrade}</span>
+                                    <input
+                                      type="text"
+                                      inputMode="numeric"
+                                      pattern="[0-9]*"
+                                      placeholder="Ilimitado"
+                                      value={val}
+                                      onChange={(e) => {
+                                        const rawVal = e.target.value.replace(/\D/g, '');
+                                        const numVal = parseInt(rawVal);
+                                        const updatedLimits = { ...limits };
+                                        if (isNaN(numVal) || numVal <= 0) {
+                                          delete updatedLimits[grade];
+                                        } else {
+                                          updatedLimits[grade] = numVal;
+                                        }
+                                        setFormData({ ...formData, vagas_por_ano: updatedLimits });
+                                      }}
+                                      className="w-full px-2 py-1.5 bg-slate-950 border border-slate-800 rounded-xl outline-none focus:border-yellow-400 text-slate-100 text-xs font-black text-center transition-all shadow-inner"
+                                    />
+                                  </div>
+                                );
+                              });
+                            })()}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
               </section>

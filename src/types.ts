@@ -49,7 +49,7 @@ export interface Event {
   registration_open_at?: string;
   countdown_target_at?: string;
   limitar_vagas_por_ano?: number;
-  vagas_por_ano?: number;
+  vagas_por_ano?: Record<string, number> | string;
 }
 
 export interface Student {

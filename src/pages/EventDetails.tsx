@@ -789,15 +789,29 @@ export default function EventDetails() {
                         </div>
                       )}
                       
-                      {event.limitar_vagas_por_ano === 1 && event.vagas_por_ano !== undefined && (
-                        <div className="p-5 bg-blue-500/10 border-2 border-blue-500/20 rounded-2xl text-blue-400 text-sm font-bold space-y-1">
+                      {event.limitar_vagas_por_ano === 1 && event.vagas_por_ano && (
+                        <div className="p-5 bg-blue-500/10 border-2 border-blue-500/20 rounded-2xl text-blue-400 text-sm font-bold space-y-2">
                           <div className="flex items-center gap-3">
                             <Users size={18} className="text-blue-400" />
                             <span className="uppercase tracking-wider font-black text-xs">Vagas Limitadas por Ano</span>
                           </div>
-                          <p className="leading-relaxed text-xs">
-                            Há um limite individual de <strong>{event.vagas_por_ano} vagas</strong> para cada ano escolar permitido.
-                          </p>
+                          <div className="space-y-1.5 leading-relaxed text-xs text-slate-300">
+                            <p>Este evento possui limite de vagas independente por ano escolar:</p>
+                            <ul className="list-disc list-inside pl-1 text-[11px] font-black text-blue-300 grid grid-cols-2 gap-1">
+                              {(() => {
+                                try {
+                                  const limits = typeof event.vagas_por_ano === 'string'
+                                    ? JSON.parse(event.vagas_por_ano)
+                                    : event.vagas_por_ano;
+                                  return Object.entries(limits || {}).map(([grade, val]) => (
+                                    <li key={grade} className="truncate">{grade}: {val} vagas</li>
+                                  ));
+                                } catch {
+                                  return null;
+                                }
+                              })()}
+                            </ul>
+                          </div>
                         </div>
                       )}
  

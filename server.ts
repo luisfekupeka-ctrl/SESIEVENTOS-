@@ -218,6 +218,7 @@ function parseRowJsonFields(table: string, row: any) {
     if (parsed.restrictions) parsed.restrictions = safeJsonParse(parsed.restrictions);
     if (parsed.form_fields) parsed.form_fields = safeJsonParse(parsed.form_fields);
     if (parsed.dias_semana) parsed.dias_semana = safeJsonParse(parsed.dias_semana);
+    if (parsed.vagas_por_ano) parsed.vagas_por_ano = safeJsonParse(parsed.vagas_por_ano);
   } else if (table === 'registrations') {
     if (parsed.form_data) parsed.form_data = safeJsonParse(parsed.form_data);
   }
@@ -303,6 +304,7 @@ app.post('/api/db', (req, res) => {
           if (preparedItem.restrictions) preparedItem.restrictions = JSON.stringify(preparedItem.restrictions);
           if (preparedItem.form_fields) preparedItem.form_fields = JSON.stringify(preparedItem.form_fields);
           if (preparedItem.dias_semana) preparedItem.dias_semana = JSON.stringify(preparedItem.dias_semana);
+          if (preparedItem.vagas_por_ano) preparedItem.vagas_por_ano = JSON.stringify(preparedItem.vagas_por_ano);
         } else if (table === 'registrations') {
           if (preparedItem.form_data) preparedItem.form_data = JSON.stringify(preparedItem.form_data);
         }
@@ -338,6 +340,7 @@ app.post('/api/db', (req, res) => {
         if (preparedData.restrictions) preparedData.restrictions = JSON.stringify(preparedData.restrictions);
         if (preparedData.form_fields) preparedData.form_fields = JSON.stringify(preparedData.form_fields);
         if (preparedData.dias_semana) preparedData.dias_semana = JSON.stringify(preparedData.dias_semana);
+        if (preparedData.vagas_por_ano) preparedData.vagas_por_ano = JSON.stringify(preparedData.vagas_por_ano);
       } else if (table === 'registrations') {
         if (preparedData.form_data) preparedData.form_data = JSON.stringify(preparedData.form_data);
       }
@@ -694,16 +697,10 @@ app.post('/api/events/:id/register', (req, res) => {
     }
 
     // Year-specific spots limit check
-    if (event.limitar_vagas_por_ano === 1 && event.vagas_por_ano !== null && event.vagas_por_ano !== undefined) {
+    if (event.limitar_vagas_por_ano === 1 && event.vagas_por_ano) {
       const studentGrade = (sGrade || '').trim().toLowerCase();
       if (studentGrade) {
-        // Fetch all active registrations for this event, including student grade
-        const eventRegistrations = db.prepare(`
-          SELECT r.*, s.grade as student_grade
-          FROM registrations r
-          LEFT JOIN students s ON r.student_id = s.id
-          WHERE r.event_id = ? AND r.status = 'approved'
-        `).all(eventId) as any[];
+        const limits = safeJsonParse(event.vagas_por_ano) || {};
 
         const normalizeYear = (y: any) => {
           if (typeof y !== 'string') return '';
@@ -712,16 +709,37 @@ app.post('/api/events/:id/register', (req, res) => {
 
         const targetGradeNormalized = normalizeYear(studentGrade);
 
-        const yearCount = eventRegistrations.filter(r => {
-          const regGrade = r.student_grade || safeJsonParse(r.form_data)?.['série'] || safeJsonParse(r.form_data)?.['ano'] || '';
-          return normalizeYear(regGrade) === targetGradeNormalized;
-        }).length;
+        // Find the limit for the student's grade
+        let gradeLimit: number | undefined;
+        let matchedKey = '';
+        for (const key of Object.keys(limits)) {
+          if (normalizeYear(key) === targetGradeNormalized) {
+            gradeLimit = parseInt(limits[key]);
+            matchedKey = key;
+            break;
+          }
+        }
 
-        if (yearCount >= event.vagas_por_ano) {
-          return res.status(400).json({ 
-            success: false, 
-            error: `Infelizmente, o limite de ${event.vagas_por_ano} vagas para o ${sGrade} já foi preenchido.` 
-          });
+        if (gradeLimit !== undefined && !isNaN(gradeLimit) && gradeLimit > 0) {
+          // Fetch all active registrations for this event, including student grade
+          const eventRegistrations = db.prepare(`
+            SELECT r.*, s.grade as student_grade
+            FROM registrations r
+            LEFT JOIN students s ON r.student_id = s.id
+            WHERE r.event_id = ? AND r.status = 'approved'
+          `).all(eventId) as any[];
+
+          const yearCount = eventRegistrations.filter(r => {
+            const regGrade = r.student_grade || safeJsonParse(r.form_data)?.['série'] || safeJsonParse(r.form_data)?.['ano'] || '';
+            return normalizeYear(regGrade) === targetGradeNormalized;
+          }).length;
+
+          if (yearCount >= gradeLimit) {
+            return res.status(400).json({ 
+              success: false, 
+              error: `Infelizmente, o limite de ${gradeLimit} vagas para o ${matchedKey} já foi preenchido.` 
+            });
+          }
         }
       }
     }

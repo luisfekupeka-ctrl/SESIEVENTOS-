@@ -516,9 +516,22 @@ export default function AdminEvents() {
                       </div>
                     );
                   })()}
-                  {event.limitar_vagas_por_ano === 1 && (
+                  {event.limitar_vagas_por_ano === 1 && event.vagas_por_ano && (
                     <div className="flex items-center gap-2 px-2.5 py-1 bg-blue-500/10 text-blue-400 font-black text-[10px] uppercase tracking-widest rounded-lg border border-blue-500/10">
-                      <Users size={12} /> {event.vagas_por_ano} vagas/ano
+                      <Users size={12} /> Limites: {(() => {
+                        try {
+                          const limits = typeof event.vagas_por_ano === 'string'
+                            ? JSON.parse(event.vagas_por_ano)
+                            : event.vagas_por_ano;
+                          const entries = Object.entries(limits || {});
+                          if (entries.length === 0) return 'Ilimitado';
+                          return entries
+                            .map(([grade, val]) => `${grade.split(' ')[0]}: ${val}`)
+                            .join(', ');
+                        } catch {
+                          return 'Configurado';
+                        }
+                      })()}
                     </div>
                   )}
                 </div>
@@ -996,7 +1009,7 @@ export default function AdminEvents() {
                         onClick={() => setFormData({ 
                           ...formData, 
                           limitar_vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? 0 : 1,
-                          vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? undefined : (formData.vagas_por_ano || 5)
+                          vagas_por_ano: formData.limitar_vagas_por_ano === 1 ? undefined : {}
                         })}
                         className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.limitar_vagas_por_ano === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
                       >
@@ -1004,16 +1017,45 @@ export default function AdminEvents() {
                       </button>
                     </div>
                     {formData.limitar_vagas_por_ano === 1 && (
-                      <div className="pt-2 border-t border-slate-800/50 animate-in fade-in slide-in-from-top-1 duration-200">
-                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Vagas por Ano</label>
-                        <input
-                          type="number"
-                          min={1}
-                          required
-                          value={formData.vagas_por_ano || ''}
-                          onChange={e => setFormData({ ...formData, vagas_por_ano: parseInt(e.target.value) || 0 })}
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl outline-none focus:border-yellow-400 text-slate-100 text-xs font-bold"
-                        />
+                      <div className="pt-4 border-t border-slate-800/50 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200 max-h-[250px] overflow-y-auto pr-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Definir Vagas:</label>
+                        <div className="space-y-2">
+                          {(() => {
+                            const gradesToShow = formData.restrictions?.type === 'years' && Array.isArray(formData.restrictions?.values) && formData.restrictions.values.length > 0
+                              ? formData.restrictions.values
+                              : GRADES;
+
+                            const limits = (typeof formData.vagas_por_ano === 'object' && formData.vagas_por_ano !== null)
+                              ? (formData.vagas_por_ano as Record<string, number>)
+                              : {};
+
+                            return gradesToShow.map((grade) => {
+                              const val = limits[grade] !== undefined ? limits[grade] : '';
+                              return (
+                                <div key={grade} className="flex items-center justify-between gap-3 bg-slate-900/60 p-2 rounded-xl border border-slate-800/60">
+                                  <span className="text-[11px] font-bold text-slate-300 truncate">{grade}</span>
+                                  <input
+                                    type="number"
+                                    min={1}
+                                    placeholder="Ilimitado"
+                                    value={val}
+                                    onChange={(e) => {
+                                      const numVal = parseInt(e.target.value);
+                                      const updatedLimits = { ...limits };
+                                      if (isNaN(numVal) || numVal <= 0) {
+                                        delete updatedLimits[grade];
+                                      } else {
+                                        updatedLimits[grade] = numVal;
+                                      }
+                                      setFormData({ ...formData, vagas_por_ano: updatedLimits });
+                                    }}
+                                    className="w-20 px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg outline-none focus:border-yellow-400 text-slate-100 text-xs font-black text-center"
+                                  />
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
                       </div>
                     )}
                   </div>

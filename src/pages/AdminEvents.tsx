@@ -198,6 +198,18 @@ export default function AdminEvents() {
     setIsUploading(true);
 
     try {
+      if (formData.limitar_vagas_por_ano === 1) {
+        const limitsObj = (typeof formData.vagas_por_ano === 'object' && formData.vagas_por_ano !== null)
+          ? (formData.vagas_por_ano as Record<string, number>)
+          : {};
+        const totalDistributed = Object.values(limitsObj).reduce((sum, val) => sum + (val || 0), 0);
+        const totalCapacity = formData.max_capacity || 0;
+
+        if (totalCapacity > 0 && totalDistributed !== totalCapacity) {
+          throw new Error(`A soma das vagas distribuídas por ano (${totalDistributed}) deve ser exatamente igual ao total de vagas do evento (${totalCapacity}).`);
+        }
+      }
+
       let finalImageUrl = formData.image_url;
 
       if (selectedImageFile) {
@@ -1136,9 +1148,59 @@ export default function AdminEvents() {
                         </button>
                       </div>
                       {formData.limitar_vagas_por_ano === 1 && (
-                        <div className="pt-4 border-t border-slate-800/50 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Definir Vagas por Ano:</label>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        <div className="pt-4 border-t border-slate-800/50 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                          {(() => {
+                            const limits = (typeof formData.vagas_por_ano === 'object' && formData.vagas_por_ano !== null)
+                              ? (formData.vagas_por_ano as Record<string, number>)
+                              : {};
+                            const totalDistributed = Object.values(limits).reduce((sum, val) => sum + (val || 0), 0);
+                            const totalCapacity = formData.max_capacity || 0;
+                            const remainingCapacity = totalCapacity - totalDistributed;
+
+                            return (
+                              <div className="space-y-3">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-4 rounded-2xl border border-slate-800/60">
+                                  <div className="space-y-1">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Divisão de Vagas</span>
+                                    <span className="text-xs font-bold text-slate-300">
+                                      Total do Evento: <strong className="text-white">{totalCapacity || 'Ilimitado'}</strong>
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-4 text-xs font-black uppercase tracking-wider">
+                                    <div className="flex flex-col items-end">
+                                      <span className="text-[9px] font-bold text-slate-500">Distribuídas</span>
+                                      <span className={totalDistributed === totalCapacity ? "text-green-400" : "text-yellow-400"}>{totalDistributed} vagas</span>
+                                    </div>
+                                    {totalCapacity > 0 && (
+                                      <div className="flex flex-col items-end border-l border-slate-800 pl-4">
+                                        <span className="text-[9px] font-bold text-slate-500">Status</span>
+                                        <span className={remainingCapacity === 0 ? "text-green-400" : remainingCapacity > 0 ? "text-blue-400" : "text-red-400"}>
+                                          {remainingCapacity === 0 ? "Pronto" : remainingCapacity > 0 ? `Restam ${remainingCapacity}` : `Excedeu ${Math.abs(remainingCapacity)}`}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {totalCapacity > 0 && remainingCapacity !== 0 && (
+                                  <div className={`p-3 rounded-xl border text-[11px] font-bold ${
+                                    remainingCapacity > 0 
+                                      ? "bg-blue-500/5 border-blue-500/20 text-blue-400" 
+                                      : "bg-red-500/5 border-red-500/20 text-red-400"
+                                  }`}>
+                                    {remainingCapacity > 0 
+                                      ? `Atenção: Restam ${remainingCapacity} vagas das ${totalCapacity} totais para serem distribuídas.`
+                                      : `Erro: A soma das vagas por ano (${totalDistributed}) excede o limite geral de ${totalCapacity} vagas!`
+                                    }
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          <div className="space-y-3">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Definir Vagas por Ano:</label>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                             {(() => {
                               const gradesToShow = formData.restrictions?.type === 'years' && Array.isArray(formData.restrictions?.values) && formData.restrictions.values.length > 0
                                 ? formData.restrictions.values
@@ -1179,9 +1241,10 @@ export default function AdminEvents() {
                             })()}
                           </div>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
+                </div>
               </section>
 
               {/* Custom Form Fields */}

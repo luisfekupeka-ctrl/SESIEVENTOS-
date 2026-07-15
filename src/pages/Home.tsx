@@ -81,8 +81,8 @@ export default function Home() {
   };
 
   const filteredEvents = events.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (event.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+                         (event.description || '').toLowerCase().includes((searchTerm || '').toLowerCase());
     const matchesCategory = selectedCategory === 'all' || event.category_id === selectedCategory;
     
     const restrictions = event.restrictions as any;

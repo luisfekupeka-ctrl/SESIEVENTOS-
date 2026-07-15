@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("[Auth] Session active for:", currentUser.email);
     setUser(currentUser);
     const userProfile = await fetchProfile(currentUser.id);
-    const isOwner = currentUser.email === 'luisfe.kupeka@gmail.com';
+    const isOwner = currentUser.email?.trim().toLowerCase() === 'luisfe.kupeka@gmail.com';
     
     // Strict check: if no profile found or not approved (and not owner), force sign out
     if (!isOwner && (!userProfile || userProfile.status !== 'approved')) {
@@ -126,7 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (data.user) {
         const userProfile = await fetchProfile(data.user.id);
-        const isOwner = data.user.email === 'luisfe.kupeka@gmail.com';
+        const isOwner = data.user.email?.trim().toLowerCase() === 'luisfe.kupeka@gmail.com';
 
         if (!isOwner && (!userProfile || userProfile.status !== 'approved')) {
           await supabase.auth.signOut();
@@ -181,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Administrative override for owner
-  const isOwner = user?.email === 'luisfe.kupeka@gmail.com';
+  const isOwner = user?.email?.trim().toLowerCase() === 'luisfe.kupeka@gmail.com';
   const effectiveProfile = isOwner ? { 
     ...profile, 
     role: 'super_admin' as const, 

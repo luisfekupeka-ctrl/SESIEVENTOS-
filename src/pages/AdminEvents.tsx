@@ -229,6 +229,10 @@ export default function AdminEvents() {
       if (cleanEventToSave.end_time === '') cleanEventToSave.end_time = null;
       cleanEventToSave.registration_open_at = null; // Always use start_date and start_time
       if (cleanEventToSave.countdown_target_at === '') cleanEventToSave.countdown_target_at = null;
+      
+      // Prevent Supabase "invalid input syntax for type uuid" error
+      if (cleanEventToSave.category_id === '') cleanEventToSave.category_id = null;
+      if (cleanEventToSave.subcategory_id === '') cleanEventToSave.subcategory_id = null;
 
       if (editingEvent) {
         const { error } = await supabase

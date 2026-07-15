@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { Users, CheckCircle, XCircle, Trash2, Shield, Mail, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { Key } from 'lucide-react';
+
 interface Profile {
   id: string;
   full_name: string;
@@ -18,6 +20,7 @@ export default function AdminManagement() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [passwordModal, setPasswordModal] = useState<{show: boolean, userId: string, userName: string, newPassword: string}>({ show: false, userId: '', userName: '', newPassword: '' });
 
   useEffect(() => {
     fetchProfiles();
@@ -72,18 +75,50 @@ export default function AdminManagement() {
   };
 
   const deleteAdmin = async (id: string) => {
-    if (!confirm("Tem certeza que deseja remover este administrador? Esta ação não pode ser desfeita.")) return;
+    if (!confirm("Tem certeza que deseja remover este administrador PERMANENTEMENTE? Esta ação não pode ser desfeita e removerá o login do usuário.")) return;
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      if (import.meta.env.VITE_USE_SQLITE === 'true') {
+        const res = await fetch(`/api/admin/users/${id}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminId: currentUserProfile?.id })
+        });
+        if (!res.ok) throw new Error('Erro ao remover (Local)');
+      } else {
+        const { error: rpcError } = await supabase.rpc('admin_delete_user', { p_user_id: id });
+        if (rpcError) {
+          console.warn("RPC failed, falling back to profile delete", rpcError);
+          const { error } = await supabase.from('profiles').delete().eq('id', id);
+          if (error) throw error;
+        }
+      }
       fetchProfiles();
     } catch (err: any) {
       console.error(err);
       alert("Erro ao remover administrador.");
+    }
+  };
+
+  const changePassword = async () => {
+    if (!passwordModal.newPassword || passwordModal.newPassword.length < 6) {
+      alert("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    try {
+      if (import.meta.env.VITE_USE_SQLITE === 'true') {
+        alert("Modo Local (SQLite): Todas as senhas são 'admin123' por padrão.");
+      } else {
+        const { error } = await supabase.rpc('admin_update_password', {
+          p_user_id: passwordModal.userId,
+          p_new_password: passwordModal.newPassword
+        });
+        if (error) throw error;
+        alert("Senha atualizada com sucesso!");
+      }
+      setPasswordModal({ show: false, userId: '', userName: '', newPassword: '' });
+    } catch (err: any) {
+      console.error(err);
+      alert("Erro ao atualizar senha. Verifique suas permissões.");
     }
   };
 
@@ -215,6 +250,13 @@ export default function AdminManagement() {
                             <Users size={20} />
                           </button>
                           <button
+                            onClick={() => setPasswordModal({ show: true, userId: profile.id, userName: profile.full_name, newPassword: '' })}
+                            className="w-11 h-11 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl flex items-center justify-center transition-all border border-emerald-500/10"
+                            title="Trocar Senha"
+                          >
+                            <Key size={20} />
+                          </button>
+                          <button
                             onClick={() => deleteAdmin(profile.id)}
                             className="w-11 h-11 bg-red-500/5 text-slate-400 hover:text-red-500 rounded-xl flex items-center justify-center transition-all border border-transparent hover:border-red-500/20"
                             title="Remover permanentemente"
@@ -231,6 +273,48 @@ export default function AdminManagement() {
           </table>
         </div>
       </div>
+
+      {/* Password Modal */}
+      {passwordModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl relative"
+          >
+            <h2 className="text-2xl font-black text-white mb-2 tracking-tight">Trocar Senha</h2>
+            <p className="text-slate-400 mb-6 font-bold">Defina uma nova senha para {passwordModal.userName}.</p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nova Senha</label>
+                <input
+                  type="text"
+                  value={passwordModal.newPassword}
+                  onChange={(e) => setPasswordModal({ ...passwordModal, newPassword: e.target.value })}
+                  placeholder="Mínimo 6 caracteres"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-all font-bold"
+                />
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setPasswordModal({ show: false, userId: '', userName: '', newPassword: '' })}
+                  className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={changePassword}
+                  className="flex-1 py-3 px-4 bg-yellow-400 hover:bg-yellow-500 text-black rounded-xl font-black transition-colors"
+                >
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

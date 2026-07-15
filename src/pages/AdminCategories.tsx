@@ -66,7 +66,7 @@ export default function AdminCategories() {
     setLoading(true);
     try {
       for (const cat of DEFAULT_CATEGORIES) {
-        if (!categories.find(c => c.name.toLowerCase() === cat.toLowerCase())) {
+        if (!categories.find(c => (c.name || '').toLowerCase() === cat.toLowerCase())) {
           const { error: err } = await supabase
             .from('categories')
             .insert({ name: cat });

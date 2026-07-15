@@ -122,7 +122,7 @@ export default function AdminStudents() {
   };
 
   const filteredStudents = students.filter(s => {
-    const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (s.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesGrade = selectedGrade === 'all' || s.grade === selectedGrade;
     return matchesSearch && matchesGrade;
   });

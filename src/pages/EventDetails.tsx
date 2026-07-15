@@ -658,7 +658,7 @@ export default function EventDetails() {
                                       
                                       if (val.length >= 3) {
                                         const matches = allStudents.filter(s => 
-                                          s.name.toLowerCase().includes(val.toLowerCase())
+                                          (s.name || '').toLowerCase().includes(val.toLowerCase())
                                         ).slice(0, 5);
                                         setSuggestions(matches);
                                         setShowSuggestions(true);

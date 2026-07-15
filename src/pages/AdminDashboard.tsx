@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Event, Registration, Student } from '../types';
 import { Calendar, Users, TrendingUp, Clock, ChevronRight, Trash2, AlertTriangle, GraduationCap, School, Loader2, ShieldCheck } from 'lucide-react';
@@ -7,7 +7,6 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { GRADES, CLASSES } from '../constants';
 import { useAuth } from '../context/AuthContext';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -32,7 +31,7 @@ export default function AdminDashboard() {
       setError(null);
       const [eventsRes, regsRes, studentsRes] = await Promise.all([
         supabase.from('events').select('*').order('name', { ascending: true }),
-        supabase.from('registrations').select('*, students(*)').order('timestamp', { ascending: false }),
+        supabase.from('registrations').select('*, students(*)').order('timestamp', { ascending: false }).limit(5),
         supabase.from('students').select('*')
       ]);
 
@@ -100,28 +99,6 @@ export default function AdminDashboard() {
     { label: 'Colaboradores', value: (students || []).filter(s => s?.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
     { label: 'Responsáveis', value: (students || []).filter(s => s?.type === 'responsible').length, icon: <School size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
   ];
-
-  // Chart Data Calculations
-  const eventsChartData = useMemo(() => {
-    return (events || []).map(e => ({
-      name: e.name.length > 20 ? e.name.substring(0, 20) + '...' : e.name,
-      Inscritos: e.registration_count || 0,
-      Vagas: e.max_capacity || 0
-    }));
-  }, [events]);
-
-  const gradesChartData = useMemo(() => {
-    const counts: Record<string, number> = {};
-    (recentRegistrations || []).forEach(reg => {
-      const student = (reg as any).students;
-      if (student && student.grade) {
-        counts[student.grade] = (counts[student.grade] || 0) + 1;
-      }
-    });
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
-  }, [recentRegistrations]);
-
-  const COLORS = ['#eab308', '#3b82f6', '#10b981', '#f43f5e', '#8b5cf6', '#f97316'];
 
   const handleReset = async () => {
     setIsResetting(true);
@@ -419,6 +396,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {stats.map((stat, i) => (
           <div key={i} className="bg-slate-900/40 p-8 rounded-[2rem] border border-slate-800 shadow-2xl flex flex-col gap-6 transition-all hover:border-yellow-400/30 group backdrop-blur-sm">
@@ -431,66 +409,6 @@ export default function AdminDashboard() {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Bar Chart: Events vs Registrations */}
-        <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-sm lg:col-span-2 p-8">
-          <h3 className="text-xl font-black text-white mb-6">Inscrições vs Vagas por Evento</h3>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={eventsChartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <YAxis stroke="#94a3b8" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', color: '#fff' }}
-                  itemStyle={{ color: '#eab308' }}
-                  cursor={{ fill: '#1e293b', opacity: 0.4 }}
-                />
-                <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                <Bar dataKey="Inscritos" fill="#eab308" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Vagas" fill="#334155" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Pie Chart: Grades Distribution */}
-        <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-sm p-8">
-          <h3 className="text-xl font-black text-white mb-6">Público por Série Escolar</h3>
-          <div className="h-80 w-full">
-            {gradesChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={gradesChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {gradesChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px', color: '#fff' }}
-                    itemStyle={{ color: '#eab308' }}
-                  />
-                  <Legend verticalAlign="bottom" height={36} />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-full text-slate-500 font-bold text-sm">
-                Ainda não há dados suficientes para o gráfico.
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -539,7 +457,7 @@ export default function AdminDashboard() {
             <h3 className="text-xl font-black text-white">Últimas Inscrições</h3>
           </div>
           <div className="divide-y divide-slate-800">
-            {(recentRegistrations || []).length > 0 ? (recentRegistrations || []).slice(0, 5).map(reg => {
+            {(recentRegistrations || []).length > 0 ? (recentRegistrations || []).map(reg => {
               if (!reg) return null;
               const student = (reg as any).students;
               return (

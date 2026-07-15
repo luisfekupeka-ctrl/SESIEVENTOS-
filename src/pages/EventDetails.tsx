@@ -246,6 +246,19 @@ export default function EventDetails() {
     }
 
 
+    if (event.enable_autocomplete !== false && participantType === 'student') {
+      const normalizeString = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+      const sNameNorm = normalizeString(sName);
+      const isStudentInDatabase = allStudents.some(s => 
+        normalizeString(s.name || '') === sNameNorm || 
+        normalizeString(`${s.name} ${s.surname || ''}`) === sNameNorm
+      );
+      if (!isStudentInDatabase) {
+        setRestrictionError("Por favor, selecione um aluno válido da lista de sugestões.");
+        return;
+      }
+    }
+
     if (event.password_protected && event.password !== eventPassword) {
       setPasswordError(true);
       return;

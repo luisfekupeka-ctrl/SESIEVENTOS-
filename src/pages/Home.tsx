@@ -12,8 +12,14 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
+  const [subcategories, setSubcategories] = useState<any[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+
+  const normalizeString = (str: string) => {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  };
 
   const activeDays = React.useMemo(() => {
     const daysSet = new Set<string>();
@@ -66,13 +72,15 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      const [eventsRes, categoriesRes] = await Promise.all([
+      const [eventsRes, categoriesRes, subcatRes] = await Promise.all([
         supabase.from('events').select('*').order('name', { ascending: true }),
-        supabase.from('categories').select('*').order('name', { ascending: true })
+        supabase.from('categories').select('*').order('name', { ascending: true }),
+        supabase.from('subcategories').select('*').order('name', { ascending: true })
       ]);
 
       if (eventsRes.data) setEvents(eventsRes.data as Event[]);
       if (categoriesRes.data) setCategories(categoriesRes.data as Category[]);
+      if (subcatRes.data) setSubcategories(subcatRes.data);
     } catch (error) {
       console.error("Error fetching home data:", error);
     } finally {
@@ -81,9 +89,13 @@ export default function Home() {
   };
 
   const filteredEvents = events.filter(event => {
-    const matchesSearch = (event.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
-                         (event.description || '').toLowerCase().includes((searchTerm || '').toLowerCase());
+    const qNorm = normalizeString(searchTerm);
+    const nameNorm = normalizeString(event.name || '');
+    const descNorm = normalizeString(event.description || '');
+    
+    const matchesSearch = nameNorm.includes(qNorm) || descNorm.includes(qNorm);
     const matchesCategory = selectedCategory === 'all' || event.category_id === selectedCategory;
+    const matchesSubcategory = selectedSubcategory === 'all' || event.subcategory_id === selectedSubcategory;
     
     const restrictions = event.restrictions as any;
     const matchesYear = selectedYear === 'all' || 
@@ -111,7 +123,7 @@ export default function Home() {
       matchesDay = eventDays.includes(selectedDay);
     }
 
-    return matchesSearch && matchesCategory && matchesYear && matchesDay;
+    return matchesSearch && matchesCategory && matchesSubcategory && matchesYear && matchesDay;
   });
 
   return (
@@ -178,6 +190,25 @@ export default function Home() {
                 <ChevronDown size={16} />
               </div>
             </div>
+
+            {selectedCategory !== 'all' && subcategories.filter(s => s.category_id === selectedCategory).length > 0 && (
+              <div className="relative flex-grow md:w-56">
+                <Filter className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
+                <select
+                  className="w-full pl-14 pr-10 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all appearance-none cursor-pointer text-white font-bold"
+                  value={selectedSubcategory}
+                  onChange={(e) => setSelectedSubcategory(e.target.value)}
+                >
+                  <option value="all">Todas as Modalidades</option>
+                  {subcategories.filter(s => s.category_id === selectedCategory).map(cat => (
+                    <option key={cat.id} value={cat.id} className="bg-slate-950 text-white">{cat.name}</option>
+                  ))}
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-yellow-400">
+                  <ChevronDown size={16} />
+                </div>
+              </div>
+            )}
 
             <div className="relative flex-grow md:w-56">
               <CalendarDays className="absolute left-5 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />

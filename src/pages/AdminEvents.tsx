@@ -137,9 +137,25 @@ export default function AdminEvents() {
         }
       }
 
+      let vagasPorAnoParsed: any = undefined;
+      const eventVagasPorAno = (event as any).vagas_por_ano;
+      if (eventVagasPorAno) {
+        if (typeof eventVagasPorAno === 'object') {
+          vagasPorAnoParsed = eventVagasPorAno;
+        } else if (typeof eventVagasPorAno === 'string') {
+          try {
+            vagasPorAnoParsed = JSON.parse(eventVagasPorAno);
+          } catch (e) {
+            vagasPorAnoParsed = undefined;
+          }
+        }
+      }
+
       setFormData({
         ...event,
         dias_semana: diasSemanaParsed,
+        limitar_vagas_por_ano: (event as any).limitar_vagas_por_ano || 0,
+        vagas_por_ano: vagasPorAnoParsed,
         restringir_dias: event.restringir_dias || 0,
         registration_open_at: event.registration_open_at || '',
         countdown_target_at: event.countdown_target_at || ''

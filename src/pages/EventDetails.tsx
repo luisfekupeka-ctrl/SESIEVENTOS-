@@ -7,8 +7,10 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatYearRestrictions } from '../components/EventCard';
+import { useAuth } from '../context/AuthContext';
 
 export default function EventDetails() {
+  const { profile } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
@@ -586,7 +588,7 @@ export default function EventDetails() {
                       </div>
                     )}
 
-                    {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity ? (
+                    {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity && profile?.role !== 'super_admin' ? (
                       <div className="text-center py-8">
                         <div className="w-20 h-20 bg-red-500/10 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
                           <AlertTriangle size={40} />
@@ -604,6 +606,16 @@ export default function EventDetails() {
                       </div>
                     ) : (
                       <form onSubmit={handleRegister} className="space-y-6">
+                      {event.max_capacity && event.max_capacity > 0 && (event.registration_count || 0) >= event.max_capacity && profile?.role === 'super_admin' && (
+                        <div className="bg-red-500/20 text-red-400 px-4 py-2 rounded-xl text-sm font-bold border border-red-500/20 mb-4 inline-flex items-center gap-2">
+                          <AlertTriangle size={20} className="shrink-0 mt-0.5" />
+                          <p>
+                            <strong>Aviso de Admin:</strong> O limite de vagas deste evento foi atingido. 
+                            Como você é um Administrador Master, você pode inscrever o aluno manualmente 
+                            (as demais regras ainda serão validadas).
+                          </p>
+                        </div>
+                      )}
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Tipo de Participante</label>
                         <select

@@ -354,7 +354,14 @@ export default function EventDetails() {
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.5 }}
           transition={{ duration: 1.5 }}
-          src={event.image_url || `https://picsum.photos/seed/${event.id}/1920/1080`}
+          src={event.image_url || (() => {
+            const n = event.name.toLowerCase();
+            if (n.includes('street jazz')) return '/images/events/street_jazz.png';
+            if (n.includes('ilustração')) return '/images/events/ilustracao.png';
+            if (n.includes('futsal')) return '/images/events/futsal.png';
+            if (n.includes('tênis de mesa') || n.includes('tenis de mesa')) return '/images/events/tenis_de_mesa.png';
+            return `https://picsum.photos/seed/${event.id}/1920/1080`;
+          })()}
           alt={event.name}
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"

@@ -57,7 +57,14 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
-          src={event.image_url || `https://picsum.photos/seed/${event.id}/800/450`}
+          src={event.image_url || (() => {
+            const n = event.name.toLowerCase();
+            if (n.includes('street jazz')) return '/images/events/street_jazz.png';
+            if (n.includes('ilustração')) return '/images/events/ilustracao.png';
+            if (n.includes('futsal')) return '/images/events/futsal.png';
+            if (n.includes('tênis de mesa') || n.includes('tenis de mesa')) return '/images/events/tenis_de_mesa.png';
+            return `https://picsum.photos/seed/${event.id}/800/450`;
+          })()}
           alt={event.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
           referrerPolicy="no-referrer"

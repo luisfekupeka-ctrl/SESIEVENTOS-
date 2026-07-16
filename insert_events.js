@@ -82,14 +82,14 @@ const mapGrade = (gradeStr) => {
   return clean; // 1º Ano EM, 2º Ano EM, 3º Ano EM usually stay the same
 };
 
-const lines = data.trim().split('\\n');
+const lines = data.trim().split('\n');
 let inserted = 0;
 
-const insertStmt = db.prepare(\`
+const insertStmt = db.prepare(`
   INSERT INTO events (
     id, name, description, start_date, start_time, end_date, max_capacity, restrictions
   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-\`);
+`);
 
 db.transaction(() => {
   for (const line of lines) {
@@ -101,10 +101,10 @@ db.transaction(() => {
     
     // convert date DD/MM/YYYY to YYYY-MM-DD
     const partsStart = startDate.split('/');
-    if (partsStart.length === 3) startDate = \`\${partsStart[2]}-\${partsStart[1]}-\${partsStart[0]}\`;
+    if (partsStart.length === 3) startDate = `${partsStart[2]}-${partsStart[1]}-${partsStart[0]}`;
     
     const partsEnd = endDate.split('/');
-    if (partsEnd.length === 3) endDate = \`\${partsEnd[2]}-\${partsEnd[1]}-\${partsEnd[0]}\`;
+    if (partsEnd.length === 3) endDate = `${partsEnd[2]}-${partsEnd[1]}-${partsEnd[0]}`;
 
     const cap = parseInt(maxCap, 10);
     const id = crypto.randomUUID();
@@ -122,4 +122,4 @@ db.transaction(() => {
   }
 })();
 
-console.log(\`Successfully inserted \${inserted} events!\`);
+console.log(`Successfully inserted ${inserted} events!`);

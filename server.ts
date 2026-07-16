@@ -4,6 +4,11 @@ import path from 'path';
 import fs from 'fs';
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.local' });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,6 +16,12 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, 'database.db');
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
+
+const useSQLite = process.env.VITE_USE_SQLITE === 'true';
+const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+const generateId = () => crypto.randomUUID();
 
 // Initialize database tables
 db.exec(`

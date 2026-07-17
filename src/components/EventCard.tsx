@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Tag, ChevronRight, Users, Lock } from 'lucide-react';
+import { getEventImage } from '../utils/getEventImage';
 import { Event, Category } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -57,7 +58,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <img
-          src={event.image_url || `https://picsum.photos/seed/${event.id}/800/450`}
+          src={event.image_url || getEventImage(event.name) || `https://picsum.photos/seed/${event.id}/800/450`}
           alt={event.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-90 group-hover:opacity-100"
           referrerPolicy="no-referrer"

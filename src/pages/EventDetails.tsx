@@ -354,7 +354,7 @@ export default function EventDetails() {
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.5 }}
           transition={{ duration: 1.5 }}
-          src={event.image_url || `https://picsum.photos/seed/${event.id}/1920/1080`}
+          src={event.image_url || getEventImage(event.name) || `https://picsum.photos/seed/${event.id}/1920/1080`}
           alt={event.name}
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"

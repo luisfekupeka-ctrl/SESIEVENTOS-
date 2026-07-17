@@ -22,6 +22,10 @@ export const getEventImage = (eventName: string): string | null => {
   if (n.includes('desenho técnico') || n.includes('desenho tecnico')) return '/images/events/desenho_tecnico.png';
   if (n.includes('futebol de botão') || n.includes('futebol de botao')) return '/images/events/futebol_de_botao.png';
   if (n.includes('gabarita sesi') || n.includes('gabarita')) return '/images/events/gabarita_sesi.png';
+  if (n.includes('desenho em mesa digital') || n.includes('mesa digital')) return '/images/events/desenho_digital.png';
+  if (n.includes('geocraft')) return '/images/events/geocraft.png';
+  if (n.includes('karaokê') || n.includes('karaoke')) return '/images/events/karaoke.png';
+  if (n.includes('k-pop') || n.includes('kpop')) return '/images/events/kpop.png';
   
   return null;
 };

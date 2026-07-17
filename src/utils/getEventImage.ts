@@ -13,6 +13,10 @@ export const getEventImage = (eventName: string): string | null => {
   if (n.includes('teatro')) return '/images/events/teatro.png';
   if (n.includes('yoga')) return '/images/events/yoga.png';
   if (n.includes('culinária') || n.includes('culinaria')) return '/images/events/culinaria.png';
+  if (n.includes('inglês') || n.includes('english')) return '/images/events/ingles.png';
+  if (n.includes('cosmética') || n.includes('cosmetica')) return '/images/events/cosmetica.png';
+  if (n.includes('sketchbook')) return '/images/events/sketchbook.png';
+  if (n.includes('crochê') || n.includes('croche')) return '/images/events/croche.png';
   
   return null;
 };

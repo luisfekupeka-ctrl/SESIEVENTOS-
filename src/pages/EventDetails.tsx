@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatYearRestrictions } from '../components/EventCard';
+import { getEventImage } from '../utils/getEventImage';
 import { useAuth } from '../context/AuthContext';
 
 export default function EventDetails() {

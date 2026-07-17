@@ -17,6 +17,11 @@ export const getEventImage = (eventName: string): string | null => {
   if (n.includes('cosmética') || n.includes('cosmetica')) return '/images/events/cosmetica.png';
   if (n.includes('sketchbook')) return '/images/events/sketchbook.png';
   if (n.includes('crochê') || n.includes('croche')) return '/images/events/croche.png';
+  if (n.includes('curso de desenho')) return '/images/events/curso_de_desenho.png';
+  if (n.includes('dança terapia') || n.includes('danca terapia')) return '/images/events/danca_terapia.png';
+  if (n.includes('desenho técnico') || n.includes('desenho tecnico')) return '/images/events/desenho_tecnico.png';
+  if (n.includes('futebol de botão') || n.includes('futebol de botao')) return '/images/events/futebol_de_botao.png';
+  if (n.includes('gabarita sesi') || n.includes('gabarita')) return '/images/events/gabarita_sesi.png';
   
   return null;
 };

@@ -139,13 +139,22 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
           return;
         }
 
+        // Remover duplicatas do próprio array antes de enviar ao banco
+        const uniqueStudentsMap = new Map();
+        studentsToInsert.forEach(student => {
+          if (!student) return;
+          const key = `${student.name.toLowerCase()}|${student.surname.toLowerCase()}`;
+          uniqueStudentsMap.set(key, student);
+        });
+        const uniqueStudentsToInsert = Array.from(uniqueStudentsMap.values());
+
         const { error } = await supabase
           .from('students')
-          .upsert(studentsToInsert, { onConflict: 'name, surname' });
+          .upsert(uniqueStudentsToInsert, { onConflict: 'name, surname' });
         
         if (error) throw error;
 
-        setFeedback({ type: 'success', message: `${studentsToInsert.length} registros importados!` });
+        setFeedback({ type: 'success', message: `${uniqueStudentsToInsert.length} registros importados!` });
         fetchParticipants();
       } catch (err) {
         console.error("Erro na importação:", err);
@@ -169,24 +178,63 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
         const parts = line.split(/[;\t,]/).map(p => p.trim());
         if (parts.length === 0 || !parts[0]) return null;
         
+        let name = '';
+        let surname = '';
+        let grade = 'N/A';
+        let classVal = 'N/A';
+
+        if (parts.length >= 4) {
+          name = parts[0];
+          surname = parts[1];
+          grade = parts[2];
+          classVal = parts[3];
+        } else if (parts.length === 3) {
+          const fullName = parts[0];
+          const nameParts = fullName.split(' ');
+          name = nameParts[0];
+          surname = nameParts.slice(1).join(' ');
+          grade = parts[1];
+          classVal = parts[2];
+        } else if (parts.length === 2) {
+          const fullName = parts[0];
+          const nameParts = fullName.split(' ');
+          name = nameParts[0];
+          surname = nameParts.slice(1).join(' ');
+          grade = parts[1];
+        } else {
+          const fullName = parts[0];
+          const nameParts = fullName.split(' ');
+          name = nameParts[0];
+          surname = nameParts.slice(1).join(' ');
+        }
+        
         return {
-          name: parts[0],
-          surname: parts.length > 3 ? parts[1] : '', // Se tiver 4 partes, assume Nome; Sobrenome; Série; Turma
-          grade: parts.length > 2 ? (parts.length === 3 ? parts[1] : parts[2]) : 'N/A',
-          class: parts.length > 2 ? (parts.length === 3 ? parts[2] : parts[3]) : 'N/A',
+          name: name.trim(),
+          surname: surname.trim(),
+          grade: grade.trim(),
+          class: classVal.trim(),
           type: type
         };
       }).filter(Boolean);
 
       if (studentsToInsert.length === 0) throw new Error("Nenhum dado válido.");
 
+      // Remover duplicatas do próprio array antes de enviar ao banco
+      const uniqueStudentsMap = new Map();
+      studentsToInsert.forEach(student => {
+        if (!student) return;
+        const key = `${student.name.toLowerCase()}|${student.surname.toLowerCase()}`;
+        uniqueStudentsMap.set(key, student);
+      });
+      const uniqueStudentsToInsert = Array.from(uniqueStudentsMap.values());
+
       const { error } = await supabase
         .from('students')
-        .upsert(studentsToInsert, { onConflict: 'name, surname' });
+        .upsert(uniqueStudentsToInsert, { onConflict: 'name, surname' });
       
       if (error) throw error;
 
-      setFeedback({ type: 'success', message: `${studentsToInsert.length} registros adicionados!` });
+      setFeedback({ type: 'success', message: `${uniqueStudentsToInsert.length} registros adicionados!` });
       setBulkText('');
       setIsBulkModalOpen(false);
       fetchParticipants();

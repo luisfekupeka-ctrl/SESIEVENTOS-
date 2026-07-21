@@ -27,6 +27,8 @@ const data = `
 | Futsal (Masculino)                         |           | 30/07/2026  | 08:00       | 01/08/2026 |            20 | 8º Ano, 9º Ano                                  |
 | Futsal (Masculino)                         |           | 30/07/2026  | 08:00       | 01/08/2026 |            20 | 1º Ano EM, 2º Ano EM, 3º Ano EM                 |
 | Gabarita SESI                              |           | 30/07/2026  | 08:00       | 01/08/2026 |            36 | 1º Ano EM, 2º Ano EM, 3º Ano EM                 |
+| Gabarita SESI                              |           | 30/07/2026  | 08:00       | 01/08/2026 |            36 | 1º Ano EM, 2º Ano EM, 3º Ano EM                 |
+| Gabarita SESI                              |           | 30/07/2026  | 08:00       | 01/08/2026 |            36 | 1º Ano EM, 2º Ano EM, 3º Ano EM                 |
 | Geocraft                                   |           | 30/07/2026  | 08:00       | 01/08/2026 |            20 | 6º Ano, 7º Ano                                  |
 | Geocraft                                   |           | 30/07/2026  | 08:00       | 01/08/2026 |            20 | 8º Ano, 9º Ano                                  |
 | Ilustração                                 |           | 30/07/2026  | 08:00       | 01/08/2026 |            20 | 1º Ano EM, 2º Ano EM, 3º Ano EM                 |

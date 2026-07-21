@@ -27,7 +27,9 @@ const data = `
 | Futsal (Fem./Mas.)                         | Terça                   |   |
 | Futsal (Masculino)                         | Segunda                 |   |
 | Futsal (Masculino)                         | Terça                   |   |
-| Gabarita SESI                              | Segunda, Terça e Quarta |   |
+| Gabarita SESI                              | Segunda                 |   |
+| Gabarita SESI                              | Terça                   |   |
+| Gabarita SESI                              | Quarta                  |   |
 | Geocraft                                   | Terça                   |   |
 | Geocraft                                   | Sexta                   |   |
 | Ilustração                                 | Terça e Quinta          |   |

@@ -7,9 +7,11 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { GRADES, CLASSES } from '../constants';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const { t } = useLanguage();
   const [events, setEvents] = useState<Event[]>([]);
   const [recentRegistrations, setRecentRegistrations] = useState<Registration[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -93,11 +95,11 @@ export default function AdminDashboard() {
   const totalRegistrations = (events || []).reduce((sum, event) => sum + (event?.registration_count || 0), 0);
 
   const stats = [
-    { label: 'Eventos', value: (events || []).length, icon: <Calendar size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: 'Inscrições', value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: 'Alunos', value: (students || []).filter(s => s?.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: 'Colaboradores', value: (students || []).filter(s => s?.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: 'Responsáveis', value: (students || []).filter(s => s?.type === 'responsible').length, icon: <School size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: t('Eventos'), value: (events || []).length, icon: <Calendar size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: t('Inscrições'), value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: t('Alunos'), value: (students || []).filter(s => s?.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: t('Colaboradores'), value: (students || []).filter(s => s?.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: t('Responsáveis'), value: (students || []).filter(s => s?.type === 'responsible').length, icon: <School size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
   ];
 
   const handleReset = async () => {
@@ -307,8 +309,8 @@ export default function AdminDashboard() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">Painel de Controle</h1>
-          <p className="text-sm md:text-base text-slate-300 font-bold">Gestão inteligente e visão geral do sistema SESI.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">{t('Painel de Controle')}</h1>
+          <p className="text-sm md:text-base text-slate-300 font-bold">{t('Gestão inteligente e visão geral do sistema SESI.')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <button
@@ -317,7 +319,7 @@ export default function AdminDashboard() {
             className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-slate-900 text-slate-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-slate-800 transition-all border border-slate-800 disabled:opacity-50 shadow-sm"
           >
             <Clock size={16} className="text-yellow-400" />
-            Atualizar
+            {t('Atualizar')}
           </button>
           <button
             onClick={seedData}
@@ -325,14 +327,14 @@ export default function AdminDashboard() {
             className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-yellow-400 text-black font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
           >
             <TrendingUp size={16} />
-            Gerar Dados
+            {t('Gerar Dados')}
           </button>
           <button
             onClick={() => setShowResetConfirm(true)}
             className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-red-500/10 text-red-500 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-red-500/20 transition-all border border-red-500/20 shadow-sm"
           >
             <Trash2 size={16} />
-            Resetar
+            {t('Resetar')}
           </button>
           <button
             onClick={recountAllRegistrations}
@@ -340,7 +342,7 @@ export default function AdminDashboard() {
             className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-amber-500/10 text-amber-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-amber-500 hover:text-black transition-all border border-amber-500/20 disabled:opacity-50 shadow-sm"
           >
             <Users size={16} />
-            Sincronizar Contagens
+            {t('Sincronizar Contagens')}
           </button>
         </div>
       </div>
@@ -415,8 +417,8 @@ export default function AdminDashboard() {
         {/* Recent Events */}
         <div className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden transition-all hover:border-yellow-400/20 backdrop-blur-sm">
           <div className="p-8 border-b border-slate-800 flex items-center justify-between">
-            <h3 className="text-xl font-black text-white">Eventos Recentes</h3>
-            <Link to="/admin/events" className="text-xs font-black uppercase tracking-widest text-yellow-400 hover:text-yellow-300 transition-colors">Ver todos</Link>
+            <h3 className="text-xl font-black text-white">{t('Eventos Recentes')}</h3>
+            <Link to="/admin/events" className="text-xs font-black uppercase tracking-widest text-yellow-400 hover:text-yellow-300 transition-colors">{t('Ver todos')}</Link>
           </div>
           <div className="divide-y divide-slate-800">
             {events.slice(0, 5).map(event => (

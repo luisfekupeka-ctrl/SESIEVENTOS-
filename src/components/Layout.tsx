@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -14,12 +15,14 @@ import {
   X,
   Plus,
   FileSpreadsheet,
-  LogIn
+  LogIn,
+  Languages
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAdmin, logout, profile } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,25 +59,35 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
             <Link to="/" className={`text-sm font-black uppercase tracking-widest transition-all hover:scale-105 ${location.pathname === '/' ? 'text-yellow-400' : 'text-slate-400 hover:text-white'}`}>
-              Início
+              {t('Início')}
             </Link>
             {isAdmin && (
               <Link to="/admin" className={`text-sm font-black uppercase tracking-widest transition-all hover:scale-105 ${isAdminPath ? 'text-yellow-400' : 'text-slate-400 hover:text-white'}`}>
-                Painel Admin
+                {t('Painel Admin')}
               </Link>
             )}
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4">
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLanguage(language === 'pt' ? 'en' : 'pt')}
+              className="p-2.5 text-slate-400 hover:text-yellow-400 hover:bg-slate-800/50 rounded-xl transition-all flex items-center gap-1.5 font-bold text-xs uppercase border border-slate-800"
+              title={language === 'pt' ? 'Translate to English' : 'Traduzir para Português'}
+            >
+              <Languages size={18} />
+              <span>{language}</span>
+            </button>
+
             {isAdmin ? (
               <div className="flex items-center gap-2 md:gap-4">
                 <span className="text-xs text-slate-500 hidden sm:inline font-bold uppercase tracking-widest">
-                  Admin
+                  {t('Admin')}
                 </span>
                 <button
                   onClick={handleLogout}
                   className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                  title="Sair"
+                  title={t('Sair')}
                 >
                   <LogOut size={20} />
                 </button>
@@ -85,7 +98,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 text-xs md:text-sm font-black text-black bg-yellow-400 hover:bg-yellow-300 rounded-xl transition-all shadow-lg shadow-yellow-400/20 uppercase tracking-widest"
               >
                 <LogIn size={18} />
-                <span className="hidden sm:inline">Acessar Painel</span>
+                <span className="hidden sm:inline">{t('Acessar Panel') || t('Acessar Painel')}</span>
               </Link>
             )}
 
@@ -135,19 +148,19 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               </div>
               
               <nav className="p-4 space-y-2 flex-grow overflow-y-auto overscroll-contain touch-pan-y custom-scrollbar pb-6">
-                <div className="px-4 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Painel Principal</div>
-                <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label="Dashboard" active={location.pathname === '/admin'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label="Calendário" active={location.pathname === '/admin/calendar'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label="Meus Eventos" active={location.pathname === '/admin/events'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label="Categorias" active={location.pathname === '/admin/categories'} onClick={toggleMobileMenu} />
+                <div className="px-4 py-3 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('Painel Principal')}</div>
+                <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label={t('Dashboard')} active={location.pathname === '/admin'} onClick={toggleMobileMenu} />
+                <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label={t('Calendário')} active={location.pathname === '/admin/calendar'} onClick={toggleMobileMenu} />
+                <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label={t('Meus Eventos')} active={location.pathname === '/admin/events'} onClick={toggleMobileMenu} />
+                <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label={t('Categorias')} active={location.pathname === '/admin/categories'} onClick={toggleMobileMenu} />
                 
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Participantes</div>
-                <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label="Alunos" active={location.pathname === '/admin/students'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label="Colaboradores" active={location.pathname === '/admin/collaborators'} onClick={toggleMobileMenu} />
-                <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label="Responsáveis" active={location.pathname === '/admin/responsible'} onClick={toggleMobileMenu} />
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">{t('Participantes')}</div>
+                <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label={t('Alunos')} active={location.pathname === '/admin/students'} onClick={toggleMobileMenu} />
+                <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label={t('Colaboradores')} active={location.pathname === '/admin/collaborators'} onClick={toggleMobileMenu} />
+                <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label={t('Responsáveis')} active={location.pathname === '/admin/responsible'} onClick={toggleMobileMenu} />
                 
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Segurança</div>
-                <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label="Administradores" active={location.pathname === '/admin/management'} onClick={toggleMobileMenu} />
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">{t('Segurança')}</div>
+                <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label={t('Administradores')} active={location.pathname === '/admin/management'} onClick={toggleMobileMenu} />
               </nav>
 
               <div className="p-6 border-t border-slate-800 bg-slate-950">
@@ -155,7 +168,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   onClick={handleLogout}
                   className="w-full flex items-center justify-center gap-3 py-4 bg-red-500/10 text-red-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-sm border border-red-500/20"
                 >
-                  <LogOut size={18} /> Sair do Sistema
+                  <LogOut size={18} /> {t('Sair do Sistema')}
                 </button>
               </div>
             </motion.div>
@@ -170,17 +183,17 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             {/* Desktop Admin Sidebar */}
             <aside className="hidden md:block w-full md:w-64 flex-shrink-0">
               <nav className="space-y-2 sticky top-28">
-                <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label="Dashboard" active={location.pathname === '/admin'} />
-                <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label="Calendário" active={location.pathname === '/admin/calendar'} />
-                <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label="Eventos" active={location.pathname === '/admin/events'} />
-                <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label="Categorias" active={location.pathname === '/admin/categories'} />
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Participantes</div>
-                <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label="Alunos" active={location.pathname === '/admin/students'} />
-                <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label="Colaboradores" active={location.pathname === '/admin/collaborators'} />
-                <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label="Responsáveis" active={location.pathname === '/admin/responsible'} />
+                <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label={t('Dashboard')} active={location.pathname === '/admin'} />
+                <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label={t('Calendário')} active={location.pathname === '/admin/calendar'} />
+                <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label={t('Eventos')} active={location.pathname === '/admin/events'} />
+                <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label={t('Categorias')} active={location.pathname === '/admin/categories'} />
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">{t('Participantes')}</div>
+                <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label={t('Alunos')} active={location.pathname === '/admin/students'} />
+                <AdminNavItem to="/admin/collaborators" icon={<Users size={18} />} label={t('Colaboradores')} active={location.pathname === '/admin/collaborators'} />
+                <AdminNavItem to="/admin/responsible" icon={<School size={18} />} label={t('Responsáveis')} active={location.pathname === '/admin/responsible'} />
                 
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">Segurança</div>
-                <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label="Administradores" active={location.pathname === '/admin/management'} />
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">{t('Segurança')}</div>
+                <AdminNavItem to="/admin/management" icon={<Shield size={18} />} label={t('Administradores')} active={location.pathname === '/admin/management'} />
               </nav>
             </aside>
             <div className="flex-grow min-w-0">
@@ -196,7 +209,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <footer className="bg-slate-950/50 border-t border-slate-800 py-10 mt-auto transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm font-bold text-slate-500 uppercase tracking-widest italic">
-            © {new Date().getFullYear()} <span className="text-white">SESI</span> <span className="text-yellow-400">Eventos</span>. Todos os direitos reservados.
+            © {new Date().getFullYear()} <span className="text-white">SESI</span> <span className="text-yellow-400">Eventos</span>. {t('Todos os direitos reservados.')}
           </p>
         </div>
       </footer>

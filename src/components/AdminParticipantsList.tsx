@@ -141,7 +141,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
 
         const { error } = await supabase
           .from('students')
-          .upsert(studentsToInsert, { onConflict: 'name, surname, grade, class' });
+          .upsert(studentsToInsert, { onConflict: 'name, surname' });
         
         if (error) throw error;
 
@@ -182,7 +182,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
 
       const { error } = await supabase
         .from('students')
-        .upsert(studentsToInsert, { onConflict: 'name, surname, grade, class' });
+        .upsert(studentsToInsert, { onConflict: 'name, surname' });
       
       if (error) throw error;
 

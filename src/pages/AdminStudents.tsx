@@ -55,9 +55,13 @@ export default function AdminStudents() {
     if (!newStudentName.trim() || !newStudentGrade) return;
 
     try {
+      const nameParts = newStudentName.trim().split(' ');
+      const name = nameParts[0];
+      const surname = nameParts.slice(1).join(' ');
+
       const { error: err } = await supabase
         .from('students')
-        .insert({ name: newStudentName.trim(), grade: newStudentGrade, surname: '' });
+        .upsert({ name, surname, grade: newStudentGrade, type: 'student' }, { onConflict: 'name, surname' });
       if (err) throw err;
       
       setNewStudentName('');
@@ -83,20 +87,30 @@ export default function AdminStudents() {
         return;
       }
 
-      const studentsToInsert = names.map(name => ({
-        name,
-        grade: bulkGrade,
-        surname: ''
-      }));
+      // Remover duplicatas do próprio lote e separar nome/sobrenome
+      const uniqueStudentsMap = new Map();
+      names.forEach(fullName => {
+        const nameParts = fullName.split(' ');
+        const name = nameParts[0];
+        const surname = nameParts.slice(1).join(' ');
+        const key = `${name.toLowerCase()}|${surname.toLowerCase()}`;
+        uniqueStudentsMap.set(key, {
+          name,
+          surname,
+          grade: bulkGrade,
+          type: 'student'
+        });
+      });
+      const uniqueStudentsToInsert = Array.from(uniqueStudentsMap.values());
 
       const { error: err } = await supabase
         .from('students')
-        .insert(studentsToInsert);
+        .upsert(uniqueStudentsToInsert, { onConflict: 'name, surname' });
       if (err) throw err;
 
       setBulkText('');
       setIsBulkModalOpen(false);
-      setFeedback({ type: 'success', message: `${names.length} alunos importados com sucesso!` });
+      setFeedback({ type: 'success', message: `${uniqueStudentsToInsert.length} alunos importados com sucesso!` });
       fetchStudents(true);
     } catch (err) {
       setFeedback({ type: 'error', message: 'Erro ao importar alunos em lote.' });
@@ -122,7 +136,8 @@ export default function AdminStudents() {
   };
 
   const filteredStudents = students.filter(s => {
-    const matchesSearch = (s.name || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const fullName = `${s.name || ''} ${s.surname || ''}`.trim();
+    const matchesSearch = fullName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesGrade = selectedGrade === 'all' || s.grade === selectedGrade;
     return matchesSearch && matchesGrade;
   });
@@ -136,7 +151,10 @@ export default function AdminStudents() {
     try {
       // Create CSV content (handling BOM for excel encoding)
       const csvHeader = 'ID,Nome Completo,Ano Escolar\n';
-      const csvRows = filteredStudents.map(s => `"${s.id}","${s.name.replace(/"/g, '""')}","${s.grade}"`).join('\n');
+      const csvRows = filteredStudents.map(s => {
+        const fullName = `${s.name || ''} ${s.surname || ''}`.trim();
+        return `"${s.id}","${fullName.replace(/"/g, '""')}","${s.grade}"`;
+      }).join('\n');
       const csvContent = '\uFEFF' + csvHeader + csvRows;
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -276,7 +294,7 @@ export default function AdminStudents() {
                         <User size={18} />
                       </div>
                       <span className="text-base font-black text-white group-hover:text-yellow-400 transition-colors">
-                        {student.name}
+                        {student.name} {student.surname}
                       </span>
                     </td>
                     <td className="px-8 py-5">

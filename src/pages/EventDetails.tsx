@@ -257,6 +257,14 @@ export default function EventDetails() {
     const sGrade = formData[gradeKey] || '';
     const sClass = formData[classKey] || '';
 
+    let finalFirstName = sName.trim();
+    let finalLastName = sSurname.trim();
+    if (!finalLastName && finalFirstName.includes(' ')) {
+      const parts = finalFirstName.split(/\s+/);
+      finalFirstName = parts[0] || '';
+      finalLastName = parts.slice(1).join(' ') || '';
+    }
+
     const restrictions = event.restrictions as any;
 
     if (restrictions?.type === 'years' && !restrictions.values?.includes(sGrade)) {
@@ -317,8 +325,8 @@ export default function EventDetails() {
 
       const { data: resData, error: rpcError } = await supabase.rpc('register_participant', {
         p_event_id: id,
-        p_student_name: sName,
-        p_student_surname: sSurname,
+        p_student_name: finalFirstName,
+        p_student_surname: finalLastName,
         p_student_grade: sGrade,
         p_student_class: sClass,
         p_participant_type: participantType,
@@ -708,9 +716,10 @@ export default function EventDetails() {
                                       setFormData({ ...formData, [fieldKey]: val });
                                       
                                       if (val.length >= 3) {
-                                        const matches = allStudents.filter(s => 
-                                          (s.name || '').toLowerCase().includes(val.toLowerCase())
-                                        ).slice(0, 5);
+                                        const matches = allStudents.filter(s => {
+                                          const fullName = `${s.name || ''} ${s.surname || ''}`.toLowerCase();
+                                          return fullName.includes(val.toLowerCase());
+                                        }).slice(0, 5);
                                         setSuggestions(matches);
                                         setShowSuggestions(true);
                                       } else {
@@ -732,7 +741,8 @@ export default function EventDetails() {
                                           type="button"
                                           className="w-full text-left px-5 py-4 text-white hover:bg-slate-800 transition-colors border-b border-slate-800/50 last:border-0"
                                           onClick={() => {
-                                            const newFormData = { ...formData, [fieldKey]: student.name };
+                                            const studentFullName = `${student.name || ''} ${student.surname || ''}`.trim();
+                                            const newFormData = { ...formData, [fieldKey]: studentFullName };
                                             
                                             // Autofill grade if exists
                                             const gradeField = event.form_fields?.find((f: any) => 

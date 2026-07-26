@@ -694,8 +694,13 @@ app.post('/api/events/:id/register', (req, res) => {
 
     const restrictions = safeJsonParse(event.restrictions || '{}');
     const sGrade = grade || form_data?.['série'] || form_data?.['ano'] || '';
-    const sName = name || form_data?.['nome'] || '';
-    const sSurname = surname || form_data?.['sobrenome'] || '';
+    let sName = (name || form_data?.['nome'] || '').trim();
+    let sSurname = (surname || form_data?.['sobrenome'] || '').trim();
+    if (!sSurname && sName.includes(' ')) {
+      const parts = sName.split(/\s+/);
+      sName = parts[0] || '';
+      sSurname = parts.slice(1).join(' ') || '';
+    }
     const fullName = `${sName} ${sSurname}`.trim();
 
     // 2. Validate school year (grade)
@@ -744,7 +749,7 @@ app.post('/api/events/:id/register', (req, res) => {
     // 3. Match student to resolve student_id if not provided
     let matchedStudentId = student_id;
     if (!matchedStudentId && fullName) {
-      const student = db.prepare("SELECT * FROM students WHERE LOWER(name) = LOWER(?)").get(fullName) as any;
+      const student = db.prepare("SELECT * FROM students WHERE LOWER(name || ' ' || COALESCE(surname, '')) = LOWER(?) OR LOWER(name) = LOWER(?)").get(fullName, fullName) as any;
       if (student) {
         matchedStudentId = student.id;
         // Update grade and class if provided

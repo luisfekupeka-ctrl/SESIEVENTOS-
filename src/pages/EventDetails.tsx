@@ -40,6 +40,8 @@ export default function EventDetails() {
   // Registration countdown timer states
   const [regCountdownTime, setRegCountdownTime] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
   const [regUpcoming, setRegUpcoming] = useState(false);
+  const [countdownTitle, setCountdownTitle] = useState('Inscrições em Breve');
+  const [countdownSubtitle, setCountdownSubtitle] = useState('Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -171,6 +173,41 @@ export default function EventDetails() {
         targetTime = new Date(`${event.start_date}T${event.start_time}:00`);
       } else if (targetTimeStr) {
         targetTime = new Date(targetTimeStr);
+      }
+
+      // Check if it's a mixed event (contains both 6/7 and 8/9/EM)
+      let isMixedEvent = false;
+      const restrictions = event.restrictions as any;
+      if (restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
+        const hasGroupA = restrictions.values.some((v: string) => ['6º Ano EF', '7º Ano EF'].includes(v));
+        const hasGroupB = restrictions.values.some((v: string) => ['8º Ano EF', '9º Ano EF', '1º Ano EM', '2º Ano EM', '3º Ano EM'].includes(v));
+        isMixedEvent = hasGroupA && hasGroupB;
+      }
+
+      if (isMixedEvent) {
+        const date27_open = new Date('2026-07-27T10:00:00-03:00');
+        const date27_close = new Date('2026-07-27T12:00:00-03:00');
+        const date28_open = new Date('2026-07-28T09:30:00-03:00');
+
+        if (now < date27_open) {
+          targetTime = date27_open;
+          setCountdownTitle('Inscrições em Breve');
+          setCountdownSubtitle('Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.');
+        } else if (now >= date27_open && now < date27_close) {
+          // Open for 6/7, closed for others (handled in submit check)
+          targetTime = null;
+        } else if (now >= date27_close && now < date28_open) {
+          // Closed temporarily, waiting for July 28th
+          targetTime = date28_open;
+          setCountdownTitle('Reabertura em Breve');
+          setCountdownSubtitle('As inscrições para o 8º/9º ano e Ensino Médio reabrirão automaticamente às 09h30 de 28/07.');
+        } else {
+          // Open for everyone
+          targetTime = null;
+        }
+      } else {
+        setCountdownTitle('Inscrições em Breve');
+        setCountdownSubtitle('Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.');
       }
 
       if (!targetTime || isNaN(targetTime.getTime())) {
@@ -435,7 +472,7 @@ export default function EventDetails() {
               ⏱️
             </div>
             <div className="space-y-4">
-              <h4 className="text-4xl md:text-5xl font-black text-white tracking-tighter">Inscrições em Breve</h4>
+              <h4 className="text-4xl md:text-5xl font-black text-white tracking-tighter">{countdownTitle}</h4>
               <p className="text-slate-400 font-bold text-lg md:text-xl uppercase tracking-[0.3em]">Abertura em contagem regressiva</p>
             </div>
 
@@ -476,7 +513,7 @@ export default function EventDetails() {
                   ? 'text-red-400'
                   : 'text-yellow-400/80'
               }`}>
-                Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.
+                {countdownSubtitle}
               </p>
             </div>
           </motion.div>

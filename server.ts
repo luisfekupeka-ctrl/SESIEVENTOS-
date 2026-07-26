@@ -706,6 +706,39 @@ app.post('/api/events/:id/register', (req, res) => {
           error: `Este evento é restrito aos anos: ${restrictions.values.join(', ')}`
         });
       }
+
+      // 2.5. Split-window validation for mixed events (contains both 6/7 and 8/9/EM)
+      const hasGroupA = restrictions.values.some((v: string) => ['6º Ano EF', '7º Ano EF'].includes(v));
+      const hasGroupB = restrictions.values.some((v: string) => ['8º Ano EF', '9º Ano EF', '1º Ano EM', '2º Ano EM', '3º Ano EM'].includes(v));
+      if (hasGroupA && hasGroupB) {
+        const now = new Date();
+        const date27_open = new Date('2026-07-27T10:00:00-03:00');
+        const date27_close = new Date('2026-07-27T12:00:00-03:00');
+        const date28_open = new Date('2026-07-28T09:30:00-03:00');
+
+        if (now < date27_open) {
+          return res.status(400).json({
+            success: false,
+            error: 'As inscrições para este evento ainda não foram abertas.'
+          });
+        }
+
+        if (now >= date27_open && now < date27_close) {
+          if (!['6º Ano EF', '7º Ano EF'].includes(sGrade)) {
+            return res.status(400).json({
+              success: false,
+              error: 'Neste momento (27/07), as inscrições estão abertas exclusivamente para alunos do 6º e 7º ano. Alunos de outras séries poderão se inscrever a partir de 28/07 às 09h30.'
+            });
+          }
+        }
+
+        if (now >= date27_close && now < date28_open) {
+          return res.status(400).json({
+            success: false,
+            error: 'As inscrições estão temporariamente fechadas. Elas reabrirão para todas as séries no dia 28/07 às 09h30.'
+          });
+        }
+      }
     }
 
     // 3. Match student to resolve student_id if not provided

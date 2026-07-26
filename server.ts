@@ -717,6 +717,13 @@ app.post('/api/events/:id/register', (req, res) => {
         // Update grade and class if provided
         db.prepare("UPDATE students SET grade = COALESCE(NULLIF(?, ''), grade), class = COALESCE(NULLIF(?, ''), class) WHERE id = ?").run(sGrade, className, student.id);
       } else {
+        // If autocomplete is enabled, block creating new students!
+        if (event.enable_autocomplete !== 0 && event.enable_autocomplete !== false && (participant_type || 'student') === 'student') {
+          return res.status(400).json({
+            success: false,
+            error: 'Inscrição recusada: este aluno não está cadastrado no sistema.'
+          });
+        }
         const result = db.prepare("INSERT INTO students (name, surname, grade, class, type) VALUES (?, ?, ?, ?, ?)").run(sName, sSurname, sGrade, className, participant_type || 'student');
         matchedStudentId = result.lastInsertRowid;
       }

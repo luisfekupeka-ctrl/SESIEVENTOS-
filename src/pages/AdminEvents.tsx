@@ -36,9 +36,8 @@ export default function AdminEvents() {
   const [isUploading, setIsUploading] = useState(false);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
   const [adminCategoryFilter, setAdminCategoryFilter] = useState('all');
-  const [adminYearFilter, setAdminYearFilter] = useState('all');
   const [adminDayFilter, setAdminDayFilter] = useState('all');
-  const [adminSegmentFilter, setAdminSegmentFilter] = useState('all');
+  const [adminSelectedGrades, setAdminSelectedGrades] = useState<string[]>([]);
 
   // Form State
   const [formData, setFormData] = useState<Partial<Event>>({
@@ -500,70 +499,117 @@ export default function AdminEvents() {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-4 mb-10">
-        <div className="relative flex-grow">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
-          <input
-            type="text"
-            placeholder="Pesquisar por nome ou descrição..."
-            className="w-full pl-12 pr-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-500 shadow-2xl"
-            value={adminSearchTerm}
-            onChange={(e) => setAdminSearchTerm(e.target.value)}
-          />
+      <div className="flex flex-col gap-4 mb-10">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative flex-grow">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-yellow-400" size={20} />
+            <input
+              type="text"
+              placeholder="Pesquisar por nome ou descrição..."
+              className="w-full pl-12 pr-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/30 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-500 shadow-2xl"
+              value={adminSearchTerm}
+              onChange={(e) => setAdminSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-wrap md:flex-nowrap gap-4">
+            <div className="relative">
+              <select
+                className="w-full md:w-56 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
+                value={adminCategoryFilter}
+                onChange={(e) => setAdminCategoryFilter(e.target.value)}
+              >
+                <option value="all">Todas as Categorias</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">{cat.name}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+            </div>
+            <div className="relative">
+              <select
+                className="w-full md:w-52 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
+                value={adminDayFilter}
+                onChange={(e) => setAdminDayFilter(e.target.value)}
+              >
+                <option value="all">Todos os Dias</option>
+                {activeDays.map(day => (
+                  <option key={day} value={day} className="bg-slate-900 text-white">{day}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-wrap md:flex-nowrap gap-4">
-          <div className="relative">
-            <select
-              className="w-full md:w-56 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
-              value={adminCategoryFilter}
-              onChange={(e) => setAdminCategoryFilter(e.target.value)}
-            >
-              <option value="all">Todas as Categorias</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">{cat.name}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+
+        {/* Multi-select Year Filter */}
+        <div className="flex flex-col gap-3 bg-slate-900/60 border border-slate-800 rounded-[2rem] p-5 shadow-2xl w-full backdrop-blur-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Filtro por Série/Ano Escolar</span>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setAdminSelectedGrades([])}
+                className={`px-3 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all cursor-pointer ${
+                  adminSelectedGrades.length === 0 ? 'text-yellow-400 border-yellow-400/20' : 'text-slate-400 border-transparent'
+                }`}
+              >
+                Todos
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminSelectedGrades(['6º Ano EF', '7º Ano EF'])}
+                className={`px-3 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all cursor-pointer ${
+                  adminSelectedGrades.length === 2 && adminSelectedGrades.includes('6º Ano EF') && adminSelectedGrades.includes('7º Ano EF')
+                    ? 'text-yellow-400 border-yellow-400/20' : 'text-slate-400 border-transparent'
+                }`}
+              >
+                6º e 7º EF
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminSelectedGrades(['6º Ano EF', '7º Ano EF', '8º Ano EF', '9º Ano EF'])}
+                className={`px-3 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all cursor-pointer ${
+                  adminSelectedGrades.length === 4 && adminSelectedGrades.every(g => g.includes('EF'))
+                    ? 'text-yellow-400 border-yellow-400/20' : 'text-slate-400 border-transparent'
+                }`}
+              >
+                Fundamental II
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminSelectedGrades(['1º Ano EM', '2º Ano EM', '3º Ano EM'])}
+                className={`px-3 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all cursor-pointer ${
+                  adminSelectedGrades.length === 3 && adminSelectedGrades.every(g => g.includes('EM'))
+                    ? 'text-yellow-400 border-yellow-400/20' : 'text-slate-400 border-transparent'
+                }`}
+              >
+                Ensino Médio
+              </button>
+            </div>
           </div>
-          <div className="relative">
-            <select
-              className="w-full md:w-52 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
-              value={adminYearFilter}
-              onChange={(e) => setAdminYearFilter(e.target.value)}
-            >
-              <option value="all">Todos os Anos</option>
-              {GRADES.map(grade => (
-                <option key={grade} value={grade} className="bg-slate-900 text-white">{grade}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
-          </div>
-          <div className="relative">
-            <select
-              className="w-full md:w-52 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
-              value={adminDayFilter}
-              onChange={(e) => setAdminDayFilter(e.target.value)}
-            >
-              <option value="all">Todos os Dias</option>
-              {activeDays.map(day => (
-                <option key={day} value={day} className="bg-slate-900 text-white">{day}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
-          </div>
-          <div className="relative">
-            <select
-              className="w-full md:w-56 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
-              value={adminSegmentFilter}
-              onChange={(e) => setAdminSegmentFilter(e.target.value)}
-            >
-              <option value="all">Todos os Segmentos</option>
-              <option value="only67">6º e 7º Ano EF</option>
-              <option value="fund2">Fundamental II (6º ao 9º)</option>
-              <option value="em">Ensino Médio</option>
-              <option value="geral">Geral / Todos os Anos</option>
-            </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+          <div className="flex flex-wrap gap-1.5">
+            {GRADES.map(grade => {
+              const isSelected = adminSelectedGrades.includes(grade);
+              const displayLabel = grade.replace(' Ano', '');
+              return (
+                <button
+                  key={grade}
+                  type="button"
+                  onClick={() => {
+                    setAdminSelectedGrades(prev => 
+                      prev.includes(grade) ? prev.filter(g => g !== grade) : [...prev, grade]
+                    );
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                    isSelected 
+                      ? 'bg-yellow-400 text-black border-yellow-400 shadow-md shadow-yellow-400/10' 
+                      : 'bg-slate-950 text-slate-400 border-slate-850 hover:text-white'
+                  }`}
+                >
+                  {displayLabel}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -577,9 +623,18 @@ export default function AdminEvents() {
             const matchesCategory = adminCategoryFilter === 'all' || event.category_id === adminCategoryFilter;
             
             const restrictions = event.restrictions as any;
-            const matchesYear = adminYearFilter === 'all' || 
-                               restrictions?.type === 'all' || 
-                               (restrictions?.type === 'years' && restrictions?.values?.includes(adminYearFilter));
+            let allowedYears: string[] = [];
+            if (restrictions?.type === 'years') {
+              allowedYears = restrictions.values || [];
+            } else if (restrictions?.type === 'all' || !restrictions?.type) {
+              allowedYears = GRADES;
+            }
+
+            // Year filter logic (subset of selected grades)
+            let matchesYear = true;
+            if (adminSelectedGrades.length > 0) {
+              matchesYear = allowedYears.length > 0 && allowedYears.every(yr => adminSelectedGrades.includes(yr));
+            }
 
             let matchesDay = true;
             if (adminDayFilter !== 'all') {
@@ -600,33 +655,7 @@ export default function AdminEvents() {
               matchesDay = eventDays.includes(adminDayFilter);
             }
 
-            // Segment filter logic
-            let matchesSegment = true;
-            if (adminSegmentFilter !== 'all') {
-              let allowedYears: string[] = [];
-              if (restrictions?.type === 'years') {
-                allowedYears = restrictions.values || [];
-              } else if (restrictions?.type === 'all' || !restrictions?.type) {
-                allowedYears = GRADES;
-              }
-
-              const only67 = allowedYears.length > 0 && allowedYears.every(yr => yr === '6º Ano EF' || yr === '7º Ano EF');
-              const isFund2 = allowedYears.length > 0 && allowedYears.every(yr => yr.includes('EF'));
-              const isEM = allowedYears.length > 0 && allowedYears.every(yr => yr.includes('EM'));
-              const isGeral = restrictions?.type === 'all' || allowedYears.length === GRADES.length;
-
-              if (adminSegmentFilter === 'only67') {
-                matchesSegment = only67;
-              } else if (adminSegmentFilter === 'fund2') {
-                matchesSegment = isFund2 && !only67;
-              } else if (adminSegmentFilter === 'em') {
-                matchesSegment = isEM;
-              } else if (adminSegmentFilter === 'geral') {
-                matchesSegment = isGeral;
-              }
-            }
-
-            return matchesSearch && matchesCategory && matchesYear && matchesDay && matchesSegment;
+            return matchesSearch && matchesCategory && matchesYear && matchesDay;
           })
           .map(event => (
           <div key={event.id} className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden hover:border-yellow-400/30 transition-all flex flex-col group backdrop-blur-sm">

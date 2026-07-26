@@ -768,7 +768,10 @@ export default function AdminEventRegistrations() {
         <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <button
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={() => {
+                fetchStudents();
+                setIsAddModalOpen(true);
+              }}
               disabled={profile?.status !== 'approved'}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
             >

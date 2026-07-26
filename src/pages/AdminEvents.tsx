@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { GRADES, CLASSES } from '../constants';
 import { useAuth } from '../context/AuthContext';
+import { getEventImage } from '../utils/getEventImage';
 
 export default function AdminEvents() {
   const { profile } = useAuth();
@@ -670,7 +671,7 @@ export default function AdminEvents() {
           .map(event => (
           <div key={event.id} className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden hover:border-yellow-400/30 transition-all flex flex-col group backdrop-blur-sm">
             <div className="w-full h-48 md:h-56 bg-slate-950 relative overflow-hidden">
-              <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-70 group-hover:opacity-100" referrerPolicy="no-referrer" />
+              <img src={event.image_url || getEventImage(event.name) || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-70 group-hover:opacity-100" referrerPolicy="no-referrer" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
               <div className="absolute bottom-4 left-6">
                 <span className="bg-yellow-400/10 text-yellow-400 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] border border-yellow-400/20 backdrop-blur-md">
@@ -857,7 +858,7 @@ export default function AdminEvents() {
                   <div key={template.id} className="flex items-center justify-between p-6 bg-slate-800/50 rounded-3xl border border-slate-800 hover:border-yellow-400/30 transition-all group">
                     <div className="flex items-center gap-5">
                       <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-950 flex-shrink-0">
-                        <img src={template.image_url || undefined} alt="" className="w-full h-full object-cover opacity-80" />
+                        <img src={template.image_url || getEventImage(template.name) || undefined} alt="" className="w-full h-full object-cover opacity-80" />
                       </div>
                       <div>
                         <h4 className="text-lg font-black text-white mb-1">{template.name}</h4>

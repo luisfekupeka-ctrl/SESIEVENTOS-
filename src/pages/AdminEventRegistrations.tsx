@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { useAuth } from '../context/AuthContext';
 import { Event, Registration } from '../types';
-import { ChevronLeft, Download, Trash2, Users, FileSpreadsheet, FileText, Copy, CheckCircle2, Loader2, Calendar, ShieldAlert, Plus } from 'lucide-react';
+import { ChevronLeft, Download, Trash2, Users, FileSpreadsheet, FileText, Copy, CheckCircle2, Loader2, Calendar, ShieldAlert, Plus, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
@@ -592,6 +592,7 @@ export default function AdminEventRegistrations() {
     if (!event || registrations.length === 0) return;
     if (profile?.status !== 'approved') return;
     try {
+      const formFields = (event.form_fields as any[]) || [];
       const data = registrations.map(reg => {
         let formattedDate = '-';
         try {
@@ -606,7 +607,7 @@ export default function AdminEventRegistrations() {
           'Data Inscrição': formattedDate
         };
         
-        event.form_fields.forEach(field => {
+        formFields.forEach(field => {
           const label = field.label.toLowerCase();
           const student = (reg as any).students;
           let value = reg.form_data[label] || reg.form_data[field.label] || '-';
@@ -639,7 +640,8 @@ export default function AdminEventRegistrations() {
       const pdfDoc = new jsPDF();
       pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
       
-      const head = [['Data', ...event.form_fields.map(f => f.label)]];
+      const formFields = (event.form_fields as any[]) || [];
+      const head = [['Data', ...formFields.map(f => f.label)]];
       const body = registrations.map(reg => {
         let formattedDate = '-';
         try {
@@ -652,7 +654,7 @@ export default function AdminEventRegistrations() {
 
         return [
           formattedDate,
-          ...event.form_fields.map(f => {
+          ...formFields.map(f => {
             const label = f.label.toLowerCase();
             const student = (reg as any).students;
             let value = reg.form_data[label] || reg.form_data[f.label] || '-';
@@ -940,69 +942,76 @@ export default function AdminEventRegistrations() {
                 <ShieldAlert size={20} className="rotate-45" /> {/* Close icon fallback */}
               </button>
             </div>
-            
             <div className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="relative md:col-span-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-center">
+                <div className="relative">
                   <input
                     type="text"
                     placeholder="Nome..."
-                    className="w-full pl-6 pr-6 py-4 bg-slate-950 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all text-xs"
+                    className="w-full h-14 pl-6 pr-6 bg-slate-950 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/20 transition-all text-xs placeholder:text-slate-500"
                     value={studentSearch}
                     onChange={(e) => setStudentSearch(e.target.value)}
                   />
                 </div>
-                <select 
-                  className="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-4 text-white text-xs font-bold outline-none"
-                  value={participantTypeFilter}
-                  onChange={(e) => setParticipantTypeFilter(e.target.value)}
-                >
-                  <option value="all">Todos os Tipos</option>
-                  <option value="student">Aluno</option>
-                  <option value="collaborator">Colaborador</option>
-                  <option value="responsible">Responsável</option>
-                  <option value="other">Outro</option>
-                </select>
-                <select 
-                  className="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-4 text-white text-xs font-bold outline-none"
-                  value={filterGrade}
-                  onChange={(e) => setFilterGrade(e.target.value)}
-                >
-                  <option value="all">Todos os Anos</option>
-                  {Array.from(new Set(allStudents.map(s => s.grade))).sort().map(g => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
-                </select>
-                <div className="flex flex-wrap gap-1.5 items-center bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2">
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mr-2">Turmas:</span>
-                  {CLASSES.map(cls => {
-                    const isSelected = filterClasses.includes(cls);
-                    return (
-                      <button
-                        key={cls}
-                        type="button"
-                        onClick={() => {
-                          setFilterClasses(prev => 
-                            prev.includes(cls) ? prev.filter(c => c !== cls) : [...prev, cls]
-                          );
-                        }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                          isSelected 
-                            ? 'bg-yellow-400 text-black border-yellow-400' 
-                            : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
-                        }`}
-                      >
-                        {cls}
-                      </button>
-                    );
-                  })}
+                <div className="relative">
+                  <select 
+                    className="w-full h-14 pl-6 pr-10 bg-slate-950 border border-slate-800 rounded-2xl text-white text-xs font-bold outline-none focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer"
+                    value={participantTypeFilter}
+                    onChange={(e) => setParticipantTypeFilter(e.target.value)}
+                  >
+                    <option value="all">Todos os Tipos</option>
+                    <option value="student">Aluno</option>
+                    <option value="collaborator">Colaborador</option>
+                    <option value="responsible">Responsável</option>
+                    <option value="other">Outro</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+                </div>
+                <div className="relative">
+                  <select 
+                    className="w-full h-14 pl-6 pr-10 bg-slate-950 border border-slate-800 rounded-2xl text-white text-xs font-bold outline-none focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer"
+                    value={filterGrade}
+                    onChange={(e) => setFilterGrade(e.target.value)}
+                  >
+                    <option value="all">Todos os Anos</option>
+                    {Array.from(new Set(allStudents.map(s => s.grade))).sort().map(g => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+                </div>
+                <div className="flex h-14 items-center justify-between bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2 w-full gap-1.5">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex-shrink-0">Turmas:</span>
+                  <div className="flex gap-1 items-center overflow-x-auto no-scrollbar">
+                    {CLASSES.map(cls => {
+                      const isSelected = filterClasses.includes(cls);
+                      return (
+                        <button
+                          key={cls}
+                          type="button"
+                          onClick={() => {
+                            setFilterClasses(prev => 
+                              prev.includes(cls) ? prev.filter(c => c !== cls) : [...prev, cls]
+                            );
+                          }}
+                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            isSelected 
+                              ? 'bg-yellow-400 text-black border-yellow-400 shadow-md shadow-yellow-400/10' 
+                              : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                          }`}
+                        >
+                          {cls}
+                        </button>
+                      );
+                    })}
+                  </div>
                   {filterClasses.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setFilterClasses([])}
-                      className="ml-2 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-slate-700"
+                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[9px] font-black uppercase tracking-widest rounded-lg transition-all border border-slate-700 cursor-pointer flex-shrink-0"
                     >
-                      Limpar
+                      X
                     </button>
                   )}
                 </div>
@@ -1050,7 +1059,7 @@ export default function AdminEventRegistrations() {
                         <div>
                           <p className="text-white font-black">{student.name} {student.surname}</p>
                           <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
-                            {student.type === 'student' ? `${student.grade} • ${student.class}` : student.type.toUpperCase()}
+                            {student.type === 'student' ? `${student.grade}${student.class ? ' • ' + student.class : ''}` : student.type.toUpperCase()}
                           </p>
                         </div>
                         <button

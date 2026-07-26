@@ -24,6 +24,7 @@ import {
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+import { getEventImage } from '../utils/getEventImage';
 
 export default function AdminCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -211,7 +212,7 @@ export default function AdminCalendar() {
               <div key={event.id} className="bg-slate-900/60 p-6 rounded-[2rem] border border-slate-800 shadow-2xl hover:border-yellow-400/30 transition-all flex items-center justify-between group backdrop-blur-sm">
                 <div className="flex items-center gap-5 overflow-hidden">
                   <div className="w-16 h-16 bg-slate-950 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-800 group-hover:border-yellow-400/20 transition-all shadow-inner">
-                    <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" referrerPolicy="no-referrer" />
+                    <img src={event.image_url || getEventImage(event.name) || undefined} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" referrerPolicy="no-referrer" />
                   </div>
                   <div className="overflow-hidden">
                     <h4 className="text-base font-black text-white group-hover:text-yellow-400 transition-colors truncate tracking-tight">{event.name}</h4>

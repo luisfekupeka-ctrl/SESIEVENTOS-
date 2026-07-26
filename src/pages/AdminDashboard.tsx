@@ -8,6 +8,7 @@ import { ptBR } from 'date-fns/locale';
 import { GRADES, CLASSES } from '../constants';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getEventImage } from '../utils/getEventImage';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -425,7 +426,7 @@ export default function AdminDashboard() {
               <div key={event.id} className="p-6 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
                 <div className="flex items-center gap-5">
                   <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-800">
-                    <img src={event.image_url || undefined} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" referrerPolicy="no-referrer" />
+                    <img src={event.image_url || getEventImage(event.name) || undefined} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" referrerPolicy="no-referrer" />
                   </div>
                   <div>
                     <p className="text-lg font-black text-white mb-1">{event.name}</p>

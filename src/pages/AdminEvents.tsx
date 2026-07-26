@@ -36,6 +36,8 @@ export default function AdminEvents() {
   const [isUploading, setIsUploading] = useState(false);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
   const [adminCategoryFilter, setAdminCategoryFilter] = useState('all');
+  const [adminYearFilter, setAdminYearFilter] = useState('all');
+  const [adminDayFilter, setAdminDayFilter] = useState('all');
 
   // Form State
   const [formData, setFormData] = useState<Partial<Event>>({
@@ -89,6 +91,30 @@ export default function AdminEvents() {
       setBackgroundLoading(false);
     }
   };
+
+  const activeDays = React.useMemo(() => {
+    const daysSet = new Set<string>();
+    const ptDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    
+    events.forEach(event => {
+      if (event.restringir_dias === 1 && event.dias_semana) {
+        let list: string[] = [];
+        if (Array.isArray(event.dias_semana)) {
+          list = event.dias_semana;
+        } else if (typeof event.dias_semana === 'string') {
+          try { list = JSON.parse(event.dias_semana); } catch { list = []; }
+        }
+        list.forEach(day => daysSet.add(day));
+      } else if (event.start_date) {
+        try {
+          const [y, m, d] = event.start_date.split('-').map(Number);
+          const date = new Date(y, m - 1, d);
+          daysSet.add(ptDays[date.getDay()]);
+        } catch(e) {}
+      }
+    });
+    return Array.from(daysSet).sort((a, b) => ptDays.indexOf(a) - ptDays.indexOf(b));
+  }, [events]);
 
   useEffect(() => {
     fetchData();
@@ -484,18 +510,46 @@ export default function AdminEvents() {
             onChange={(e) => setAdminSearchTerm(e.target.value)}
           />
         </div>
-        <div className="relative">
-          <select
-            className="w-full md:w-64 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
-            value={adminCategoryFilter}
-            onChange={(e) => setAdminCategoryFilter(e.target.value)}
-          >
-            <option value="all">Todas as Categorias</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">{cat.name}</option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+        <div className="flex flex-wrap md:flex-nowrap gap-4">
+          <div className="relative">
+            <select
+              className="w-full md:w-56 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
+              value={adminCategoryFilter}
+              onChange={(e) => setAdminCategoryFilter(e.target.value)}
+            >
+              <option value="all">Todas as Categorias</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">{cat.name}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+          </div>
+          <div className="relative">
+            <select
+              className="w-full md:w-52 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
+              value={adminYearFilter}
+              onChange={(e) => setAdminYearFilter(e.target.value)}
+            >
+              <option value="all">Todos os Anos</option>
+              {GRADES.map(grade => (
+                <option key={grade} value={grade} className="bg-slate-900 text-white">{grade}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+          </div>
+          <div className="relative">
+            <select
+              className="w-full md:w-52 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
+              value={adminDayFilter}
+              onChange={(e) => setAdminDayFilter(e.target.value)}
+            >
+              <option value="all">Todos os Dias</option>
+              {activeDays.map(day => (
+                <option key={day} value={day} className="bg-slate-900 text-white">{day}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+          </div>
         </div>
       </div>
 
@@ -506,7 +560,32 @@ export default function AdminEvents() {
             const matchesSearch = (event.name || '').toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
                                  (event.description || '').toLowerCase().includes(adminSearchTerm.toLowerCase());
             const matchesCategory = adminCategoryFilter === 'all' || event.category_id === adminCategoryFilter;
-            return matchesSearch && matchesCategory;
+            
+            const restrictions = event.restrictions as any;
+            const matchesYear = adminYearFilter === 'all' || 
+                               restrictions?.type === 'all' || 
+                               (restrictions?.type === 'years' && restrictions?.values?.includes(adminYearFilter));
+
+            let matchesDay = true;
+            if (adminDayFilter !== 'all') {
+              let eventDays: string[] = [];
+              const ptDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+              if (event.restringir_dias === 1 && event.dias_semana) {
+                if (Array.isArray(event.dias_semana)) eventDays = event.dias_semana;
+                else if (typeof event.dias_semana === 'string') {
+                  try { eventDays = JSON.parse(event.dias_semana); } catch { eventDays = []; }
+                }
+              } else if (event.start_date) {
+                try {
+                  const [y, m, d] = event.start_date.split('-').map(Number);
+                  const date = new Date(y, m - 1, d);
+                  eventDays = [ptDays[date.getDay()]];
+                } catch(e) {}
+              }
+              matchesDay = eventDays.includes(adminDayFilter);
+            }
+
+            return matchesSearch && matchesCategory && matchesYear && matchesDay;
           })
           .map(event => (
           <div key={event.id} className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden hover:border-yellow-400/30 transition-all flex flex-col group backdrop-blur-sm">

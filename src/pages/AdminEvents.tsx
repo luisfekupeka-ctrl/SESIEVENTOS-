@@ -567,6 +567,16 @@ export default function AdminEvents() {
               </button>
               <button
                 type="button"
+                onClick={() => setAdminSelectedGrades(['8º Ano EF', '9º Ano EF'])}
+                className={`px-3 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all cursor-pointer ${
+                  adminSelectedGrades.length === 2 && adminSelectedGrades.includes('8º Ano EF') && adminSelectedGrades.includes('9º Ano EF')
+                    ? 'text-yellow-400 border-yellow-400/20' : 'text-slate-400 border-transparent'
+                }`}
+              >
+                8º e 9º EF
+              </button>
+              <button
+                type="button"
                 onClick={() => setAdminSelectedGrades(['6º Ano EF', '7º Ano EF', '8º Ano EF', '9º Ano EF'])}
                 className={`px-3 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] font-black uppercase tracking-widest rounded-lg border transition-all cursor-pointer ${
                   adminSelectedGrades.length === 4 && adminSelectedGrades.every(g => g.includes('EF'))

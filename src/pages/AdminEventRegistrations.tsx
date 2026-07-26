@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { CLASSES } from '../constants';
 
 export default function AdminEventRegistrations() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ export default function AdminEventRegistrations() {
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [studentSearch, setStudentSearch] = useState('');
   const [filterGrade, setFilterGrade] = useState('all');
-  const [filterClass, setFilterClass] = useState('all');
+  const [filterClasses, setFilterClasses] = useState<string[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [bulkStep, setBulkStep] = useState<'input' | 'review'>('input');
@@ -155,7 +156,7 @@ export default function AdminEventRegistrations() {
     const filtered = allStudents.filter(s => {
       const matchesSearch = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
       const matchesGrade = filterGrade === 'all' || s.grade === filterGrade;
-      const matchesClass = filterClass === 'all' || s.class === filterClass;
+      const matchesClass = filterClasses.length === 0 || filterClasses.includes(s.class);
       const matchesType = participantTypeFilter === 'all' || s.type === participantTypeFilter;
       return matchesSearch && matchesGrade && matchesClass && matchesType;
     });
@@ -972,16 +973,39 @@ export default function AdminEventRegistrations() {
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
-                <select 
-                  className="bg-slate-950 border border-slate-800 rounded-2xl px-4 py-4 text-white text-xs font-bold outline-none"
-                  value={filterClass}
-                  onChange={(e) => setFilterClass(e.target.value)}
-                >
-                  <option value="all">Todas as Turmas</option>
-                  {Array.from(new Set(allStudents.map(s => s.class))).sort().map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+                <div className="flex flex-wrap gap-1.5 items-center bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mr-2">Turmas:</span>
+                  {CLASSES.map(cls => {
+                    const isSelected = filterClasses.includes(cls);
+                    return (
+                      <button
+                        key={cls}
+                        type="button"
+                        onClick={() => {
+                          setFilterClasses(prev => 
+                            prev.includes(cls) ? prev.filter(c => c !== cls) : [...prev, cls]
+                          );
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                          isSelected 
+                            ? 'bg-yellow-400 text-black border-yellow-400' 
+                            : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                        }`}
+                      >
+                        {cls}
+                      </button>
+                    );
+                  })}
+                  {filterClasses.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setFilterClasses([])}
+                      className="ml-2 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-slate-700"
+                    >
+                      Limpar
+                    </button>
+                  )}
+                </div>
               </div>
 
               {batchFeedback && (
@@ -995,7 +1019,7 @@ export default function AdminEventRegistrations() {
                   Resultados: {allStudents.filter(s => {
                     const ms = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
                     const mg = filterGrade === 'all' || s.grade === filterGrade;
-                    const mc = filterClass === 'all' || s.class === filterClass;
+                    const mc = filterClasses.length === 0 || filterClasses.includes(s.class);
                     const mt = participantTypeFilter === 'all' || s.type === participantTypeFilter;
                     return ms && mg && mc && mt;
                   }).length} pessoas
@@ -1014,7 +1038,7 @@ export default function AdminEventRegistrations() {
                   .filter(s => {
                     const ms = `${s.name} ${s.surname}`.toLowerCase().includes(studentSearch.toLowerCase());
                     const mg = filterGrade === 'all' || s.grade === filterGrade;
-                    const mc = filterClass === 'all' || s.class === filterClass;
+                    const mc = filterClasses.length === 0 || filterClasses.includes(s.class);
                     const mt = participantTypeFilter === 'all' || s.type === participantTypeFilter;
                     return ms && mg && mc && mt;
                   })

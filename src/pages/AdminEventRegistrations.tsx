@@ -607,10 +607,11 @@ export default function AdminEventRegistrations() {
           'Data Inscrição': formattedDate
         };
         
+        const formData = reg.form_data || {};
         formFields.forEach(field => {
           const label = field.label.toLowerCase();
           const student = (reg as any).students;
-          let value = reg.form_data[label] || reg.form_data[field.label] || '-';
+          let value = formData[label] || formData[field.label] || '-';
           
           if (student) {
             if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
@@ -630,6 +631,7 @@ export default function AdminEventRegistrations() {
       XLSX.writeFile(wb, `Inscritos_${event.name.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`);
     } catch (err) {
       console.error("Erro no Excel:", err);
+      alert("Erro ao exportar para Excel: " + (err instanceof Error ? err.message : String(err)));
     }
   };
 
@@ -652,12 +654,13 @@ export default function AdminEventRegistrations() {
           console.error("Erro ao formatar data para PDF:", e);
         }
 
+        const formData = reg.form_data || {};
         return [
           formattedDate,
           ...formFields.map(f => {
             const label = f.label.toLowerCase();
             const student = (reg as any).students;
-            let value = reg.form_data[label] || reg.form_data[f.label] || '-';
+            let value = formData[label] || formData[f.label] || '-';
             
             if (student) {
               if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
@@ -681,6 +684,7 @@ export default function AdminEventRegistrations() {
       pdfDoc.save(`Inscritos_${event.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
     } catch (err) {
       console.error("Erro no PDF:", err);
+      alert("Erro ao exportar para PDF: " + (err instanceof Error ? err.message : String(err)));
     }
   };
 
@@ -939,23 +943,23 @@ export default function AdminEventRegistrations() {
                 <h3 className="text-3xl font-black text-white tracking-tight">Adicionar Participante</h3>
               </div>
               <button onClick={() => setIsAddModalOpen(false)} className="w-10 h-10 bg-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center transition-colors">
-                <ShieldAlert size={20} className="rotate-45" /> {/* Close icon fallback */}
+                <ShieldAlert size={20} className="rotate-45" />
               </button>
             </div>
             <div className="p-8 space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-center">
-                <div className="relative">
+              <div className="grid grid-cols-12 gap-4 items-center">
+                <div className="relative col-span-12 md:col-span-3">
                   <input
                     type="text"
                     placeholder="Nome..."
-                    className="w-full h-14 pl-6 pr-6 bg-slate-950 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/20 transition-all text-xs placeholder:text-slate-500"
+                    className="w-full h-14 pl-4 pr-4 bg-slate-950 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/20 transition-all text-xs placeholder:text-slate-500"
                     value={studentSearch}
                     onChange={(e) => setStudentSearch(e.target.value)}
                   />
                 </div>
-                <div className="relative">
+                <div className="relative col-span-12 sm:col-span-6 md:col-span-2">
                   <select 
-                    className="w-full h-14 pl-6 pr-10 bg-slate-950 border border-slate-800 rounded-2xl text-white text-xs font-bold outline-none focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer"
+                    className="w-full h-14 pl-4 pr-8 bg-slate-950 border border-slate-800 rounded-2xl text-white text-xs font-bold outline-none focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer"
                     value={participantTypeFilter}
                     onChange={(e) => setParticipantTypeFilter(e.target.value)}
                   >
@@ -965,11 +969,11 @@ export default function AdminEventRegistrations() {
                     <option value="responsible">Responsável</option>
                     <option value="other">Outro</option>
                   </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={14} />
                 </div>
-                <div className="relative">
+                <div className="relative col-span-12 sm:col-span-6 md:col-span-3">
                   <select 
-                    className="w-full h-14 pl-6 pr-10 bg-slate-950 border border-slate-800 rounded-2xl text-white text-xs font-bold outline-none focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer"
+                    className="w-full h-14 pl-4 pr-8 bg-slate-950 border border-slate-800 rounded-2xl text-white text-xs font-bold outline-none focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer truncate"
                     value={filterGrade}
                     onChange={(e) => setFilterGrade(e.target.value)}
                   >
@@ -978,9 +982,9 @@ export default function AdminEventRegistrations() {
                       <option key={g} value={g}>{g}</option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={16} />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" size={14} />
                 </div>
-                <div className="flex h-14 items-center justify-between bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2 w-full gap-1.5">
+                <div className="flex h-14 items-center justify-between bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2 col-span-12 md:col-span-4 gap-1.5">
                   <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex-shrink-0">Turmas:</span>
                   <div className="flex gap-1 items-center overflow-x-auto no-scrollbar">
                     {CLASSES.map(cls => {
@@ -994,7 +998,7 @@ export default function AdminEventRegistrations() {
                               prev.includes(cls) ? prev.filter(c => c !== cls) : [...prev, cls]
                             );
                           }}
-                          className={`w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                          className={`w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                             isSelected 
                               ? 'bg-yellow-400 text-black border-yellow-400 shadow-md shadow-yellow-400/10' 
                               : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'

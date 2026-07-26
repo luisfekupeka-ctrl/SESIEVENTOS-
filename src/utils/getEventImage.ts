@@ -30,6 +30,13 @@ export const getEventImage = (eventName: string): string | null => {
   if (n.includes('taekwondo') || n.includes('muay thai') || n.includes('muaythai')) return '/images/events/artes_marciais.png';
   if (n.includes('rpg') || n.includes('vintage game') || n.includes('vintage')) return '/images/events/jogos_vintage.png';
   if (n.includes('leitura') || n.includes('quadrinhos')) return '/images/events/oficina_leitura.png';
+  if (n.includes('law school')) return '/images/events/law_school.png';
+  if (n.includes('memórias urbanas') || n.includes('memorias urbanas') || n.includes('curitiba')) return '/images/events/memorias_curitiba.png';
+  if (n.includes('microsoft start') || n.includes('microsoft')) return '/images/events/microsoft_start.png';
+  if (n.includes('mini-mun') || n.includes('minimun') || n.includes('mun')) return '/images/events/mini_mun.png';
+  if (n.includes('modelagem plana') || n.includes('modelagem') || n.includes('plana')) return '/images/events/modelagem_plana.png';
+  if (n.includes('passaporte global') || n.includes('passaporte') || n.includes('global')) return '/images/events/passaporte_global.png';
+  if (n.includes('produção audiovisual') || n.includes('producao audiovisual') || n.includes('audiovisual')) return '/images/events/producao_audiovisual.png';
   
   return null;
 };

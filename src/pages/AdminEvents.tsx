@@ -38,6 +38,7 @@ export default function AdminEvents() {
   const [adminCategoryFilter, setAdminCategoryFilter] = useState('all');
   const [adminYearFilter, setAdminYearFilter] = useState('all');
   const [adminDayFilter, setAdminDayFilter] = useState('all');
+  const [adminSegmentFilter, setAdminSegmentFilter] = useState('all');
 
   // Form State
   const [formData, setFormData] = useState<Partial<Event>>({
@@ -550,6 +551,20 @@ export default function AdminEvents() {
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
           </div>
+          <div className="relative">
+            <select
+              className="w-full md:w-56 px-6 py-4 bg-slate-900 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all appearance-none cursor-pointer shadow-2xl"
+              value={adminSegmentFilter}
+              onChange={(e) => setAdminSegmentFilter(e.target.value)}
+            >
+              <option value="all">Todos os Segmentos</option>
+              <option value="only67">6º e 7º Ano EF</option>
+              <option value="fund2">Fundamental II (6º ao 9º)</option>
+              <option value="em">Ensino Médio</option>
+              <option value="geral">Geral / Todos os Anos</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-yellow-400 pointer-events-none" size={16} />
+          </div>
         </div>
       </div>
 
@@ -585,7 +600,33 @@ export default function AdminEvents() {
               matchesDay = eventDays.includes(adminDayFilter);
             }
 
-            return matchesSearch && matchesCategory && matchesYear && matchesDay;
+            // Segment filter logic
+            let matchesSegment = true;
+            if (adminSegmentFilter !== 'all') {
+              let allowedYears: string[] = [];
+              if (restrictions?.type === 'years') {
+                allowedYears = restrictions.values || [];
+              } else if (restrictions?.type === 'all' || !restrictions?.type) {
+                allowedYears = GRADES;
+              }
+
+              const only67 = allowedYears.length > 0 && allowedYears.every(yr => yr === '6º Ano EF' || yr === '7º Ano EF');
+              const isFund2 = allowedYears.length > 0 && allowedYears.every(yr => yr.includes('EF'));
+              const isEM = allowedYears.length > 0 && allowedYears.every(yr => yr.includes('EM'));
+              const isGeral = restrictions?.type === 'all' || allowedYears.length === GRADES.length;
+
+              if (adminSegmentFilter === 'only67') {
+                matchesSegment = only67;
+              } else if (adminSegmentFilter === 'fund2') {
+                matchesSegment = isFund2 && !only67;
+              } else if (adminSegmentFilter === 'em') {
+                matchesSegment = isEM;
+              } else if (adminSegmentFilter === 'geral') {
+                matchesSegment = isGeral;
+              }
+            }
+
+            return matchesSearch && matchesCategory && matchesYear && matchesDay && matchesSegment;
           })
           .map(event => (
           <div key={event.id} className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden hover:border-yellow-400/30 transition-all flex flex-col group backdrop-blur-sm">

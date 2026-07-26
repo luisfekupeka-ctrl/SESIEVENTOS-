@@ -26,6 +26,10 @@ export const getEventImage = (eventName: string): string | null => {
   if (n.includes('geocraft')) return '/images/events/geocraft.png';
   if (n.includes('karaokê') || n.includes('karaoke')) return '/images/events/karaoke.png';
   if (n.includes('k-pop') || n.includes('kpop')) return '/images/events/kpop.png';
+  if (n.includes('violino') || n.includes('musicalização') || n.includes('musicalizacao')) return '/images/events/violino.png';
+  if (n.includes('taekwondo') || n.includes('muay thai') || n.includes('muaythai')) return '/images/events/artes_marciais.png';
+  if (n.includes('rpg') || n.includes('vintage game') || n.includes('vintage')) return '/images/events/jogos_vintage.png';
+  if (n.includes('leitura') || n.includes('quadrinhos')) return '/images/events/oficina_leitura.png';
   
   return null;
 };

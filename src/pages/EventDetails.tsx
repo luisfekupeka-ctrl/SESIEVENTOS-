@@ -211,6 +211,12 @@ export default function EventDetails() {
       finalLastName = parts.slice(1).join(' ') || '';
     }
 
+    // ── Apenas alunos do 6º e 7º Ano EF podem se inscrever neste momento ──────
+    if (participantType === 'student' && !['6º Ano EF', '7º Ano EF'].includes(sGrade)) {
+      setRestrictionError('Neste momento, as inscrições estão abertas exclusivamente para alunos do 6º e 7º ano.');
+      return;
+    }
+
     let restrictions = event.restrictions as any;
     if (typeof restrictions === 'string') {
       try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }

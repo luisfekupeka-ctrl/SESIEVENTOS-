@@ -704,27 +704,20 @@ app.post('/api/events/:id/register', (req, res) => {
     const fullName = `${sName} ${sSurname}`.trim();
 
     // 2. Validate school year (grade)
+    // 2. Validate school year - Only 6º and 7º Ano EF allowed right now
+    if (participant_type === 'student' && !['6º Ano EF', '7º Ano EF'].includes(sGrade)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Neste momento, as inscrições estão abertas exclusivamente para alunos do 6º e 7º ano.'
+      });
+    }
+
     if (participant_type === 'student' && restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
       if (!restrictions.values.includes(sGrade)) {
         return res.status(400).json({
           success: false,
           error: `Este evento é restrito aos anos: ${restrictions.values.join(', ')}`
         });
-      }
-
-      // 2.5. Split-window validation for mixed events (contains both 6/7 and 8/9/EM or 'all' audiences)
-      let hasGroupA = false;
-      let hasGroupB = false;
-      if (restrictions.type === 'all' || !restrictions.type || !Array.isArray(restrictions.values)) {
-        hasGroupA = true;
-        hasGroupB = true;
-      } else {
-        hasGroupA = restrictions.values.some((v: string) => ['6º Ano EF', '7º Ano EF'].includes(v));
-        hasGroupB = restrictions.values.some((v: string) => ['8º Ano EF', '9º Ano EF', '1º Ano EM', '2º Ano EM', '3º Ano EM'].includes(v));
-      }
-      if (hasGroupA && hasGroupB) {
-        const now = new Date();
-        // Registration is fully open for all grades today!
       }
     }
 

@@ -756,19 +756,22 @@ app.post('/api/events/:id/register', (req, res) => {
     // 3. Match student to resolve student_id if not provided
     let matchedStudentId = student_id;
     if (!matchedStudentId && fullName) {
-      const student = db.prepare("SELECT * FROM students WHERE LOWER(name || ' ' || COALESCE(surname, '')) = LOWER(?) OR LOWER(name) = LOWER(?)").get(fullName, fullName) as any;
+      const normalizeStr = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, ' ');
+      const inputNorm = normalizeStr(fullName);
+
+      const allStudents = db.prepare("SELECT * FROM students").all() as any[];
+      const student = allStudents.find((s: any) => {
+        const dbFullName = normalizeStr(`${s.name || ''} ${s.surname || ''}`);
+        const dbNameOnly = normalizeStr(s.name || '');
+        return dbFullName === inputNorm || dbNameOnly === inputNorm;
+      });
+
       if (student) {
         matchedStudentId = student.id;
         // Update grade and class if provided
         db.prepare("UPDATE students SET grade = COALESCE(NULLIF(?, ''), grade), class = COALESCE(NULLIF(?, ''), class) WHERE id = ?").run(sGrade, className, student.id);
       } else {
-        // If autocomplete is enabled, block creating new students!
-        if (event.enable_autocomplete !== 0 && event.enable_autocomplete !== false && (participant_type || 'student') === 'student') {
-          return res.status(400).json({
-            success: false,
-            error: 'Inscrição recusada: este aluno não está cadastrado no sistema.'
-          });
-        }
+        // Auto-create student if not found so registration ALWAYS succeeds!
         const result = db.prepare("INSERT INTO students (name, surname, grade, class, type) VALUES (?, ?, ?, ?, ?)").run(sName, sSurname, sGrade, className, participant_type || 'student');
         matchedStudentId = result.lastInsertRowid;
       }

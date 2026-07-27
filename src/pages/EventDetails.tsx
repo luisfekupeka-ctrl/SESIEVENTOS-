@@ -306,7 +306,7 @@ export default function EventDetails() {
     }
 
 
-    if (event.enable_autocomplete !== false && participantType === 'student') {
+    if (event.enable_autocomplete === 1 && participantType === 'student') {
       const normalizeString = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
       const sNameNorm = normalizeString(sName);
       const isStudentInDatabase = allStudents.some(s => 

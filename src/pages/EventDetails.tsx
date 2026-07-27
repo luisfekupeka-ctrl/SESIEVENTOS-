@@ -31,6 +31,7 @@ export default function EventDetails() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedStudentGrade, setSelectedStudentGrade] = useState<string>('');
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [studentSelectedFromList, setStudentSelectedFromList] = useState(false);
   const [paymentAccepted, setPaymentAccepted] = useState(false);
   const [eventParticipants, setEventParticipants] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -294,6 +295,12 @@ export default function EventDetails() {
     }
 
 
+
+    // ── Bloquear se aluno não foi selecionado da lista de sugestões ────────
+    if (participantType === 'student' && !studentSelectedFromList) {
+      setRestrictionError('Por favor, selecione seu nome da lista de sugestões. Digite pelo menos 2 letras e clique no seu nome quando aparecer.');
+      return;
+    }
 
     if (event.password_protected && event.password !== eventPassword) {
       setPasswordError(true);
@@ -707,6 +714,9 @@ export default function EventDetails() {
                                     onChange={(e) => {
                                       const val = e.target.value;
                                       setFormData({ ...formData, [fieldKey]: val });
+                                      // Reset: user is typing manually, not selected from list
+                                      setStudentSelectedFromList(false);
+                                      setSelectedStudentId(null);
                                       
                                       if (val.length >= 2) {
                                         const norm = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -763,6 +773,7 @@ export default function EventDetails() {
                                             
                                             setFormData(newFormData);
                                             setSelectedStudentId(student.id);
+                                            setStudentSelectedFromList(true);
                                             setShowSuggestions(false);
                                           }}
                                         >

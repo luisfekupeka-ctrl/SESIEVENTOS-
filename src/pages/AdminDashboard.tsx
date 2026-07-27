@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Event, Registration, Student } from '../types';
-import { Calendar, Users, TrendingUp, Clock, ChevronRight, Trash2, AlertTriangle, GraduationCap, School, Loader2, ShieldCheck } from 'lucide-react';
+import { Calendar, Users, TrendingUp, Clock, ChevronRight, Trash2, AlertTriangle, GraduationCap, School, Loader2, ShieldCheck, Eye, Lock, Unlock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -9,10 +9,21 @@ import { GRADES, CLASSES } from '../constants';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getEventImage } from '../utils/getEventImage';
+import { useDisplayMode } from '../hooks/useDisplayMode';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
   const { t } = useLanguage();
+  const { 
+    isDisplayModeActive, 
+    isCountdownActive, 
+    isUnlocked, 
+    secondsLeft, 
+    loading: displayModeLoading, 
+    activateDisplayMode, 
+    startUnlockCountdown, 
+    unlockImmediately 
+  } = useDisplayMode();
   const [events, setEvents] = useState<Event[]>([]);
   const [recentRegistrations, setRecentRegistrations] = useState<Registration[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -345,6 +356,73 @@ export default function AdminDashboard() {
             <Users size={16} />
             {t('Sincronizar Contagens')}
           </button>
+        </div>
+      </div>
+
+      {/* MODO EXIBIÇÃO & CONTAGEM REGRESSIVA CARD */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-3">
+              <span className={`px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border ${
+                isDisplayModeActive 
+                  ? 'bg-yellow-400/10 text-yellow-400 border-yellow-400/30'
+                  : isCountdownActive
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 animate-pulse'
+                  : 'bg-green-500/10 text-green-400 border-green-500/30'
+              }`}>
+                {isDisplayModeActive ? '🟢 Modo Exibição Ativo' : isCountdownActive ? '⏳ Contagem 1 Minuto' : '🔓 Inscrições Abertas'}
+              </span>
+            </div>
+            <h2 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+              <Eye className="text-yellow-400" size={24} /> Modo Exibição & Liberação de Inscrições
+            </h2>
+            <p className="text-xs md:text-sm text-slate-300 font-medium leading-relaxed">
+              {isDisplayModeActive 
+                ? 'Os alunos podem navegar e ver todos os Afters, mas as inscrições estão bloqueadas. Clique abaixo para iniciar a contagem regressiva de 1 minuto e liberar as inscrições.'
+                : isCountdownActive
+                ? `Contagem regressiva em andamento no portal. Inscrições serão liberadas automaticamente em ${secondsLeft}s!`
+                : 'As inscrições estão abertas para todos os alunos. Você pode ativar o Modo Exibição a qualquer momento para bloquear novas inscrições.'}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            {isDisplayModeActive && (
+              <button
+                onClick={() => startUnlockCountdown(60)}
+                disabled={displayModeLoading}
+                className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all shadow-lg shadow-yellow-400/20 flex items-center justify-center gap-2.5"
+              >
+                <Unlock size={18} /> Iniciar Liberação (1 Minuto)
+              </button>
+            )}
+
+            {isCountdownActive && (
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <div className="px-5 py-3 bg-slate-950 border border-amber-500/50 rounded-2xl font-mono text-2xl font-black text-amber-400 flex items-center gap-2">
+                  <Clock size={20} className="animate-spin text-amber-400" />
+                  00:{secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft}
+                </div>
+                <button
+                  onClick={activateDisplayMode}
+                  disabled={displayModeLoading}
+                  className="w-full sm:w-auto px-5 py-3.5 bg-slate-950 text-red-400 border border-red-500/30 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-red-500/10 transition-all flex items-center justify-center gap-2"
+                >
+                  <Lock size={16} /> Cancelar / Bloquear
+                </button>
+              </div>
+            )}
+
+            {isUnlocked && (
+              <button
+                onClick={activateDisplayMode}
+                disabled={displayModeLoading}
+                className="w-full sm:w-auto px-6 py-4 bg-slate-950 border border-slate-800 text-slate-200 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-yellow-400 hover:text-black hover:border-yellow-400 transition-all flex items-center justify-center gap-2.5 shadow-inner"
+              >
+                <Eye size={18} className="text-yellow-400" /> Ativar Modo Exibição
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

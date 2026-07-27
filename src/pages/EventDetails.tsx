@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { Event, Category } from '../types';
-import { Calendar, Clock, Tag, Users, ShieldCheck, ChevronLeft, Send, CheckCircle2, AlertTriangle, Lock, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Tag, Users, ShieldCheck, ChevronLeft, Send, CheckCircle2, AlertTriangle, Lock, Loader2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatYearRestrictions } from '../components/EventCard';
 import { getEventImage } from '../utils/getEventImage';
 import { useAuth } from '../context/AuthContext';
+import { useDisplayMode } from '../hooks/useDisplayMode';
 
 export default function EventDetails() {
   const { profile } = useAuth();
+  const { isDisplayModeActive, isCountdownActive, isUnlocked, secondsLeft } = useDisplayMode();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
@@ -550,7 +552,38 @@ export default function EventDetails() {
               transition={{ delay: 0.5 }}
               className="bg-slate-900 rounded-[2.5rem] border border-slate-800 shadow-2xl p-8 md:p-10 sticky top-28 backdrop-blur-md"
             >
-              <AnimatePresence mode="wait">
+              {isDisplayModeActive ? (
+                <div className="text-center py-6 space-y-6">
+                  <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-3xl flex items-center justify-center mx-auto border border-yellow-400/20 shadow-lg">
+                    <Eye size={36} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white tracking-tight mb-2">Modo de Exibição</h3>
+                    <p className="text-slate-400 font-bold text-sm leading-relaxed">
+                      Você está em modo de navegação. As inscrições para este After serão liberadas em breve pelo administrador!
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs font-black text-yellow-400 uppercase tracking-widest">
+                    🔒 Formulário Temporariamente Bloqueado
+                  </div>
+                </div>
+              ) : isCountdownActive ? (
+                <div className="text-center py-6 space-y-6">
+                  <div className="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-3xl flex items-center justify-center mx-auto border border-amber-400/30 shadow-lg animate-bounce">
+                    <Clock size={36} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white tracking-tight mb-2">Liberando Inscrições...</h3>
+                    <p className="text-slate-300 font-bold text-xs">
+                      Aguarde o cronômetro zerar para a liberação automática do formulário!
+                    </p>
+                  </div>
+                  <div className="text-4xl font-black font-mono text-amber-400 tracking-widest my-4 p-4 bg-slate-950 rounded-2xl border border-amber-500/40 shadow-inner">
+                    00:{secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft}
+                  </div>
+                </div>
+              ) : (
+                <AnimatePresence mode="wait">
                 {registrationSuccess ? (
                   <motion.div
                     key="success"
@@ -922,6 +955,7 @@ export default function EventDetails() {
                   </motion.div>
                 )}
               </AnimatePresence>
+              )}
             </motion.div>
           </div>
           )}

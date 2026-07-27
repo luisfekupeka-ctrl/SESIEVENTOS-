@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
+import { DisplayModeBanner } from './DisplayModeBanner';
+
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAdmin, logout, profile } = useAuth();
   const { language, setLanguage, t } = useLanguage();
@@ -48,6 +50,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   return (
     <div className="min-h-screen bg-[#020617] flex flex-col font-sans transition-colors duration-300 text-white">
+      <DisplayModeBanner />
       {/* Header */}
       <header className="bg-slate-950/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">

@@ -686,6 +686,22 @@ app.post('/api/events/:id/register', (req, res) => {
   const student_id = req.body.student_id;
 
   try {
+    // 0. Check display_mode from system_settings
+    try {
+      const displaySettingRow = db.prepare("SELECT value FROM system_settings WHERE key = 'display_mode'").get() as any;
+      if (displaySettingRow?.value) {
+        const displayVal = safeJsonParse(displaySettingRow.value);
+        if (displayVal?.enabled === true) {
+          return res.status(400).json({ success: false, error: 'Inscrições temporariamente bloqueadas (Modo Exibição Ativo).' });
+        }
+        if (displayVal?.unlock_target_at && new Date() < new Date(displayVal.unlock_target_at)) {
+          return res.status(400).json({ success: false, error: 'Inscrições bloqueadas. Aguarde o término da contagem regressiva para liberação.' });
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
     // 1. Fetch Event
     const event = db.prepare("SELECT * FROM events WHERE id = ?").get(eventId) as any;
     if (!event) {

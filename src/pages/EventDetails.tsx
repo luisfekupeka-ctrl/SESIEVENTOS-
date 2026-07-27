@@ -211,21 +211,18 @@ export default function EventDetails() {
       finalLastName = parts.slice(1).join(' ') || '';
     }
 
-    // ── Apenas alunos do 6º e 7º Ano EF podem se inscrever neste momento ──────
-    const normGrade = (sGrade || '').replace(/°/g, 'º').trim();
-    if (participantType === 'student' && !['6º Ano EF', '7º Ano EF'].includes(normGrade)) {
-      setRestrictionError('Neste momento, as inscrições estão abertas exclusivamente para alunos do 6º e 7º ano.');
-      return;
-    }
-
     let restrictions = event.restrictions as any;
     if (typeof restrictions === 'string') {
       try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
     }
 
-    if (restrictions?.type === 'years' && !restrictions.values?.includes(sGrade)) {
-      setRestrictionError(`Este evento é restrito aos anos: ${restrictions.values?.join(', ')}`);
-      return;
+    const normGrade = (sGrade || '').replace(/°/g, 'º').trim();
+    if (participantType === 'student' && restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
+      const normalizedValues = restrictions.values.map((v: string) => v.replace(/°/g, 'º').trim());
+      if (!normalizedValues.includes(normGrade)) {
+        setRestrictionError(`Este evento é restrito aos anos: ${restrictions.values.join(', ')}`);
+        return;
+      }
     }
     if (restrictions?.type === 'classes' && !restrictions.values?.includes(sClass)) {
       setRestrictionError(`Este evento é restrito às turmas: ${restrictions.values?.join(', ')}`);

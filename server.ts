@@ -703,17 +703,11 @@ app.post('/api/events/:id/register', (req, res) => {
     }
     const fullName = `${sName} ${sSurname}`.trim();
 
-    // 2. Validate school year - Only 6º and 7º Ano EF allowed right now
+    // 2. Validate school year according to event restrictions
     const normGrade = (sGrade || '').replace(/°/g, 'º').trim();
-    if (participant_type === 'student' && !['6º Ano EF', '7º Ano EF'].includes(normGrade)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Neste momento, as inscrições estão abertas exclusivamente para alunos do 6º e 7º ano.'
-      });
-    }
-
     if (participant_type === 'student' && restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
-      if (!restrictions.values.includes(sGrade)) {
+      const normalizedValues = restrictions.values.map((v: string) => v.replace(/°/g, 'º').trim());
+      if (!normalizedValues.includes(normGrade)) {
         return res.status(400).json({
           success: false,
           error: `Este evento é restrito aos anos: ${restrictions.values.join(', ')}`

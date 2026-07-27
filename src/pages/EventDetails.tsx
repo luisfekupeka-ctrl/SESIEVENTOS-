@@ -170,9 +170,15 @@ export default function EventDetails() {
       let targetTimeStr = event.registration_open_at;
 
       if (!targetTimeStr && event.start_date && event.start_time) {
-        targetTime = new Date(`${event.start_date}T${event.start_time}:00`);
-      } else if (targetTimeStr) {
-        targetTime = new Date(targetTimeStr);
+        targetTimeStr = `${event.start_date}T${event.start_time}:00`;
+      }
+
+      if (targetTimeStr) {
+        const cleanStr = targetTimeStr.trim();
+        const isoStr = cleanStr.includes('-03:00') || cleanStr.includes('Z')
+          ? cleanStr
+          : (cleanStr.length === 16 ? `${cleanStr}:00-03:00` : (cleanStr.length === 19 ? `${cleanStr}-03:00` : cleanStr));
+        targetTime = new Date(isoStr);
       }
 
       // Check if it's a mixed event (contains both 6/7 and 8/9/EM)
@@ -187,8 +193,8 @@ export default function EventDetails() {
       }
 
       if (isMixedEvent) {
-        const date27_open = new Date('2026-07-27T11:45:00-03:00');
-        const date27_close = new Date('2026-07-27T12:00:00-03:00');
+        const date27_open = new Date('2026-07-27T12:15:00-03:00');
+        const date27_close = new Date('2026-07-27T14:00:00-03:00');
         const date28_open = new Date('2026-07-28T09:30:00-03:00');
 
         if (now < date27_open) {

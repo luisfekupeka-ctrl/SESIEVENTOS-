@@ -108,11 +108,38 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
                 );
               })()}
               {(() => {
+                let targetTime: Date | null = null;
                 let target = event.registration_open_at;
                 if (!target && event.start_date && event.start_time) {
-                  target = `${event.start_date}T${event.start_time}`;
+                  target = `${event.start_date}T${event.start_time}:00`;
                 }
-                const isUpcoming = target && new Date(target).getTime() > Date.now();
+                if (target) {
+                  const cleanStr = target.trim();
+                  const isoStr = cleanStr.includes('-03:00') || cleanStr.includes('Z')
+                    ? cleanStr
+                    : (cleanStr.length === 16 ? `${cleanStr}:00-03:00` : (cleanStr.length === 19 ? `${cleanStr}-03:00` : cleanStr));
+                  targetTime = new Date(isoStr);
+                }
+
+                // Check split-window logic
+                let isMixedEvent = false;
+                const restrictions = event.restrictions as any;
+                if (restrictions?.type === 'all' || !restrictions || !restrictions.type) {
+                  isMixedEvent = true;
+                } else if (restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
+                  const hasGroupA = restrictions.values.some((v: string) => ['6º Ano EF', '7º Ano EF'].includes(v));
+                  const hasGroupB = restrictions.values.some((v: string) => ['8º Ano EF', '9º Ano EF', '1º Ano EM', '2º Ano EM', '3º Ano EM'].includes(v));
+                  isMixedEvent = hasGroupA && hasGroupB;
+                }
+
+                if (isMixedEvent) {
+                  const date27_open = new Date('2026-07-27T12:15:00-03:00');
+                  if (Date.now() < date27_open.getTime()) {
+                    targetTime = date27_open;
+                  }
+                }
+
+                const isUpcoming = targetTime && !isNaN(targetTime.getTime()) && targetTime.getTime() > Date.now();
                 if (isUpcoming) {
                   return (
                     <span className="px-3 py-1 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm shadow-amber-500/25 animate-pulse">

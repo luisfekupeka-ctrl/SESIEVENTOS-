@@ -717,7 +717,7 @@ app.post('/api/events/:id/register', (req, res) => {
       const hasGroupB = restrictions.values.some((v: string) => ['8º Ano EF', '9º Ano EF', '1º Ano EM', '2º Ano EM', '3º Ano EM'].includes(v));
       if (hasGroupA && hasGroupB) {
         const now = new Date();
-        const date27_open = new Date('2026-07-27T10:00:00-03:00');
+        const date27_open = new Date('2026-07-27T10:46:00-03:00');
         const date27_close = new Date('2026-07-27T12:00:00-03:00');
         const date28_open = new Date('2026-07-28T09:30:00-03:00');
 

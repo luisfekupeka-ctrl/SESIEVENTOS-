@@ -724,7 +724,7 @@ export default function EventDetails() {
                             const commonClasses = "w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-600 shadow-inner";
                             const isNameField = fieldKey === 'nome' || fieldKey === 'nome completo';
                             
-                            if (isNameField && participantType === 'student' && event.enable_autocomplete !== false) {
+                            if (isNameField && participantType === 'student') {
                               return (
                                 <div className="relative">
                                   <input
@@ -738,11 +738,13 @@ export default function EventDetails() {
                                       const val = e.target.value;
                                       setFormData({ ...formData, [fieldKey]: val });
                                       
-                                      if (val.length >= 3) {
+                                      if (val.length >= 2) {
+                                        const norm = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+                                        const queryNorm = norm(val);
                                         const matches = allStudents.filter(s => {
-                                          const fullName = `${s.name || ''} ${s.surname || ''}`.toLowerCase();
-                                          return fullName.includes(val.toLowerCase());
-                                        }).slice(0, 5);
+                                          const fullNameNorm = norm(`${s.name || ''} ${s.surname || ''}`);
+                                          return fullNameNorm.includes(queryNorm);
+                                        }).slice(0, 6);
                                         setSuggestions(matches);
                                         setShowSuggestions(true);
                                       } else {

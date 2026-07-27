@@ -139,7 +139,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
                 }
 
                 if (isMixedEvent) {
-                  const date27_open = new Date('2026-07-27T13:30:00-03:00');
+                  const date27_open = new Date('2026-07-27T10:00:00-03:00');
                   if (Date.now() < date27_open.getTime()) {
                     targetTime = date27_open;
                   }

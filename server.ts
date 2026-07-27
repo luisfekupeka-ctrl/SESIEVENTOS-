@@ -724,32 +724,7 @@ app.post('/api/events/:id/register', (req, res) => {
       }
       if (hasGroupA && hasGroupB) {
         const now = new Date();
-        const date27_open = new Date('2026-07-27T10:00:00-03:00');
-        const date27_close = new Date('2026-07-27T23:59:00-03:00');
-        const date28_open = new Date('2026-07-28T09:30:00-03:00');
-
-        if (now < date27_open) {
-          return res.status(400).json({
-            success: false,
-            error: 'As inscrições para este evento ainda não foram abertas.'
-          });
-        }
-
-        if (now >= date27_open && now < date27_close) {
-          if (!['6º Ano EF', '7º Ano EF'].includes(sGrade)) {
-            return res.status(400).json({
-              success: false,
-              error: 'Neste momento (27/07), as inscrições estão abertas exclusivamente para alunos do 6º e 7º ano. Alunos de outras séries poderão se inscrever a partir de 28/07 às 09h30.'
-            });
-          }
-        }
-
-        if (now >= date27_close && now < date28_open) {
-          return res.status(400).json({
-            success: false,
-            error: 'As inscrições estão temporariamente fechadas. Elas reabrirão para todas as séries no dia 28/07 às 09h30.'
-          });
-        }
+        // Registration is fully open for all grades today!
       }
     }
 

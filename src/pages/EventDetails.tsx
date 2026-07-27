@@ -202,26 +202,8 @@ export default function EventDetails() {
       }
 
       if (isMixedEvent) {
-        const date27_open = new Date('2026-07-27T10:00:00-03:00');
-        const date27_close = new Date('2026-07-27T23:59:00-03:00');
-        const date28_open = new Date('2026-07-28T09:30:00-03:00');
-
-        if (now < date27_open) {
-          targetTime = date27_open;
-          setCountdownTitle('Inscrições em Breve');
-          setCountdownSubtitle('Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.');
-        } else if (now >= date27_open && now < date27_close) {
-          // Open for 6/7, closed for others (handled in submit check)
-          targetTime = null;
-        } else if (now >= date27_close && now < date28_open) {
-          // Closed temporarily, waiting for July 28th
-          targetTime = date28_open;
-          setCountdownTitle('Reabertura em Breve');
-          setCountdownSubtitle('As inscrições para o 8º/9º ano e Ensino Médio reabrirão automaticamente às 09h30 de 28/07.');
-        } else {
-          // Open for everyone
-          targetTime = null;
-        }
+        // Fully open for all grades today!
+        targetTime = null;
       } else {
         setCountdownTitle('Inscrições em Breve');
         setCountdownSubtitle('Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.');

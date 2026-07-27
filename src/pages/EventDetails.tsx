@@ -212,7 +212,8 @@ export default function EventDetails() {
     }
 
     // ── Apenas alunos do 6º e 7º Ano EF podem se inscrever neste momento ──────
-    if (participantType === 'student' && !['6º Ano EF', '7º Ano EF'].includes(sGrade)) {
+    const normGrade = (sGrade || '').replace(/°/g, 'º').trim();
+    if (participantType === 'student' && !['6º Ano EF', '7º Ano EF'].includes(normGrade)) {
       setRestrictionError('Neste momento, as inscrições estão abertas exclusivamente para alunos do 6º e 7º ano.');
       return;
     }

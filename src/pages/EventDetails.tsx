@@ -246,8 +246,8 @@ export default function EventDetails() {
 
 
 
-    // ── Bloquear se aluno não foi selecionado da lista de sugestões ────────
-    if (participantType === 'student' && !studentSelectedFromList) {
+    // ── Bloquear se nome não foi selecionado da lista de sugestões ────────
+    if (!studentSelectedFromList) {
       setRestrictionError('Por favor, selecione seu nome da lista de sugestões. Digite pelo menos 2 letras e clique no seu nome quando aparecer.');
       return;
     }
@@ -625,20 +625,35 @@ export default function EventDetails() {
                           </p>
                         </div>
                       )}
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Tipo de Participante</label>
-                        <select
-                          required
-                          className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
-                          value={participantType}
-                          onChange={(e) => setParticipantType(e.target.value as any)}
-                        >
-                          <option value="student" className="bg-slate-900">Aluno</option>
-                          <option value="collaborator" className="bg-slate-900">Colaborador</option>
-                          <option value="responsible" className="bg-slate-900">Responsável</option>
-                          <option value="other" className="bg-slate-900">Outro</option>
-                        </select>
-                      </div>
+                      {(() => {
+                        let restrictions = event?.restrictions as any;
+                        if (typeof restrictions === 'string') {
+                          try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
+                        }
+                        let allowedTypes = ['student'];
+                        if (restrictions?.type === 'participant_types' && Array.isArray(restrictions.values) && restrictions.values.length > 0) {
+                          allowedTypes = restrictions.values;
+                        } else if (restrictions?.type === 'collaborators') {
+                          allowedTypes = ['collaborator'];
+                        }
+
+                        return (
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Tipo de Participante</label>
+                            <select
+                              required
+                              className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
+                              value={participantType}
+                              onChange={(e) => setParticipantType(e.target.value as any)}
+                            >
+                              {allowedTypes.includes('student') && <option value="student" className="bg-slate-900">Aluno</option>}
+                              {allowedTypes.includes('collaborator') && <option value="collaborator" className="bg-slate-900">Colaborador</option>}
+                              {allowedTypes.includes('responsible') && <option value="responsible" className="bg-slate-900">Responsável</option>}
+                              {allowedTypes.includes('other') && <option value="other" className="bg-slate-900">Outro</option>}
+                            </select>
+                          </div>
+                        );
+                      })()}
 
                       {/* Custom Form Fields */}
                       {((event.form_fields as any[]) || []).map((field) => (
@@ -651,7 +666,7 @@ export default function EventDetails() {
                             const commonClasses = "w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-600 shadow-inner";
                             const isNameField = fieldKey === 'nome' || fieldKey === 'nome completo';
                             
-                            if (isNameField && participantType === 'student') {
+                            if (isNameField) {
                               return (
                                 <div className="relative">
                                   <input

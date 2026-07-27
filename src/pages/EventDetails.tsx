@@ -57,14 +57,20 @@ export default function EventDetails() {
         if (eventData) {
           setEvent(eventData as Event);
           
-          const { data: catData } = await supabase
-            .from('categories')
-            .select('*')
-            .eq('id', eventData.category_id)
-            .single();
+          if (eventData.category_id) {
+            try {
+              const { data: catData } = await supabase
+                .from('categories')
+                .select('*')
+                .eq('id', eventData.category_id)
+                .maybeSingle();
 
-          if (catData) {
-            setCategory(catData as Category);
+              if (catData) {
+                setCategory(catData as Category);
+              }
+            } catch (cErr) {
+              console.warn("Category fetch warning:", cErr);
+            }
           }
         }
       } catch (err) {

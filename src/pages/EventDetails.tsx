@@ -178,14 +178,16 @@ export default function EventDetails() {
       // Check if it's a mixed event (contains both 6/7 and 8/9/EM)
       let isMixedEvent = false;
       const restrictions = event.restrictions as any;
-      if (restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
+      if (restrictions?.type === 'all' || !restrictions || !restrictions.type) {
+        isMixedEvent = true;
+      } else if (restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
         const hasGroupA = restrictions.values.some((v: string) => ['6º Ano EF', '7º Ano EF'].includes(v));
         const hasGroupB = restrictions.values.some((v: string) => ['8º Ano EF', '9º Ano EF', '1º Ano EM', '2º Ano EM', '3º Ano EM'].includes(v));
         isMixedEvent = hasGroupA && hasGroupB;
       }
 
       if (isMixedEvent) {
-        const date27_open = new Date('2026-07-27T11:30:00-03:00');
+        const date27_open = new Date('2026-07-27T11:45:00-03:00');
         const date27_close = new Date('2026-07-27T12:00:00-03:00');
         const date28_open = new Date('2026-07-28T09:30:00-03:00');
 

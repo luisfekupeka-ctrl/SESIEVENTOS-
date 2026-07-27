@@ -800,6 +800,24 @@ export default function EventDetails() {
                                   />
                                 );
                               case 'select':
+                                const isGradeField = fieldKey.includes('série') || fieldKey.includes('ano');
+                                if (isGradeField && studentSelectedFromList) {
+                                  return (
+                                    <div className="relative">
+                                      <select
+                                        disabled
+                                        className={`${commonClasses} appearance-none bg-slate-900 text-slate-300 border-slate-700 cursor-not-allowed`}
+                                        value={selectedStudentGrade || formData[fieldKey] || ''}
+                                      >
+                                        <option value={selectedStudentGrade || formData[fieldKey]}>{selectedStudentGrade || formData[fieldKey]}</option>
+                                      </select>
+                                      <span className="text-[10px] font-black text-yellow-400 uppercase tracking-widest block mt-1">
+                                        🔒 Série bloqueada conforme cadastro oficial do aluno
+                                      </span>
+                                    </div>
+                                  );
+                                }
+
                                 return (
                                   <select
                                     required={field.required}
@@ -808,7 +826,7 @@ export default function EventDetails() {
                                     onChange={(e) => {
                                       const val = e.target.value;
                                       setFormData({ ...formData, [fieldKey]: val });
-                                      if (fieldKey.includes('série') || fieldKey.includes('ano')) {
+                                      if (isGradeField) {
                                         setSelectedStudentGrade(val);
                                       }
                                     }}

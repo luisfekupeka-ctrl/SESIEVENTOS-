@@ -709,7 +709,6 @@ app.post('/api/events/:id/register', (req, res) => {
     }
 
     const restrictions = safeJsonParse(event.restrictions || '{}');
-    const sGrade = grade || form_data?.['série'] || form_data?.['ano'] || '';
     let sName = (name || form_data?.['nome'] || '').trim();
     let sSurname = (surname || form_data?.['sobrenome'] || '').trim();
     if (!sSurname && sName.includes(' ')) {
@@ -718,22 +717,13 @@ app.post('/api/events/:id/register', (req, res) => {
       sSurname = parts.slice(1).join(' ') || '';
     }
     const fullName = `${sName} ${sSurname}`.trim();
+    const inputGrade = grade || form_data?.['série'] || form_data?.['ano'] || '';
 
-    // 2. Validate school year according to event restrictions
-    const normGrade = (sGrade || '').replace(/°/g, 'º').trim();
-    if (participant_type === 'student' && restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
-      const normalizedValues = restrictions.values.map((v: string) => v.replace(/°/g, 'º').trim());
-      if (!normalizedValues.includes(normGrade)) {
-        return res.status(400).json({
-          success: false,
-          error: `Este evento é restrito aos anos: ${restrictions.values.join(', ')}`
-        });
-      }
-    }
-
-    // 3. Match student to resolve student_id if not provided
+    // 2. Match student in database FIRST to resolve student_id and real grade
     let matchedStudentId = student_id;
-    if (!matchedStudentId && fullName) {
+    let effectiveGrade = inputGrade;
+
+    if (fullName) {
       const normalizeStr = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, ' ');
       const inputNorm = normalizeStr(fullName);
 
@@ -746,13 +736,24 @@ app.post('/api/events/:id/register', (req, res) => {
 
       if (student) {
         matchedStudentId = student.id;
-        // Update grade and class if provided
-        db.prepare("UPDATE students SET grade = COALESCE(NULLIF(?, ''), grade), class = COALESCE(NULLIF(?, ''), class) WHERE id = ?").run(sGrade, className, student.id);
+        // USE REAL DATABASE GRADE (Does not allow student to change grade)
+        effectiveGrade = student.grade || inputGrade;
       } else {
-        // Nome não encontrado — apenas alunos da lista podem se inscrever
         return res.status(400).json({
           success: false,
-          error: `Aluno "${fullName}" não está cadastrado no sistema. Selecione seu nome da lista de sugestões.`
+          error: `Aluno "${fullName}" não está cadastrado no sistema.`
+        });
+      }
+    }
+
+    // 3. Validate school year according to REAL DATABASE GRADE
+    const normGrade = (effectiveGrade || '').replace(/°/g, 'º').trim();
+    if (participant_type === 'student' && restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
+      const normalizedValues = restrictions.values.map((v: string) => v.replace(/°/g, 'º').trim());
+      if (!normalizedValues.includes(normGrade)) {
+        return res.status(400).json({
+          success: false,
+          error: `Este aluno pertence ao ${effectiveGrade || 'outro ano'}, que não é permitido para este evento.`
         });
       }
     }
@@ -786,7 +787,7 @@ app.post('/api/events/:id/register', (req, res) => {
 
     // Year-specific spots limit check
     if (event.limitar_vagas_por_ano === 1 && event.vagas_por_ano) {
-      const studentGrade = (sGrade || '').trim().toLowerCase();
+      const studentGrade = (effectiveGrade || '').trim().toLowerCase();
       if (studentGrade) {
         const limits = safeJsonParse(event.vagas_por_ano) || {};
 

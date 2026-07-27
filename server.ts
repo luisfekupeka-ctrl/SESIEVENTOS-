@@ -741,11 +741,16 @@ app.post('/api/events/:id/register', (req, res) => {
       }
     }
 
-    // 4. Duplicate category & type restriction validation
+    // 4. Duplicate modality restriction validation (e.g. Vôlei vs Vôlei, Futsal vs Futsal)
+    // Permits registering in different modalities (e.g. Vôlei AND Futsal)
     if (event.restringir_duplicidade === 1 && matchedStudentId) {
-      // Find other active registrations for the same student
-      const registrations = db.prepare(`
-        SELECT r.*, e.name as event_name, e.category_id, e.subcategory_id
+      const getBaseModality = (n: string) => {
+        return (n || '').toLowerCase().replace(/\(.*\)/g, '').replace(/\bem\b/g, '').trim().replace(/\s+/g, ' ');
+      };
+      const currentBaseModality = getBaseModality(event.name);
+
+      const activeRegistrations = db.prepare(`
+        SELECT r.*, e.name as event_name
         FROM registrations r
         JOIN events e ON r.event_id = e.id
         WHERE r.student_id = ? 
@@ -753,16 +758,12 @@ app.post('/api/events/:id/register', (req, res) => {
           AND r.status = 'approved'
       `).all(matchedStudentId, eventId) as any[];
 
-      // Check if any shares same category_id AND subcategory_id
-      const conflict = registrations.find(r => 
-        r.category_id === event.category_id && 
-        r.subcategory_id === event.subcategory_id
-      );
+      const conflict = activeRegistrations.find(r => getBaseModality(r.event_name) === currentBaseModality);
 
       if (conflict) {
         return res.status(400).json({
           success: false,
-          error: `Inscrição não permitida. O aluno já está inscrito no evento "${conflict.event_name}" da mesma categoria e tipo/subcategoria.`
+          error: `Inscrição não permitida. O aluno já está inscrito na modalidade "${conflict.event_name}".`
         });
       }
     }

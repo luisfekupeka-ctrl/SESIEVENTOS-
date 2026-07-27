@@ -294,18 +294,6 @@ export default function EventDetails() {
     }
 
 
-    if (participantType === 'student') {
-      const normalizeString = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, ' ');
-      const sNameNorm = normalizeString(sName);
-      const isStudentInDatabase = allStudents.some(s =>
-        normalizeString(`${s.name || ''} ${s.surname || ''}`) === sNameNorm ||
-        normalizeString(s.name || '') === sNameNorm
-      );
-      if (!isStudentInDatabase) {
-        setRestrictionError("Aluno não encontrado no sistema. Verifique o nome digitado ou selecione o aluno da lista de sugestões.");
-        return;
-      }
-    }
 
     if (event.password_protected && event.password !== eventPassword) {
       setPasswordError(true);

@@ -724,8 +724,8 @@ app.post('/api/events/:id/register', (req, res) => {
       }
       if (hasGroupA && hasGroupB) {
         const now = new Date();
-        const date27_open = new Date('2026-07-27T12:15:00-03:00');
-        const date27_close = new Date('2026-07-27T14:00:00-03:00');
+        const date27_open = new Date('2026-07-27T13:30:00-03:00');
+        const date27_close = new Date('2026-07-27T15:30:00-03:00');
         const date28_open = new Date('2026-07-28T09:30:00-03:00');
 
         if (now < date27_open) {

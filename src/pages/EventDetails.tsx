@@ -185,7 +185,7 @@ export default function EventDetails() {
       }
 
       if (isMixedEvent) {
-        const date27_open = new Date('2026-07-27T10:46:00-03:00');
+        const date27_open = new Date('2026-07-27T11:15:00-03:00');
         const date27_close = new Date('2026-07-27T12:00:00-03:00');
         const date28_open = new Date('2026-07-28T09:30:00-03:00');
 

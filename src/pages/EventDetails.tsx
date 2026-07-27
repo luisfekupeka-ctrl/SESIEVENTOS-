@@ -294,15 +294,15 @@ export default function EventDetails() {
     }
 
 
-    if (event.enable_autocomplete === 1 && participantType === 'student') {
-      const normalizeString = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    if (participantType === 'student') {
+      const normalizeString = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, ' ');
       const sNameNorm = normalizeString(sName);
-      const isStudentInDatabase = allStudents.some(s => 
-        normalizeString(s.name || '') === sNameNorm || 
-        normalizeString(`${s.name} ${s.surname || ''}`) === sNameNorm
+      const isStudentInDatabase = allStudents.some(s =>
+        normalizeString(`${s.name || ''} ${s.surname || ''}`) === sNameNorm ||
+        normalizeString(s.name || '') === sNameNorm
       );
       if (!isStudentInDatabase) {
-        setRestrictionError("Por favor, selecione um aluno válido da lista de sugestões.");
+        setRestrictionError("Aluno não encontrado no sistema. Verifique o nome digitado ou selecione o aluno da lista de sugestões.");
         return;
       }
     }

@@ -746,9 +746,11 @@ app.post('/api/events/:id/register', (req, res) => {
         // Update grade and class if provided
         db.prepare("UPDATE students SET grade = COALESCE(NULLIF(?, ''), grade), class = COALESCE(NULLIF(?, ''), class) WHERE id = ?").run(sGrade, className, student.id);
       } else {
-        // Auto-create student if not found so registration ALWAYS succeeds!
-        const result = db.prepare("INSERT INTO students (name, surname, grade, class, type) VALUES (?, ?, ?, ?, ?)").run(sName, sSurname, sGrade, className, participant_type || 'student');
-        matchedStudentId = result.lastInsertRowid;
+        // Aluno não está cadastrado — inscrição NÃO permitida
+        return res.status(400).json({
+          success: false,
+          error: `Aluno "${fullName}" não encontrado no sistema. Verifique se o nome foi digitado corretamente ou selecione o aluno da lista de sugestões.`
+        });
       }
     }
 

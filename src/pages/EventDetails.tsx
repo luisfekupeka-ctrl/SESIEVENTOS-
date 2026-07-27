@@ -172,63 +172,9 @@ export default function EventDetails() {
         setIsLive(false);
       }
 
-      // Check registration opening / countdown target
-      let targetTime: Date | null = null;
-      let targetTimeStr = event.registration_open_at;
-
-      if (!targetTimeStr && event.start_date && event.start_time) {
-        targetTimeStr = `${event.start_date}T${event.start_time}:00`;
-      }
-
-      if (targetTimeStr) {
-        const cleanStr = targetTimeStr.trim();
-        const isoStr = cleanStr.includes('-03:00') || cleanStr.includes('Z')
-          ? cleanStr
-          : (cleanStr.length === 16 ? `${cleanStr}:00-03:00` : (cleanStr.length === 19 ? `${cleanStr}-03:00` : cleanStr));
-        targetTime = new Date(isoStr);
-      }
-
-      // Check if it's a mixed event (contains both 6/7 and 8/9/EM)
-      let isMixedEvent = false;
-      let restrictions = event.restrictions as any;
-      if (typeof restrictions === 'string') {
-        try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
-      }
-      if (restrictions?.type === 'all' || !restrictions || !restrictions.type) {
-        isMixedEvent = true;
-      } else if (restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
-        const hasGroupA = restrictions.values.some((v: string) => ['6º Ano EF', '7º Ano EF'].includes(v));
-        const hasGroupB = restrictions.values.some((v: string) => ['8º Ano EF', '9º Ano EF', '1º Ano EM', '2º Ano EM', '3º Ano EM'].includes(v));
-        isMixedEvent = hasGroupA && hasGroupB;
-      }
-
-      if (isMixedEvent) {
-        // Fully open for all grades today!
-        targetTime = null;
-      } else {
-        setCountdownTitle('Inscrições em Breve');
-        setCountdownSubtitle('Prepare-se! As inscrições serão liberadas automaticamente assim que o cronômetro zerar.');
-      }
-
-      if (!targetTime || isNaN(targetTime.getTime())) {
-        setRegCountdownTime(null);
-        setRegUpcoming(false);
-        return;
-      }
-      
-      const diffReg = targetTime.getTime() - now.getTime();
-      
-      if (diffReg <= 0) {
-        setRegCountdownTime(null);
-        setRegUpcoming(false);
-      } else {
-        setRegUpcoming(true);
-        const d = Math.floor(diffReg / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diffReg % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diffReg % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diffReg % (1000 * 60)) / 1000);
-        setRegCountdownTime({ d, h, m, s });
-      }
+      // Registration is fully open for all events without countdown blocking!
+      setRegCountdownTime(null);
+      setRegUpcoming(false);
     };
 
     calculateTime(); // run immediately!

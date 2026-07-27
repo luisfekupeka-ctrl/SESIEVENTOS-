@@ -8,7 +8,10 @@ import { ptBR } from 'date-fns/locale';
 import { GRADES } from '../constants';
 
 export function formatYearRestrictions(event: Event): string {
-  const restrictions = event.restrictions as any;
+  let restrictions = event.restrictions as any;
+  if (typeof restrictions === 'string') {
+    try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
+  }
   if (!restrictions || restrictions.type !== 'years' || !restrictions.values || restrictions.values.length === 0) {
     return "Livre para todos os públicos";
   }
@@ -123,7 +126,10 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
 
                 // Check split-window logic
                 let isMixedEvent = false;
-                const restrictions = event.restrictions as any;
+                let restrictions = event.restrictions as any;
+                if (typeof restrictions === 'string') {
+                  try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
+                }
                 if (restrictions?.type === 'all' || !restrictions || !restrictions.type) {
                   isMixedEvent = true;
                 } else if (restrictions?.type === 'years' && Array.isArray(restrictions.values)) {

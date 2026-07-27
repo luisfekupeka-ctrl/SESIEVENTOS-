@@ -97,10 +97,16 @@ export default function Home() {
     const matchesCategory = selectedCategory === 'all' || event.category_id === selectedCategory;
     const matchesSubcategory = selectedSubcategory === 'all' || event.subcategory_id === selectedSubcategory;
     
-    const restrictions = event.restrictions as any;
+    let restrictions = event.restrictions as any;
+    if (typeof restrictions === 'string') {
+      try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
+    }
+    
     const matchesYear = selectedYear === 'all' || 
+                       !restrictions ||
                        restrictions?.type === 'all' || 
-                       (restrictions?.type === 'years' && restrictions?.values?.includes(selectedYear));
+                       !restrictions?.type ||
+                       (restrictions?.type === 'years' && Array.isArray(restrictions?.values) && restrictions.values.includes(selectedYear));
 
     // Day filter logic
     let matchesDay = true;

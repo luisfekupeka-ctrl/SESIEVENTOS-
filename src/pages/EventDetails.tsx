@@ -183,7 +183,10 @@ export default function EventDetails() {
 
       // Check if it's a mixed event (contains both 6/7 and 8/9/EM)
       let isMixedEvent = false;
-      const restrictions = event.restrictions as any;
+      let restrictions = event.restrictions as any;
+      if (typeof restrictions === 'string') {
+        try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
+      }
       if (restrictions?.type === 'all' || !restrictions || !restrictions.type) {
         isMixedEvent = true;
       } else if (restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
@@ -273,7 +276,10 @@ export default function EventDetails() {
       finalLastName = parts.slice(1).join(' ') || '';
     }
 
-    const restrictions = event.restrictions as any;
+    let restrictions = event.restrictions as any;
+    if (typeof restrictions === 'string') {
+      try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
+    }
 
     if (restrictions?.type === 'years' && !restrictions.values?.includes(sGrade)) {
       setRestrictionError(`Este evento é restrito aos anos: ${restrictions.values?.join(', ')}`);
@@ -392,7 +398,10 @@ export default function EventDetails() {
     </div>
   );
 
-  const restrictions = event.restrictions as any;
+  let restrictions = event.restrictions as any;
+  if (typeof restrictions === 'string') {
+    try { restrictions = JSON.parse(restrictions); } catch { restrictions = null; }
+  }
   const isGradeInvalid = participantType === 'student' && 
                          restrictions?.type === 'years' && 
                          selectedStudentGrade && 

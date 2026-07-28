@@ -272,15 +272,37 @@ export default function EventDetails() {
         }
       }
 
-      const { data: resData, error: rpcError } = await supabase.rpc('register_participant', {
-        p_event_id: id,
-        p_student_name: finalFirstName,
-        p_student_surname: finalLastName,
-        p_student_grade: sGrade,
-        p_student_class: sClass,
-        p_participant_type: participantType,
-        p_form_data: { ...formData, status }
-      });
+      // Re-tentativa automática com suporte a oscilação de rede (Backoff Exponencial)
+      let resData: any = null;
+      let rpcError: any = null;
+
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const result = await supabase.rpc('register_participant', {
+            p_event_id: id,
+            p_student_name: finalFirstName,
+            p_student_surname: finalLastName,
+            p_student_grade: sGrade,
+            p_student_class: sClass,
+            p_participant_type: participantType,
+            p_form_data: { ...formData, status }
+          });
+          resData = result.data;
+          rpcError = result.error;
+
+          // Se recebeu resposta válida do banco (sucesso ou mensagem de validação), encerra os retries
+          if (resData || rpcError?.message) {
+            break;
+          }
+        } catch (netErr: any) {
+          if (attempt === 3) {
+            rpcError = netErr;
+            break;
+          }
+          // Aguarda antes de tentar novamente (300ms na 1ª, 600ms na 2ª)
+          await new Promise((res) => setTimeout(res, 300 * attempt));
+        }
+      }
 
       if (rpcError || !resData || !resData.success) {
         const errorMsg = rpcError?.message || resData?.error || "Erro ao processar inscrição. Tente novamente.";

@@ -33,6 +33,8 @@ export default function AdminDashboard() {
   const [isResetting, setIsResetting] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isRecounting, setIsRecounting] = useState(false);
   const fetchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const fetchData = async (isBackground = false) => {
@@ -94,7 +96,7 @@ export default function AdminDashboard() {
     };
   }, []);
 
-  const [error, setError] = useState<string | null>(null);
+
 
   if (loading) {
     return (
@@ -134,7 +136,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const [isRecounting, setIsRecounting] = useState(false);
+
 
   const recountAllRegistrations = async () => {
     setIsRecounting(true);

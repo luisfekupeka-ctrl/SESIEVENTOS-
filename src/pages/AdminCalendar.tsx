@@ -127,7 +127,7 @@ export default function AdminCalendar() {
     return (
       <div className="flex flex-col items-center justify-center py-40">
         <Loader2 className="w-16 h-16 text-yellow-400 animate-spin mb-8 shadow-[0_0_20px_rgba(234,179,8,0.3)]" />
-        <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-xs">Sincronizando Agenda...</p>
+        <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-xs">Carregando agenda...</p>
       </div>
     );
   }

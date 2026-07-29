@@ -260,7 +260,7 @@ export default function Home() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32">
             <div className="w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-6"></div>
-            <p className="text-yellow-500 font-black tracking-widest uppercase text-sm">Sincronizando eventos...</p>
+            <p className="text-yellow-500 font-black tracking-widest uppercase text-sm">Carregando eventos...</p>
           </div>
         ) : filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">

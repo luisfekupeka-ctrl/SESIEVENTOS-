@@ -99,7 +99,7 @@ export default function AdminDashboard() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="w-12 h-12 text-yellow-400 animate-spin mb-4 shadow-[0_0_15px_rgba(234,179,8,0.3)]" />
-        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Sincronizando Dashboard...</p>
+        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Carregando Dashboard...</p>
       </div>
     );
   }
@@ -133,8 +133,10 @@ export default function AdminDashboard() {
     }
   };
 
+  const [isRecounting, setIsRecounting] = useState(false);
+
   const recountAllRegistrations = async () => {
-    setLoading(true);
+    setIsRecounting(true);
     try {
       // 1. Get all events
       const { data: allEvents, error: eventsError } = await supabase
@@ -162,12 +164,12 @@ export default function AdminDashboard() {
       }
       
       setFeedback({ type: 'success', message: 'Contagens sincronizadas com sucesso!' });
-      fetchData();
+      fetchData(true);
     } catch (err) {
       console.error(err);
       setFeedback({ type: 'error', message: 'Erro ao sincronizar contagens.' });
     } finally {
-      setLoading(false);
+      setIsRecounting(false);
     }
   };
 
@@ -350,10 +352,10 @@ export default function AdminDashboard() {
           </button>
           <button
             onClick={recountAllRegistrations}
-            disabled={loading}
+            disabled={loading || isRecounting}
             className="flex items-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-amber-500/10 text-amber-400 font-black uppercase text-[10px] md:text-xs tracking-widest rounded-xl md:rounded-2xl hover:bg-amber-500 hover:text-black transition-all border border-amber-500/20 disabled:opacity-50 shadow-sm"
           >
-            <Users size={16} />
+            {isRecounting ? <Loader2 size={16} className="animate-spin" /> : <Users size={16} />}
             {t('Sincronizar Contagens')}
           </button>
         </div>

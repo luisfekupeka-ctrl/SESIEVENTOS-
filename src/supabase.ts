@@ -21,12 +21,20 @@ class QueryBuilder {
   private orderFields: any[] = [];
   private limitValue?: number;
   private isSingle = false;
+  private isHead = false;
+  private countOption?: string;
 
   constructor(table: string) {
     this.table = table;
   }
 
-  select(columns = '*') {
+  select(columns = '*', options?: { count?: string; head?: boolean }) {
+    if (options?.head) {
+      this.isHead = true;
+    }
+    if (options?.count) {
+      this.countOption = options.count;
+    }
     return this;
   }
 
@@ -55,7 +63,7 @@ class QueryBuilder {
     return this;
   }
 
-  async then(onfulfilled: (res: { data: any; error: any }) => void) {
+  async then(onfulfilled: (res: { data: any; count: number | null; error: any }) => void) {
     try {
       const response = await fetch('/api/db', {
         method: 'POST',
@@ -72,12 +80,17 @@ class QueryBuilder {
       
       const data = await response.json();
       if (!response.ok) {
-        onfulfilled({ data: null, error: { message: data.error || 'Fetch failed' } });
+        onfulfilled({ data: null, count: null, error: { message: data.error || 'Fetch failed' } });
       } else {
-        onfulfilled({ data, error: null });
+        const countValue = (this.countOption || this.isHead) ? (Array.isArray(data) ? data.length : (data ? 1 : 0)) : null;
+        onfulfilled({ 
+          data: this.isHead ? null : data, 
+          count: countValue, 
+          error: null 
+        });
       }
     } catch (error: any) {
-      onfulfilled({ data: null, error });
+      onfulfilled({ data: null, count: null, error });
     }
   }
 

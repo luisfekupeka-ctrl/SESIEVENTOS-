@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { Calendar, Tag, ChevronRight, Users, Lock } from 'lucide-react';
 import { getEventImage } from '../utils/getEventImage';
 import { Event, Category } from '../types';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { safeFormatDate } from '../utils/formatDate';
 import { GRADES } from '../constants';
 
 export function formatYearRestrictions(event: Event): string {
@@ -135,14 +134,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
               <Calendar size={20} />
             </div>
             <span className="text-sm font-black uppercase tracking-widest">
-              {(() => {
-                try {
-                  // Add T00:00:00 to ensure local time parsing
-                  return format(new Date(event.start_date + 'T00:00:00'), "dd 'de' MMMM", { locale: ptBR });
-                } catch (e) {
-                  return event.start_date || '-';
-                }
-              })()}
+              {safeFormatDate(event.start_date, "dd 'de' MMMM")}
             </span>
           </div>
           

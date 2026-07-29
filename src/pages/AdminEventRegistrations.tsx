@@ -10,6 +10,7 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { CLASSES } from '../constants';
+import { safeFormatDate } from '../utils/formatDate';
 
 export default function AdminEventRegistrations() {
   const { id } = useParams<{ id: string }>();
@@ -732,13 +733,7 @@ export default function AdminEventRegistrations() {
   };
 
   const formatRegDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return '-';
-      return format(date, "dd/MM HH:mm");
-    } catch (e) {
-      return '-';
-    }
+    return safeFormatDate(dateStr, "dd/MM HH:mm");
   };
 
   if (loading) {

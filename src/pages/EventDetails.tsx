@@ -10,6 +10,7 @@ import { formatYearRestrictions } from '../components/EventCard';
 import { getEventImage } from '../utils/getEventImage';
 import { useAuth } from '../context/AuthContext';
 import { useDisplayMode } from '../hooks/useDisplayMode';
+import { safeFormatDate } from '../utils/formatDate';
 
 export default function EventDetails() {
   const { profile } = useAuth();
@@ -532,13 +533,7 @@ export default function EventDetails() {
                 <div>
                   <h4 className="text-[10px] font-black text-yellow-400/60 uppercase tracking-[0.2em] mb-2">Data e Hora</h4>
                   <p className="text-white text-2xl font-black tracking-tight">
-                    {(() => {
-                      try {
-                        return format(new Date(event.start_date + 'T00:00:00'), "dd 'de' MMMM", { locale: ptBR });
-                      } catch (e) {
-                        return event.start_date;
-                      }
-                    })()}
+                    {safeFormatDate(event.start_date, "dd 'de' MMMM")}
                   </p>
                   <p className="text-slate-400 text-lg font-bold mt-1">
                     {event.start_time} às {event.end_time}

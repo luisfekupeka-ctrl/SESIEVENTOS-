@@ -16,6 +16,7 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, 'database.db');
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
+db.pragma('busy_timeout = 10000');
 
 const useSQLite = process.env.VITE_USE_SQLITE === 'true';
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
@@ -245,7 +246,18 @@ try {
 }
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Enable serving uploads folder static files
 const uploadsDir = path.join(__dirname, 'public', 'uploads');

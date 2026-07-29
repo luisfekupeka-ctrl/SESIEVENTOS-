@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { GRADES, CLASSES } from '../constants';
 import { useAuth } from '../context/AuthContext';
 import { getEventImage } from '../utils/getEventImage';
+import { safeFormatDate } from '../utils/formatDate';
 
 export default function AdminEvents() {
   const { profile } = useAuth();
@@ -735,14 +736,7 @@ export default function AdminEvents() {
                       <Calendar size={16} />
                     </div>
                     <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
-                      Início: {(() => {
-                        try {
-                          if (!event.start_date) return 'Sem data';
-                          return format(new Date(event.start_date + 'T00:00:00'), "dd/MM/yyyy");
-                        } catch (e) {
-                          return event.start_date || 'Data inválida';
-                        }
-                      })()} às {event.start_time || '--:--'}
+                      Início: {safeFormatDate(event.start_date, 'dd/MM/yyyy')} às {event.start_time || '--:--'}
                     </span>
                   </div>
                   {event.end_date && (
@@ -751,14 +745,7 @@ export default function AdminEvents() {
                         <Clock size={16} />
                       </div>
                       <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
-                        Limite: {(() => {
-                          try {
-                            if (!event.end_date) return 'Sem limite';
-                            return format(new Date(event.end_date + 'T00:00:00'), "dd/MM/yyyy");
-                          } catch (e) {
-                            return event.end_date || 'Data inválida';
-                          }
-                        })()} às {event.end_time || '--:--'}
+                        Limite: {safeFormatDate(event.end_date, 'dd/MM/yyyy')} às {event.end_time || '--:--'}
                       </span>
                     </div>
                   )}

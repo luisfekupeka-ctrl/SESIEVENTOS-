@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getEventImage } from '../utils/getEventImage';
 import { useDisplayMode } from '../hooks/useDisplayMode';
+import { safeFormatDate } from '../utils/formatDate';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -512,13 +513,7 @@ export default function AdminDashboard() {
                     <p className="text-lg font-black text-white mb-1">{event.name}</p>
                     <div className="flex items-center gap-3">
                       <p className="text-xs font-bold text-slate-300">
-                        {(() => {
-                          try {
-                            return format(new Date(event.start_date + 'T00:00:00'), "dd/MM/yyyy");
-                          } catch (e) {
-                            return '-';
-                          }
-                        })()}
+                        {safeFormatDate(event.start_date, 'dd/MM/yyyy')}
                       </p>
                       <span className="text-[10px] font-black px-2.5 py-1 bg-yellow-400/10 text-yellow-400 rounded-lg uppercase tracking-widest border border-yellow-400/10">
                         {event.registration_count || 0} inscritos
@@ -558,27 +553,15 @@ export default function AdminDashboard() {
                           return `${student?.name || ''} ${student?.surname || ''}`.trim() || 'Participante';
                         })()}
                       </p>
-                      <p className="text-xs font-bold text-slate-300">Inscrito em: <span className="text-yellow-400">{events.find(e => e.id === reg.event_id)?.name}</span></p>
+                      <p className="text-xs font-bold text-slate-300">Inscrito em: <span className="text-yellow-400">{events.find(e => e.id === reg.event_id)?.name || 'Evento'}</span></p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-black text-white uppercase tracking-widest">
-                      {(() => {
-                        try {
-                          return format(new Date(reg.timestamp), "HH:mm", { locale: ptBR });
-                        } catch (e) {
-                          return '-';
-                        }
-                      })()}
+                      {safeFormatDate(reg.timestamp, 'HH:mm')}
                     </p>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">
-                      {(() => {
-                        try {
-                          return format(new Date(reg.timestamp), "dd/MM", { locale: ptBR });
-                        } catch (e) {
-                          return '-';
-                        }
-                      })()}
+                      {safeFormatDate(reg.timestamp, 'dd/MM')}
                     </p>
                   </div>
                 </div>

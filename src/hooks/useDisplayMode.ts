@@ -90,7 +90,10 @@ export function useDisplayMode() {
     try {
       const { error } = await supabase
         .from('system_settings')
-        .upsert({ key: 'display_mode', value: newVal, updated_at: new Date().toISOString() });
+        .upsert(
+          { key: 'display_mode', value: newVal, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        );
 
       if (error) throw error;
       setSetting(newVal);

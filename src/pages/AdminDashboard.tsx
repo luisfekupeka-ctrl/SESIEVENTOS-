@@ -393,13 +393,22 @@ export default function AdminDashboard() {
 
           <div className="flex flex-col sm:flex-row items-center gap-3">
             {isDisplayModeActive && (
-              <button
-                onClick={() => startUnlockCountdown(60)}
-                disabled={displayModeLoading}
-                className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all shadow-lg shadow-yellow-400/20 flex items-center justify-center gap-2.5"
-              >
-                <Unlock size={18} /> Iniciar Liberação (1 Minuto)
-              </button>
+              <>
+                <button
+                  onClick={unlockImmediately}
+                  disabled={displayModeLoading}
+                  className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-green-400 to-emerald-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all shadow-lg shadow-green-400/20 flex items-center justify-center gap-2.5"
+                >
+                  <Unlock size={18} /> Desbloquear Agora
+                </button>
+                <button
+                  onClick={() => startUnlockCountdown(60)}
+                  disabled={displayModeLoading}
+                  className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-slate-950 font-black text-xs uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all shadow-lg shadow-yellow-400/20 flex items-center justify-center gap-2.5"
+                >
+                  <Clock size={18} /> Liberar em 1 Minuto
+                </button>
+              </>
             )}
 
             {isCountdownActive && (
@@ -408,6 +417,13 @@ export default function AdminDashboard() {
                   <Clock size={20} className="animate-spin text-amber-400" />
                   00:{secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft}
                 </div>
+                <button
+                  onClick={unlockImmediately}
+                  disabled={displayModeLoading}
+                  className="w-full sm:w-auto px-5 py-3.5 bg-green-500/10 text-green-400 border border-green-500/30 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-green-500/20 transition-all flex items-center justify-center gap-2"
+                >
+                  <Unlock size={16} /> Liberar Agora
+                </button>
                 <button
                   onClick={activateDisplayMode}
                   disabled={displayModeLoading}

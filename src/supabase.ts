@@ -14,14 +14,25 @@ if (!rawUrl || !supabaseAnonKey) {
 
 const realSupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
+const authListeners = new Set<Function>();
+
+const triggerAuthChange = () => {
+  const sessionStr = localStorage.getItem('supabase.auth.token');
+  const session = sessionStr ? JSON.parse(sessionStr) : null;
+  const event = session ? 'SIGNED_IN' : 'SIGNED_OUT';
+  authListeners.forEach(cb => cb(event, session));
+};
+(window as any)._triggerAuthChange = triggerAuthChange;
+
 // SQLite Mock Client (used locally when VITE_USE_SQLITE is 'true')
 class QueryBuilder {
   private table: string;
-  private action: 'select' | 'insert' | 'update' | 'delete' = 'select';
+  private action: 'select' | 'insert' | 'update' | 'upsert' | 'delete' = 'select';
   private filters: any[] = [];
   private orderFields: any[] = [];
   private limitValue?: number;
   private isSingle = false;
+  private isMaybeSingle = false;
   private isHead = false;
   private countOption?: string;
   private payloadData: any = null;
@@ -49,6 +60,12 @@ class QueryBuilder {
 
   update(data: any) {
     this.action = 'update';
+    this.payloadData = data;
+    return this;
+  }
+
+  upsert(data: any, options?: any) {
+    this.action = 'upsert';
     this.payloadData = data;
     return this;
   }
@@ -88,6 +105,11 @@ class QueryBuilder {
     return this;
   }
 
+  maybeSingle() {
+    this.isMaybeSingle = true;
+    return this;
+  }
+
   async then(onfulfilled: (res: { data: any; count?: number | null; error: any }) => void) {
     try {
       const response = await fetch('/api/db', {
@@ -99,7 +121,7 @@ class QueryBuilder {
           filters: this.filters,
           order: this.orderFields,
           limit: this.limitValue,
-          single: this.isSingle,
+          single: this.isSingle || this.isMaybeSingle,
           data: this.payloadData
         })
       });
@@ -109,18 +131,22 @@ class QueryBuilder {
         onfulfilled({ data: null, count: null, error: { message: resData.error || `${this.action} failed` } });
       } else {
         if (this.action === 'select') {
+          let dataResult = resData;
+          if (this.isSingle || this.isMaybeSingle) {
+            dataResult = Array.isArray(resData) ? (resData[0] || null) : resData;
+          }
           const countValue = (this.countOption || this.isHead) ? (Array.isArray(resData) ? resData.length : (resData ? 1 : 0)) : null;
           onfulfilled({ 
-            data: this.isHead ? null : resData, 
+            data: this.isHead ? null : dataResult, 
             count: countValue, 
-            error: null 
+            error: (this.isSingle && !dataResult) ? { message: 'Row not found' } : null 
           });
         } else {
           onfulfilled({ data: resData, error: null });
         }
       }
     } catch (error: any) {
-      onfulfilled({ data: null, count: null, error });
+      onfulfilled({ data: null, count: null, error: { message: error.message || 'Network error' } });
     }
   }
 }
@@ -146,7 +172,7 @@ const sqliteMockClient: any = {
       }
       return { data, error: null };
     } catch (error: any) {
-      return { data: null, error };
+      return { data: null, error: { message: error.message || 'Network error' } };
     }
   },
 
@@ -166,7 +192,7 @@ const sqliteMockClient: any = {
             }
             return { data, error: null };
           } catch (error: any) {
-            return { data: null, error };
+            return { data: null, error: { message: error.message || 'Upload error' } };
           }
         },
         getPublicUrl(path: string) {
@@ -183,13 +209,16 @@ const sqliteMockClient: any = {
     },
     
     onAuthStateChange(callback: any) {
-      const triggerAuthChange = () => {
-        const sessionStr = localStorage.getItem('supabase.auth.token');
-        callback(sessionStr ? 'SIGNED_IN' : 'SIGNED_OUT', sessionStr ? JSON.parse(sessionStr) : null);
+      authListeners.add(callback);
+      return {
+        data: {
+          subscription: {
+            unsubscribe() {
+              authListeners.delete(callback);
+            }
+          }
+        }
       };
-      
-      (window as any)._triggerAuthChange = triggerAuthChange;
-      return { data: { subscription: { unsubscribe() {} } } };
     },
 
     async signInWithPassword({ email, password }: any) {
@@ -206,13 +235,11 @@ const sqliteMockClient: any = {
         }
         
         localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
-        if ((window as any)._triggerAuthChange) {
-          (window as any)._triggerAuthChange();
-        }
+        triggerAuthChange();
         
         return { data: { user: data.session.user, session: data.session }, error: null };
       } catch (error: any) {
-        return { data: { user: null, session: null }, error };
+        return { data: { user: null, session: null }, error: { message: error.message || 'Login error' } };
       }
     },
 
@@ -235,15 +262,13 @@ const sqliteMockClient: any = {
         
         return { data: { user: data.user, session: null }, error: null };
       } catch (error: any) {
-        return { data: { user: null, session: null }, error };
+        return { data: { user: null, session: null }, error: { message: error.message || 'SignUp error' } };
       }
     },
 
     async signOut() {
       localStorage.removeItem('supabase.auth.token');
-      if ((window as any)._triggerAuthChange) {
-        (window as any)._triggerAuthChange();
-      }
+      triggerAuthChange();
       return { error: null };
     }
   },

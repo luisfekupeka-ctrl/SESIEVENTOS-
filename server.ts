@@ -131,6 +131,12 @@ db.exec(`
     limitar_vagas_por_ano INTEGER DEFAULT 0,
     vagas_por_ano INTEGER DEFAULT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS system_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Run migrations on events safely
@@ -269,6 +275,8 @@ function parseRowJsonFields(table: string, row: any) {
     if (parsed.vagas_por_ano) parsed.vagas_por_ano = safeJsonParse(parsed.vagas_por_ano);
   } else if (table === 'registrations') {
     if (parsed.form_data) parsed.form_data = safeJsonParse(parsed.form_data);
+  } else if (table === 'system_settings') {
+    if (parsed.value) parsed.value = safeJsonParse(parsed.value);
   }
   return parsed;
 }
@@ -462,6 +470,72 @@ app.post('/api/db', (req, res) => {
 
       db.prepare(deleteQuery).run(...params);
       return res.json({ success: true });
+
+    } else if (action === 'upsert') {
+      const dataToUpsert = Array.isArray(data) ? data : [data];
+      const resultRows: any[] = [];
+
+      for (const item of dataToUpsert) {
+        const preparedItem = { ...item };
+        if (table === 'events' || table === 'event_templates') {
+          if (preparedItem.restrictions) preparedItem.restrictions = JSON.stringify(preparedItem.restrictions);
+          if (preparedItem.form_fields) preparedItem.form_fields = JSON.stringify(preparedItem.form_fields);
+          if (preparedItem.dias_semana) preparedItem.dias_semana = JSON.stringify(preparedItem.dias_semana);
+          if (preparedItem.vagas_por_ano) preparedItem.vagas_por_ano = JSON.stringify(preparedItem.vagas_por_ano);
+        } else if (table === 'registrations') {
+          if (preparedItem.form_data) preparedItem.form_data = JSON.stringify(preparedItem.form_data);
+        } else if (table === 'system_settings') {
+          if (preparedItem.value) preparedItem.value = JSON.stringify(preparedItem.value);
+        }
+
+        let existing: any = null;
+        if (preparedItem.id) {
+          existing = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(preparedItem.id);
+        } else if (table === 'system_settings' && preparedItem.key) {
+          existing = db.prepare(`SELECT * FROM ${table} WHERE key = ?`).get(preparedItem.key);
+        } else if (table === 'students' && preparedItem.name && preparedItem.surname !== undefined) {
+          existing = db.prepare(`SELECT * FROM ${table} WHERE name = ? AND surname = ?`).get(preparedItem.name, preparedItem.surname);
+        } else if (table === 'categories' && preparedItem.name) {
+          existing = db.prepare(`SELECT * FROM ${table} WHERE name = ?`).get(preparedItem.name);
+        }
+
+        if (existing) {
+          const keys = Object.keys(preparedItem).filter(k => k !== 'id' && k !== 'key');
+          if (keys.length > 0) {
+            const sets = keys.map(k => `${k} = ?`).join(', ');
+            const values = keys.map(k => preparedItem[k]);
+            const targetParam = preparedItem.key || preparedItem.id || existing.id || existing.key;
+            const targetCol = preparedItem.key ? 'key' : 'id';
+            db.prepare(`UPDATE ${table} SET ${sets} WHERE ${targetCol} = ?`).run(...values, targetParam);
+          }
+          const updatedRow = db.prepare(`SELECT * FROM ${table} WHERE ${preparedItem.key ? 'key' : 'id'} = ?`).get(preparedItem.key || preparedItem.id || existing.id || existing.key);
+          resultRows.push(parseRowJsonFields(table, updatedRow));
+        } else {
+          const keys = Object.keys(preparedItem);
+          const placeholders = keys.map(() => '?').join(', ');
+          const values = keys.map(k => preparedItem[k]);
+
+          const insertQuery = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
+          const runResult = db.prepare(insertQuery).run(...values);
+          
+          let insertedId = item.id;
+          if (!insertedId && runResult.lastInsertRowid) {
+            insertedId = Number(runResult.lastInsertRowid);
+          }
+
+          let insertedRow;
+          if (preparedItem.key) {
+            insertedRow = db.prepare(`SELECT * FROM ${table} WHERE key = ?`).get(preparedItem.key);
+          } else if (insertedId) {
+            insertedRow = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(insertedId);
+          } else {
+            insertedRow = db.prepare(`SELECT * FROM ${table} ORDER BY rowid DESC LIMIT 1`).get();
+          }
+          resultRows.push(parseRowJsonFields(table, insertedRow));
+        }
+      }
+
+      return res.json(resultRows);
     }
 
     return res.status(400).json({ error: 'Invalid action' });

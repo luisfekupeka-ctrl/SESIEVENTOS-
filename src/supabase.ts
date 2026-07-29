@@ -17,18 +17,21 @@ const realSupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 // SQLite Mock Client (used locally when VITE_USE_SQLITE is 'true')
 class QueryBuilder {
   private table: string;
+  private action: 'select' | 'insert' | 'update' | 'delete' = 'select';
   private filters: any[] = [];
   private orderFields: any[] = [];
   private limitValue?: number;
   private isSingle = false;
   private isHead = false;
   private countOption?: string;
+  private payloadData: any = null;
 
   constructor(table: string) {
     this.table = table;
   }
 
   select(columns = '*', options?: { count?: string; head?: boolean }) {
+    this.action = 'select';
     if (options?.head) {
       this.isHead = true;
     }
@@ -38,8 +41,30 @@ class QueryBuilder {
     return this;
   }
 
+  insert(data: any) {
+    this.action = 'insert';
+    this.payloadData = data;
+    return this;
+  }
+
+  update(data: any) {
+    this.action = 'update';
+    this.payloadData = data;
+    return this;
+  }
+
+  delete() {
+    this.action = 'delete';
+    return this;
+  }
+
   eq(column: string, value: any) {
     this.filters.push({ column, op: 'eq', value });
+    return this;
+  }
+
+  neq(column: string, value: any) {
+    this.filters.push({ column, op: 'neq', value });
     return this;
   }
 
@@ -63,98 +88,39 @@ class QueryBuilder {
     return this;
   }
 
-  async then(onfulfilled: (res: { data: any; count: number | null; error: any }) => void) {
+  async then(onfulfilled: (res: { data: any; count?: number | null; error: any }) => void) {
     try {
       const response = await fetch('/api/db', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'select',
+          action: this.action,
           table: this.table,
           filters: this.filters,
           order: this.orderFields,
           limit: this.limitValue,
-          single: this.isSingle
+          single: this.isSingle,
+          data: this.payloadData
         })
       });
       
-      const data = await response.json();
+      const resData = await response.json();
       if (!response.ok) {
-        onfulfilled({ data: null, count: null, error: { message: data.error || 'Fetch failed' } });
+        onfulfilled({ data: null, count: null, error: { message: resData.error || `${this.action} failed` } });
       } else {
-        const countValue = (this.countOption || this.isHead) ? (Array.isArray(data) ? data.length : (data ? 1 : 0)) : null;
-        onfulfilled({ 
-          data: this.isHead ? null : data, 
-          count: countValue, 
-          error: null 
-        });
+        if (this.action === 'select') {
+          const countValue = (this.countOption || this.isHead) ? (Array.isArray(resData) ? resData.length : (resData ? 1 : 0)) : null;
+          onfulfilled({ 
+            data: this.isHead ? null : resData, 
+            count: countValue, 
+            error: null 
+          });
+        } else {
+          onfulfilled({ data: resData, error: null });
+        }
       }
     } catch (error: any) {
       onfulfilled({ data: null, count: null, error });
-    }
-  }
-
-  async insert(data: any) {
-    try {
-      const response = await fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'insert',
-          table: this.table,
-          data
-        })
-      });
-      const resData = await response.json();
-      if (!response.ok) {
-        return { data: null, error: { message: resData.error || 'Insert failed' } };
-      }
-      return { data: resData, error: null };
-    } catch (error: any) {
-      return { data: null, error };
-    }
-  }
-
-  async update(data: any) {
-    try {
-      const response = await fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update',
-          table: this.table,
-          data,
-          filters: this.filters
-        })
-      });
-      const resData = await response.json();
-      if (!response.ok) {
-        return { data: null, error: { message: resData.error || 'Update failed' } };
-      }
-      return { data: resData, error: null };
-    } catch (error: any) {
-      return { data: null, error };
-    }
-  }
-
-  async delete() {
-    try {
-      const response = await fetch('/api/db', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete',
-          table: this.table,
-          filters: this.filters
-        })
-      });
-      const resData = await response.json();
-      if (!response.ok) {
-        return { data: null, error: { message: resData.error || 'Delete failed' } };
-      }
-      return { data: resData, error: null };
-    } catch (error: any) {
-      return { data: null, error };
     }
   }
 }

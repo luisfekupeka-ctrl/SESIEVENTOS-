@@ -290,6 +290,9 @@ app.post('/api/db', (req, res) => {
           if (f.op === 'eq') {
             whereClauses.push(`${f.column} = ?`);
             params.push(f.value);
+          } else if (f.op === 'neq') {
+            whereClauses.push(`${f.column} != ?`);
+            params.push(f.value);
           } else if (f.op === 'in') {
             const placeholders = f.value.map(() => '?').join(', ');
             whereClauses.push(`${f.column} IN (${placeholders})`);
@@ -407,6 +410,13 @@ app.post('/api/db', (req, res) => {
           if (f.op === 'eq') {
             whereClauses.push(`${f.column} = ?`);
             whereParams.push(f.value);
+          } else if (f.op === 'neq') {
+            whereClauses.push(`${f.column} != ?`);
+            whereParams.push(f.value);
+          } else if (f.op === 'in') {
+            const placeholders = f.value.map(() => '?').join(', ');
+            whereClauses.push(`${f.column} IN (${placeholders})`);
+            whereParams.push(...f.value);
           }
         }
       }
@@ -434,6 +444,13 @@ app.post('/api/db', (req, res) => {
           if (f.op === 'eq') {
             whereClauses.push(`${f.column} = ?`);
             params.push(f.value);
+          } else if (f.op === 'neq') {
+            whereClauses.push(`${f.column} != ?`);
+            params.push(f.value);
+          } else if (f.op === 'in') {
+            const placeholders = f.value.map(() => '?').join(', ');
+            whereClauses.push(`${f.column} IN (${placeholders})`);
+            params.push(...f.value);
           }
         }
       }

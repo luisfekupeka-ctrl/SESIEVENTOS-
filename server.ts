@@ -640,6 +640,184 @@ app.post('/api/auth/login', (req, res) => {
   }
 });
 
+function executeRegisterParticipant(req: any, res: any) {
+  const eventId = req.params?.id || req.body?.p_event_id;
+  const name = req.body.name || req.body.p_student_name;
+  const surname = req.body.surname || req.body.p_student_surname;
+  const grade = req.body.grade || req.body.p_student_grade;
+  const className = req.body.class || req.body.p_student_class;
+  const participant_type = req.body.participant_type || req.body.p_participant_type;
+  const form_data = req.body.form_data || req.body.p_form_data;
+  const student_id = req.body.student_id;
+
+  try {
+    // 0. Check display_mode from system_settings
+    try {
+      const displaySettingRow = db.prepare("SELECT value FROM system_settings WHERE key = 'display_mode'").get() as any;
+      if (displaySettingRow?.value) {
+        const displayVal = safeJsonParse(displaySettingRow.value);
+        if (displayVal?.enabled === true) {
+          return res.status(400).json({ success: false, error: 'Inscrições temporariamente bloqueadas (Modo Exibição Ativo).' });
+        }
+        if (displayVal?.unlock_target_at && new Date() < new Date(displayVal.unlock_target_at)) {
+          return res.status(400).json({ success: false, error: 'Inscrições bloqueadas. Aguarde o término da contagem regressiva para liberação.' });
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // 1. Fetch Event
+    const event = db.prepare("SELECT * FROM events WHERE id = ?").get(eventId) as any;
+    if (!event) {
+      return res.status(404).json({ success: false, error: 'Evento não encontrado.' });
+    }
+
+    const restrictions = safeJsonParse(event.restrictions || '{}');
+    let sName = (name || form_data?.['nome'] || '').trim();
+    let sSurname = (surname || form_data?.['sobrenome'] || '').trim();
+    if (!sSurname && sName.includes(' ')) {
+      const parts = sName.split(/\s+/);
+      sName = parts[0] || '';
+      sSurname = parts.slice(1).join(' ') || '';
+    }
+    const fullName = `${sName} ${sSurname}`.trim();
+    const inputGrade = grade || form_data?.['série'] || form_data?.['ano'] || '';
+
+    // 2. Match student in database FIRST to resolve student_id and real grade
+    let matchedStudentId = student_id;
+    let effectiveGrade = inputGrade;
+
+    if (fullName) {
+      const normalizeStr = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, ' ');
+      const inputNorm = normalizeStr(fullName);
+
+      const allStudents = db.prepare("SELECT * FROM students").all() as any[];
+      const student = allStudents.find((s: any) => {
+        const dbFullName = normalizeStr(`${s.name || ''} ${s.surname || ''}`);
+        const dbNameOnly = normalizeStr(s.name || '');
+        return dbFullName === inputNorm || dbNameOnly === inputNorm;
+      });
+
+      if (student) {
+        matchedStudentId = student.id;
+        effectiveGrade = student.grade || inputGrade;
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: `Aluno "${fullName}" não está cadastrado no sistema.`
+        });
+      }
+    }
+
+    // 3. Validate school year according to REAL DATABASE GRADE
+    const normGrade = (effectiveGrade || '').replace(/°/g, 'º').trim();
+    if (participant_type === 'student' && restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
+      const normalizedValues = restrictions.values.map((v: string) => v.replace(/°/g, 'º').trim());
+      if (!normalizedValues.includes(normGrade)) {
+        return res.status(400).json({
+          success: false,
+          error: `Este aluno pertence ao ${effectiveGrade || 'outro ano'}, que não é permitido para este evento.`
+        });
+      }
+    }
+
+    // 4. Duplicate modality restriction validation
+    if (event.restringir_duplicidade === 1 && matchedStudentId) {
+      const getBaseModality = (n: string) => {
+        return (n || '').toLowerCase().replace(/\(.*\)/g, '').replace(/\bem\b/g, '').trim().replace(/\s+/g, ' ');
+      };
+      const currentBaseModality = getBaseModality(event.name);
+
+      const activeRegistrations = db.prepare(`
+        SELECT r.*, e.name as event_name
+        FROM registrations r
+        JOIN events e ON r.event_id = e.id
+        WHERE r.student_id = ? 
+          AND r.event_id != ? 
+          AND r.status = 'approved'
+      `).all(matchedStudentId, eventId) as any[];
+
+      const conflict = activeRegistrations.find(r => getBaseModality(r.event_name) === currentBaseModality);
+
+      if (conflict) {
+        return res.status(400).json({
+          success: false,
+          error: `Inscrição não permitida. O aluno já está inscrito na modalidade "${conflict.event_name}".`
+        });
+      }
+    }
+
+    // Year-specific spots limit check
+    if (event.limitar_vagas_por_ano === 1 && event.vagas_por_ano) {
+      const studentGrade = (effectiveGrade || '').trim().toLowerCase();
+      if (studentGrade) {
+        const limits = safeJsonParse(event.vagas_por_ano) || {};
+
+        const normalizeYear = (y: any) => {
+          if (typeof y !== 'string') return '';
+          return y.trim().toLowerCase().replace(/º/g, '°');
+        };
+
+        const targetGradeNormalized = normalizeYear(studentGrade);
+
+        let gradeLimit: number | undefined;
+        let matchedKey = '';
+        for (const key of Object.keys(limits)) {
+          if (normalizeYear(key) === targetGradeNormalized) {
+            gradeLimit = parseInt(limits[key]);
+            matchedKey = key;
+            break;
+          }
+        }
+
+        if (gradeLimit !== undefined && !isNaN(gradeLimit) && gradeLimit > 0) {
+          const eventRegistrations = db.prepare(`
+            SELECT r.*, s.grade as student_grade
+            FROM registrations r
+            LEFT JOIN students s ON r.student_id = s.id
+            WHERE r.event_id = ? AND r.status = 'approved'
+          `).all(eventId) as any[];
+
+          const yearCount = eventRegistrations.filter(r => {
+            const regGrade = r.student_grade || safeJsonParse(r.form_data)?.['série'] || safeJsonParse(r.form_data)?.['ano'] || '';
+            return normalizeYear(regGrade) === targetGradeNormalized;
+          }).length;
+
+          if (yearCount >= gradeLimit) {
+            return res.status(400).json({ 
+              success: false, 
+              error: `Infelizmente, o limite de ${gradeLimit} vagas para o ${matchedKey} já foi preenchido.` 
+            });
+          }
+        }
+      }
+    }
+
+    // Check capacity limit
+    if (event.max_capacity > 0 && event.registration_count >= event.max_capacity) {
+      return res.status(400).json({ success: false, error: 'Desculpe, o evento já está lotado.' });
+    }
+
+    // 5. Insert registration
+    const regId = crypto.randomUUID();
+    const status = form_data?.status || 'approved';
+    
+    db.prepare(`
+      INSERT INTO registrations (id, event_id, student_id, form_data, status)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(regId, eventId, matchedStudentId || null, JSON.stringify(form_data), status);
+
+    // 6. Increment registration count
+    db.prepare("UPDATE events SET registration_count = registration_count + 1 WHERE id = ?").run(eventId);
+
+    res.json({ success: true, registrationId: regId });
+  } catch (err: any) {
+    console.error("Registration validation error:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
 // RPC Emulator endpoint
 app.post('/api/rpc/:method', (req, res) => {
   const { method } = req.params;
@@ -653,8 +831,7 @@ app.post('/api/rpc/:method', (req, res) => {
     }
     
     if (method === 'register_participant') {
-      // Forward to standard register endpoint
-      return res.redirect(307, `/api/events/${args.p_event_id}/register`);
+      return executeRegisterParticipant(req, res);
     }
 
     return res.status(400).json({ error: `Unknown RPC method: ${method}` });
@@ -794,185 +971,7 @@ app.post('/api/events/:id/start-countdown', (req, res) => {
 
 // Event registrations with validations
 app.post('/api/events/:id/register', (req, res) => {
-  const eventId = req.params.id || req.body.p_event_id;
-  const name = req.body.name || req.body.p_student_name;
-  const surname = req.body.surname || req.body.p_student_surname;
-  const grade = req.body.grade || req.body.p_student_grade;
-  const className = req.body.class || req.body.p_student_class;
-  const participant_type = req.body.participant_type || req.body.p_participant_type;
-  const form_data = req.body.form_data || req.body.p_form_data;
-  const student_id = req.body.student_id;
-
-  try {
-    // 0. Check display_mode from system_settings
-    try {
-      const displaySettingRow = db.prepare("SELECT value FROM system_settings WHERE key = 'display_mode'").get() as any;
-      if (displaySettingRow?.value) {
-        const displayVal = safeJsonParse(displaySettingRow.value);
-        if (displayVal?.enabled === true) {
-          return res.status(400).json({ success: false, error: 'Inscrições temporariamente bloqueadas (Modo Exibição Ativo).' });
-        }
-        if (displayVal?.unlock_target_at && new Date() < new Date(displayVal.unlock_target_at)) {
-          return res.status(400).json({ success: false, error: 'Inscrições bloqueadas. Aguarde o término da contagem regressiva para liberação.' });
-        }
-      }
-    } catch (e) {
-      // ignore
-    }
-
-    // 1. Fetch Event
-    const event = db.prepare("SELECT * FROM events WHERE id = ?").get(eventId) as any;
-    if (!event) {
-      return res.status(404).json({ success: false, error: 'Evento não encontrado.' });
-    }
-
-    const restrictions = safeJsonParse(event.restrictions || '{}');
-    let sName = (name || form_data?.['nome'] || '').trim();
-    let sSurname = (surname || form_data?.['sobrenome'] || '').trim();
-    if (!sSurname && sName.includes(' ')) {
-      const parts = sName.split(/\s+/);
-      sName = parts[0] || '';
-      sSurname = parts.slice(1).join(' ') || '';
-    }
-    const fullName = `${sName} ${sSurname}`.trim();
-    const inputGrade = grade || form_data?.['série'] || form_data?.['ano'] || '';
-
-    // 2. Match student in database FIRST to resolve student_id and real grade
-    let matchedStudentId = student_id;
-    let effectiveGrade = inputGrade;
-
-    if (fullName) {
-      const normalizeStr = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, ' ');
-      const inputNorm = normalizeStr(fullName);
-
-      const allStudents = db.prepare("SELECT * FROM students").all() as any[];
-      const student = allStudents.find((s: any) => {
-        const dbFullName = normalizeStr(`${s.name || ''} ${s.surname || ''}`);
-        const dbNameOnly = normalizeStr(s.name || '');
-        return dbFullName === inputNorm || dbNameOnly === inputNorm;
-      });
-
-      if (student) {
-        matchedStudentId = student.id;
-        // USE REAL DATABASE GRADE (Does not allow student to change grade)
-        effectiveGrade = student.grade || inputGrade;
-      } else {
-        return res.status(400).json({
-          success: false,
-          error: `Aluno "${fullName}" não está cadastrado no sistema.`
-        });
-      }
-    }
-
-    // 3. Validate school year according to REAL DATABASE GRADE
-    const normGrade = (effectiveGrade || '').replace(/°/g, 'º').trim();
-    if (participant_type === 'student' && restrictions?.type === 'years' && Array.isArray(restrictions.values)) {
-      const normalizedValues = restrictions.values.map((v: string) => v.replace(/°/g, 'º').trim());
-      if (!normalizedValues.includes(normGrade)) {
-        return res.status(400).json({
-          success: false,
-          error: `Este aluno pertence ao ${effectiveGrade || 'outro ano'}, que não é permitido para este evento.`
-        });
-      }
-    }
-
-    // 4. Duplicate modality restriction validation (e.g. Vôlei vs Vôlei, Futsal vs Futsal)
-    // Permits registering in different modalities (e.g. Vôlei AND Futsal)
-    if (event.restringir_duplicidade === 1 && matchedStudentId) {
-      const getBaseModality = (n: string) => {
-        return (n || '').toLowerCase().replace(/\(.*\)/g, '').replace(/\bem\b/g, '').trim().replace(/\s+/g, ' ');
-      };
-      const currentBaseModality = getBaseModality(event.name);
-
-      const activeRegistrations = db.prepare(`
-        SELECT r.*, e.name as event_name
-        FROM registrations r
-        JOIN events e ON r.event_id = e.id
-        WHERE r.student_id = ? 
-          AND r.event_id != ? 
-          AND r.status = 'approved'
-      `).all(matchedStudentId, eventId) as any[];
-
-      const conflict = activeRegistrations.find(r => getBaseModality(r.event_name) === currentBaseModality);
-
-      if (conflict) {
-        return res.status(400).json({
-          success: false,
-          error: `Inscrição não permitida. O aluno já está inscrito na modalidade "${conflict.event_name}".`
-        });
-      }
-    }
-
-    // Year-specific spots limit check
-    if (event.limitar_vagas_por_ano === 1 && event.vagas_por_ano) {
-      const studentGrade = (effectiveGrade || '').trim().toLowerCase();
-      if (studentGrade) {
-        const limits = safeJsonParse(event.vagas_por_ano) || {};
-
-        const normalizeYear = (y: any) => {
-          if (typeof y !== 'string') return '';
-          return y.trim().toLowerCase().replace(/º/g, '°');
-        };
-
-        const targetGradeNormalized = normalizeYear(studentGrade);
-
-        // Find the limit for the student's grade
-        let gradeLimit: number | undefined;
-        let matchedKey = '';
-        for (const key of Object.keys(limits)) {
-          if (normalizeYear(key) === targetGradeNormalized) {
-            gradeLimit = parseInt(limits[key]);
-            matchedKey = key;
-            break;
-          }
-        }
-
-        if (gradeLimit !== undefined && !isNaN(gradeLimit) && gradeLimit > 0) {
-          // Fetch all active registrations for this event, including student grade
-          const eventRegistrations = db.prepare(`
-            SELECT r.*, s.grade as student_grade
-            FROM registrations r
-            LEFT JOIN students s ON r.student_id = s.id
-            WHERE r.event_id = ? AND r.status = 'approved'
-          `).all(eventId) as any[];
-
-          const yearCount = eventRegistrations.filter(r => {
-            const regGrade = r.student_grade || safeJsonParse(r.form_data)?.['série'] || safeJsonParse(r.form_data)?.['ano'] || '';
-            return normalizeYear(regGrade) === targetGradeNormalized;
-          }).length;
-
-          if (yearCount >= gradeLimit) {
-            return res.status(400).json({ 
-              success: false, 
-              error: `Infelizmente, o limite de ${gradeLimit} vagas para o ${matchedKey} já foi preenchido.` 
-            });
-          }
-        }
-      }
-    }
-
-    // Check capacity limit
-    if (event.max_capacity > 0 && event.registration_count >= event.max_capacity) {
-      return res.status(400).json({ success: false, error: 'Desculpe, o evento já está lotado.' });
-    }
-
-    // 5. Insert registration
-    const regId = crypto.randomUUID();
-    const status = form_data?.status || 'approved';
-    
-    db.prepare(`
-      INSERT INTO registrations (id, event_id, student_id, form_data, status)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(regId, eventId, matchedStudentId || null, JSON.stringify(form_data), status);
-
-    // 6. Increment registration count
-    db.prepare("UPDATE events SET registration_count = registration_count + 1 WHERE id = ?").run(eventId);
-
-    res.json({ success: true, registrationId: regId });
-  } catch (err: any) {
-    console.error("Registration validation error:", err);
-    res.status(500).json({ success: false, error: err.message });
-  }
+  return executeRegisterParticipant(req, res);
 });
 
 // ADMIN CRUD - SUPABASE & SQLITE

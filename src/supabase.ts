@@ -24,6 +24,24 @@ const triggerAuthChange = () => {
 };
 (window as any)._triggerAuthChange = triggerAuthChange;
 
+async function safeFetch(url: string, init?: RequestInit): Promise<Response> {
+  try {
+    const res = await fetch(url, init);
+    if (res.ok || res.status < 500) return res;
+    if (url.startsWith('/api')) {
+      const fallbackUrl = `http://localhost:3001${url}`;
+      return await fetch(fallbackUrl, init);
+    }
+    return res;
+  } catch {
+    if (url.startsWith('/api')) {
+      const fallbackUrl = `http://localhost:3001${url}`;
+      return await fetch(fallbackUrl, init);
+    }
+    throw new Error('Servidor indisponível no momento. Tente novamente em instantes.');
+  }
+}
+
 // SQLite Mock Client (used locally when VITE_USE_SQLITE is 'true')
 class QueryBuilder {
   private table: string;
@@ -112,7 +130,7 @@ class QueryBuilder {
 
   async then(onfulfilled: (res: { data: any; count?: number | null; error: any }) => void) {
     try {
-      const response = await fetch('/api/db', {
+      const response = await safeFetch('/api/db', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -158,7 +176,7 @@ const sqliteMockClient: any = {
 
   async rpc(name: string, args: any) {
     try {
-      const response = await fetch(`/api/rpc/${name}`, {
+      const response = await safeFetch(`/api/rpc/${name}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(args)
@@ -181,7 +199,7 @@ const sqliteMockClient: any = {
       return {
         async upload(path: string, file: File) {
           try {
-            const response = await fetch(`/api/storage/upload?path=${encodeURIComponent(path)}`, {
+            const response = await safeFetch(`/api/storage/upload?path=${encodeURIComponent(path)}`, {
               method: 'POST',
               headers: { 'Content-Type': file.type },
               body: file
@@ -223,7 +241,7 @@ const sqliteMockClient: any = {
 
     async signInWithPassword({ email, password }: any) {
       try {
-        const response = await fetch('/api/auth/login', {
+        const response = await safeFetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -245,7 +263,7 @@ const sqliteMockClient: any = {
 
     async signUp({ email, password, options }: any) {
       try {
-        const response = await fetch('/api/auth/signup', {
+        const response = await safeFetch('/api/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

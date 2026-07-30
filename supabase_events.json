@@ -2330,6 +2330,78 @@
     "vagas_por_ano": null
   },
   {
+    "id": "9b5c83f9-8d07-4479-b98c-f4d055a3ac38",
+    "name": "Tênis de Mesa",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "O After Tênis de Mesa é destinado aos estudantes do 6º e 7º ano e desenvolve os fundamentos da modalidade por meio de atividades práticas e jogos. Durante as aulas, os participantes aperfeiçoam coordenação motora, agilidade, reflexos, concentração e raciocínio estratégico, além de vivenciarem valores como respeito, disciplina e espírito esportivo.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 10,
+    "registration_count": 0,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "f9f6b349-3baf-45e9-9b09-6086d090b397",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Quarta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
     "id": "ed18d24a-6fcd-4053-897f-9fd8501603e5",
     "name": "Bordado",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -2402,6 +2474,217 @@
     "countdown_target_at": null,
     "limitar_vagas_por_ano": 1,
     "vagas_por_ano": "{\"7º Ano EF\":7,\"6º Ano EF\":7,\"8º Ano EF\":6,\"9º Ano EF\":6}"
+  },
+  {
+    "id": "175efbb1-fb05-4563-90ca-1031df84e050",
+    "name": "Cerâmica Fria",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pela professora Gabrielle, o After de Cerâmica Fria proporciona aos alunos uma experiência prática e criativa no universo da modelagem artística. Ao longo das aulas, os participantes aprendem desde os conceitos iniciais e os materiais utilizados até técnicas de modelagem, criação de peças individuais e acabamento, incluindo selagem, pintura, aplicação de verniz, secagem e conservação. Em um ambiente acolhedor e inspirador, os alunos desenvolvem a criatividade, a coordenação motora fina, a concentração e a expressão artística, produzindo peças únicas e explorando diferentes possibilidades da cerâmica fria.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784146074181-y9zy7.png",
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-07-30",
+    "end_time": "08:00",
+    "duration": "",
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": "",
+    "max_capacity": 20,
+    "registration_count": 20,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T19:45:23.235036+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "b9936295-2bb6-4ebd-9f91-3fa91cf58adb",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Terça"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": null,
+    "limitar_vagas_por_ano": 1,
+    "vagas_por_ano": "{\"6º Ano EF\":10,\"7º Ano EF\":10}"
+  },
+  {
+    "id": "8a6456a9-aa09-4173-9c4c-1eb90710fccb",
+    "name": "Crochê",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pela professora Mariel, o After Crochê tem como objetivo desenvolver habilidades manuais por meio da prática dessa tradicional técnica artesanal. Os estudantes escolhem seus próprios projetos de acordo com seu nível de conhecimento, aprendendo diferentes pontos, técnicas e acabamentos enquanto confeccionam peças autorais. A atividade estimula a criatividade, a concentração, a coordenação motora fina, a autonomia e a paciência em um ambiente acolhedor e colaborativo.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784222627376-yygh8c.png",
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": null,
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 30,
+    "registration_count": 29,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "c961a1cf-6f4f-4125-b029-c7e513168e8b",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Terça",
+      "Quinta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "59a69e76-6939-4c7d-a463-31acfd331e48",
+    "name": "Circo",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "o After Circo é destinado aos estudantes do 6º e 7º ano e proporciona experiências lúdicas e artísticas por meio de atividades de equilíbrio, malabarismo, acrobacias, expressão corporal e jogos cooperativos. Durante as aulas, os participantes desenvolvem coordenação motora, concentração, criatividade, flexibilidade, autoconfiança, trabalho em equipe, disciplina e autonomia, favorecendo o desenvolvimento físico, social e emocional de forma divertida e significativa.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784210698431-p8m2cg.png",
+    "start_date": "2026-07-15",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 21,
+    "registration_count": 17,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "b1847e69-31e4-4c62-9a9f-552c6a4d29cd",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
   },
   {
     "id": "789e75ca-6a2e-419e-a4af-0927359b78ef",
@@ -2769,150 +3052,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "9b5c83f9-8d07-4479-b98c-f4d055a3ac38",
-    "name": "Tênis de Mesa",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "O After Tênis de Mesa é destinado aos estudantes do 6º e 7º ano e desenvolve os fundamentos da modalidade por meio de atividades práticas e jogos. Durante as aulas, os participantes aperfeiçoam coordenação motora, agilidade, reflexos, concentração e raciocínio estratégico, além de vivenciarem valores como respeito, disciplina e espírito esportivo.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 10,
-    "registration_count": 0,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "f9f6b349-3baf-45e9-9b09-6086d090b397",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Quarta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
-    "id": "175efbb1-fb05-4563-90ca-1031df84e050",
-    "name": "Cerâmica Fria",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pela professora Gabrielle, o After de Cerâmica Fria proporciona aos alunos uma experiência prática e criativa no universo da modelagem artística. Ao longo das aulas, os participantes aprendem desde os conceitos iniciais e os materiais utilizados até técnicas de modelagem, criação de peças individuais e acabamento, incluindo selagem, pintura, aplicação de verniz, secagem e conservação. Em um ambiente acolhedor e inspirador, os alunos desenvolvem a criatividade, a coordenação motora fina, a concentração e a expressão artística, produzindo peças únicas e explorando diferentes possibilidades da cerâmica fria.",
-    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784146074181-y9zy7.png",
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-07-30",
-    "end_time": "08:00",
-    "duration": "",
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": "",
-    "max_capacity": 20,
-    "registration_count": 20,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T19:45:23.235036+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "b9936295-2bb6-4ebd-9f91-3fa91cf58adb",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Terça"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": null,
-    "limitar_vagas_por_ano": 1,
-    "vagas_por_ano": "{\"6º Ano EF\":10,\"7º Ano EF\":10}"
-  },
-  {
     "id": "2feb8306-2cc5-4cfd-a67a-46da8cb2cd38",
     "name": "Jogos de Cartas  ",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -3051,145 +3190,6 @@
     "restringir_dias": 1,
     "dias_semana": [
       "Terça"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
-    "id": "8a6456a9-aa09-4173-9c4c-1eb90710fccb",
-    "name": "Crochê",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pela professora Mariel, o After Crochê tem como objetivo desenvolver habilidades manuais por meio da prática dessa tradicional técnica artesanal. Os estudantes escolhem seus próprios projetos de acordo com seu nível de conhecimento, aprendendo diferentes pontos, técnicas e acabamentos enquanto confeccionam peças autorais. A atividade estimula a criatividade, a concentração, a coordenação motora fina, a autonomia e a paciência em um ambiente acolhedor e colaborativo.",
-    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784222627376-yygh8c.png",
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": null,
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 30,
-    "registration_count": 29,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "c961a1cf-6f4f-4125-b029-c7e513168e8b",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Terça",
-      "Quinta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
-    "id": "59a69e76-6939-4c7d-a463-31acfd331e48",
-    "name": "Circo",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "o After Circo é destinado aos estudantes do 6º e 7º ano e proporciona experiências lúdicas e artísticas por meio de atividades de equilíbrio, malabarismo, acrobacias, expressão corporal e jogos cooperativos. Durante as aulas, os participantes desenvolvem coordenação motora, concentração, criatividade, flexibilidade, autoconfiança, trabalho em equipe, disciplina e autonomia, favorecendo o desenvolvimento físico, social e emocional de forma divertida e significativa.",
-    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784210698431-p8m2cg.png",
-    "start_date": "2026-07-15",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 21,
-    "registration_count": 17,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "b1847e69-31e4-4c62-9a9f-552c6a4d29cd",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Sexta"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",

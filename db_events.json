@@ -1324,7 +1324,7 @@
     "password_protected": false,
     "password": null,
     "max_capacity": 20,
-    "registration_count": 0,
+    "registration_count": 19,
     "form_fields": [
       {
         "id": "field_name",
@@ -1632,80 +1632,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "9e5c1193-65d2-4a55-b35c-af88e5fdc63f",
-    "name": "Culinária",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Salomão, o After Culinária proporciona experiências práticas que vão muito além da cozinha. Durante as aulas, os estudantes aprendem técnicas culinárias, preparo de receitas e boas práticas de manipulação de alimentos, desenvolvendo criatividade, organização, trabalho em equipe e autonomia. Além de preparar diferentes pratos, os participantes exploram conceitos de nutrição, planejamento e segurança alimentar, tornando a culinária uma experiência divertida e educativa.",
-    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784223545969-kz5yj.png",
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF",
-        "8º Ano EF",
-        "9º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 20,
-    "registration_count": 15,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "e305afcc-f707-414e-bf80-2ae8e2aa42d8",
-    "is_paid": 1,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Segunda"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "59937ef4-6ef2-49ff-927a-1e7e7c2e2fc4",
     "name": "Culinária",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -1773,6 +1699,80 @@
     "restringir_dias": 1,
     "dias_semana": [
       "Terça"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "9e5c1193-65d2-4a55-b35c-af88e5fdc63f",
+    "name": "Culinária",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Salomão, o After Culinária proporciona experiências práticas que vão muito além da cozinha. Durante as aulas, os estudantes aprendem técnicas culinárias, preparo de receitas e boas práticas de manipulação de alimentos, desenvolvendo criatividade, organização, trabalho em equipe e autonomia. Além de preparar diferentes pratos, os participantes exploram conceitos de nutrição, planejamento e segurança alimentar, tornando a culinária uma experiência divertida e educativa.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784223545969-kz5yj.png",
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF",
+        "8º Ano EF",
+        "9º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 20,
+    "registration_count": 15,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "e305afcc-f707-414e-bf80-2ae8e2aa42d8",
+    "is_paid": 1,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Segunda"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -1854,79 +1854,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "914ad071-cfe8-4d6a-b93e-daa1d474e8d6",
-    "name": "Culinária  EM",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Salomão, o After Culinária proporciona experiências práticas que vão muito além da cozinha. Durante as aulas, os estudantes aprendem técnicas culinárias, preparo de receitas e boas práticas de manipulação de alimentos, desenvolvendo criatividade, organização, trabalho em equipe e autonomia. Além de preparar diferentes pratos, os participantes exploram conceitos de nutrição, planejamento e segurança alimentar, tornando a culinária uma experiência divertida e educativa.",
-    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784223614359-dloxd.png",
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "1º Ano EM",
-        "2º Ano EM",
-        "3º Ano EM"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 20,
-    "registration_count": 5,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-16T17:36:08.897975+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "e305afcc-f707-414e-bf80-2ae8e2aa42d8",
-    "is_paid": 1,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Quarta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "bf3185b1-9ff9-48de-93e8-d299a5bd3401",
     "name": "Culinária  EM",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -2000,11 +1927,11 @@
     "vagas_por_ano": null
   },
   {
-    "id": "6ec14f97-0fcc-4e9a-a376-f71249478ed7",
-    "name": "Curso de Desenho",
+    "id": "914ad071-cfe8-4d6a-b93e-daa1d474e8d6",
+    "name": "Culinária  EM",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Revson, o After Curso de Desenho incentiva a criatividade, a expressão artística e o desenvolvimento das habilidades visuais dos estudantes. Ao longo das aulas, os participantes exploram técnicas de desenho, composição, perspectiva, luz, sombra, formas e cores, aperfeiçoando a coordenação motora, a percepção estética e a capacidade de representar ideias por meio da arte. O ambiente favorece a imaginação, a autoconfiança e o desenvolvimento artístico de cada aluno.",
-    "image_url": null,
+    "description": "Ministrado pelo professor Salomão, o After Culinária proporciona experiências práticas que vão muito além da cozinha. Durante as aulas, os estudantes aprendem técnicas culinárias, preparo de receitas e boas práticas de manipulação de alimentos, desenvolvendo criatividade, organização, trabalho em equipe e autonomia. Além de preparar diferentes pratos, os participantes exploram conceitos de nutrição, planejamento e segurança alimentar, tornando a culinária uma experiência divertida e educativa.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784223614359-dloxd.png",
     "start_date": "2026-07-30",
     "start_time": "08:00",
     "end_date": "2026-08-01",
@@ -2020,8 +1947,8 @@
     },
     "password_protected": false,
     "password": null,
-    "max_capacity": 32,
-    "registration_count": 17,
+    "max_capacity": 20,
+    "registration_count": 5,
     "form_fields": [
       {
         "id": "field_name",
@@ -2058,14 +1985,14 @@
         "required": true
       }
     ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "created_at": "2026-07-16T17:36:08.897975+00:00",
     "enable_autocomplete": true,
-    "subcategory_id": "fbcc6597-3863-422a-aecb-8d9a6ab00588",
-    "is_paid": 0,
+    "subcategory_id": "e305afcc-f707-414e-bf80-2ae8e2aa42d8",
+    "is_paid": 1,
     "restringir_duplicidade": 0,
     "restringir_dias": 1,
     "dias_semana": [
-      "Sexta"
+      "Quarta"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -2138,6 +2065,79 @@
     "restringir_dias": 1,
     "dias_semana": [
       "Terça"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "6ec14f97-0fcc-4e9a-a376-f71249478ed7",
+    "name": "Curso de Desenho",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Revson, o After Curso de Desenho incentiva a criatividade, a expressão artística e o desenvolvimento das habilidades visuais dos estudantes. Ao longo das aulas, os participantes exploram técnicas de desenho, composição, perspectiva, luz, sombra, formas e cores, aperfeiçoando a coordenação motora, a percepção estética e a capacidade de representar ideias por meio da arte. O ambiente favorece a imaginação, a autoconfiança e o desenvolvimento artístico de cada aluno.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "1º Ano EM",
+        "2º Ano EM",
+        "3º Ano EM"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 32,
+    "registration_count": 17,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "fbcc6597-3863-422a-aecb-8d9a6ab00588",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Sexta"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -2438,78 +2438,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "d13a5fdf-704e-48bf-83b9-4863e6d783c4",
-    "name": "Futebol de Botão",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelos professores Raí e Dilermando, o After Futebol de Botão resgata uma das brincadeiras mais tradicionais do Brasil, proporcionando aos estudantes momentos de diversão, estratégia e competição saudável. Durante o semestre, os participantes disputam campeonatos inspirados no Campeonato Brasileiro e em grandes competições como a Copa do Brasil e a Copa do Mundo, desenvolvendo raciocínio estratégico, concentração, espírito esportivo e respeito aos adversários em um ambiente descontraído e colaborativo.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "8º Ano EF",
-        "9º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 25,
-    "registration_count": 24,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "1cfaf5fa-8bc4-4ddb-a867-d0bc9b342a5f",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Quinta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "46b41ddb-5987-4433-8782-cb50fe65ceeb",
     "name": "Futebol de Botão",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -2575,6 +2503,78 @@
     "restringir_dias": 1,
     "dias_semana": [
       "Terça"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "d13a5fdf-704e-48bf-83b9-4863e6d783c4",
+    "name": "Futebol de Botão",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelos professores Raí e Dilermando, o After Futebol de Botão resgata uma das brincadeiras mais tradicionais do Brasil, proporcionando aos estudantes momentos de diversão, estratégia e competição saudável. Durante o semestre, os participantes disputam campeonatos inspirados no Campeonato Brasileiro e em grandes competições como a Copa do Brasil e a Copa do Mundo, desenvolvendo raciocínio estratégico, concentração, espírito esportivo e respeito aos adversários em um ambiente descontraído e colaborativo.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "8º Ano EF",
+        "9º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 25,
+    "registration_count": 24,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "1cfaf5fa-8bc4-4ddb-a867-d0bc9b342a5f",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Quinta"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -2799,79 +2799,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "a6341436-6d4e-44f1-9870-a48b1c2ea49f",
-    "name": "Gabarita SESI",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "O After Gabarita SESI foi criado para apoiar os estudantes do Ensino Médio na preparação para os principais vestibulares e para o Exame Nacional do Ensino Médio (ENEM). O projeto promove o aprofundamento acadêmico por meio da resolução de questões, desenvolvimento da interpretação de textos, argumentação, pensamento crítico e estratégias de prova, fortalecendo as competências necessárias para o ingresso no Ensino Superior e para a construção do projeto de vida dos estudantes. Mais do que preparar para exames, o Gabarita SESI busca ampliar horizontes, fortalecer sonhos e oferecer uma formação consistente para que cada estudante esteja preparado para os desafios acadêmicos e profissionais do futuro.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "1º Ano EM",
-        "2º Ano EM",
-        "3º Ano EM"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 36,
-    "registration_count": 6,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "d351a47a-2935-47c4-b967-576c2f42c85b",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Segunda"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "84993a40-36b0-466d-adab-720a0f6d1810",
     "name": "Gabarita SESI",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -3018,10 +2945,10 @@
     "vagas_por_ano": null
   },
   {
-    "id": "53b3b78c-e67e-45b5-a611-733cd054004a",
-    "name": "Geocraft",
+    "id": "a6341436-6d4e-44f1-9870-a48b1c2ea49f",
+    "name": "Gabarita SESI",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pela professora Amanda, o After Geocraft utiliza o universo do Minecraft como ferramenta para ensinar conceitos de Geografia de forma prática e divertida. Durante os desafios, os estudantes exploram temas como geomorfologia, climatologia, urbanismo e sustentabilidade enquanto constroem e investigam mundos virtuais, desenvolvendo criatividade, pensamento crítico, resolução de problemas e trabalho colaborativo.",
+    "description": "O After Gabarita SESI foi criado para apoiar os estudantes do Ensino Médio na preparação para os principais vestibulares e para o Exame Nacional do Ensino Médio (ENEM). O projeto promove o aprofundamento acadêmico por meio da resolução de questões, desenvolvimento da interpretação de textos, argumentação, pensamento crítico e estratégias de prova, fortalecendo as competências necessárias para o ingresso no Ensino Superior e para a construção do projeto de vida dos estudantes. Mais do que preparar para exames, o Gabarita SESI busca ampliar horizontes, fortalecer sonhos e oferecer uma formação consistente para que cada estudante esteja preparado para os desafios acadêmicos e profissionais do futuro.",
     "image_url": null,
     "start_date": "2026-07-30",
     "start_time": "08:00",
@@ -3031,14 +2958,15 @@
     "restrictions": {
       "type": "years",
       "values": [
-        "6º Ano EF",
-        "7º Ano EF"
+        "1º Ano EM",
+        "2º Ano EM",
+        "3º Ano EM"
       ]
     },
     "password_protected": false,
     "password": null,
-    "max_capacity": 20,
-    "registration_count": 17,
+    "max_capacity": 36,
+    "registration_count": 6,
     "form_fields": [
       {
         "id": "field_name",
@@ -3077,12 +3005,12 @@
     ],
     "created_at": "2026-07-15T22:09:26.056094+00:00",
     "enable_autocomplete": true,
-    "subcategory_id": "68316eeb-4118-473d-bce6-62240f656a54",
+    "subcategory_id": "d351a47a-2935-47c4-b967-576c2f42c85b",
     "is_paid": 0,
     "restringir_duplicidade": 0,
     "restringir_dias": 1,
     "dias_semana": [
-      "Terça"
+      "Segunda"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -3155,6 +3083,78 @@
     "restringir_dias": 1,
     "dias_semana": [
       "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "53b3b78c-e67e-45b5-a611-733cd054004a",
+    "name": "Geocraft",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pela professora Amanda, o After Geocraft utiliza o universo do Minecraft como ferramenta para ensinar conceitos de Geografia de forma prática e divertida. Durante os desafios, os estudantes exploram temas como geomorfologia, climatologia, urbanismo e sustentabilidade enquanto constroem e investigam mundos virtuais, desenvolvendo criatividade, pensamento crítico, resolução de problemas e trabalho colaborativo.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 20,
+    "registration_count": 17,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "68316eeb-4118-473d-bce6-62240f656a54",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Terça"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -3603,78 +3603,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "9beeccbf-a9c4-4592-a15d-b98e36a1667b",
-    "name": "Memórias Urbanas dos Bairros de Curitiba",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Igor, o After Memórias Urbanas dos Bairros de Curitiba convida os estudantes a conhecerem a história, a identidade e a cultura da cidade por meio das memórias de seus bairros e moradores. Durante as atividades, os participantes exploram o patrimônio histórico e cultural, escutam e recontam histórias da comunidade e refletem sobre a construção da identidade curitibana, fortalecendo o sentimento de pertencimento e valorização da história local.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "8º Ano EF",
-        "9º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 30,
-    "registration_count": 8,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "19b46498-bc70-4b0c-a825-be73550fd70d",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Terça"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "04800316-f0c5-4cd2-9d02-f3c527638dfe",
     "name": "Memórias Urbanas dos Bairros de Curitiba",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -3740,6 +3668,78 @@
     "restringir_dias": 1,
     "dias_semana": [
       "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "9beeccbf-a9c4-4592-a15d-b98e36a1667b",
+    "name": "Memórias Urbanas dos Bairros de Curitiba",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Igor, o After Memórias Urbanas dos Bairros de Curitiba convida os estudantes a conhecerem a história, a identidade e a cultura da cidade por meio das memórias de seus bairros e moradores. Durante as atividades, os participantes exploram o patrimônio histórico e cultural, escutam e recontam histórias da comunidade e refletem sobre a construção da identidade curitibana, fortalecendo o sentimento de pertencimento e valorização da história local.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "8º Ano EF",
+        "9º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 30,
+    "registration_count": 8,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "19b46498-bc70-4b0c-a825-be73550fd70d",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Terça"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -4182,79 +4182,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "947ab33d-bdc9-4da4-abc9-76d14bc21be6",
-    "name": "Musicalização",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Wilson, o After Musicalização é destinado aos estudantes do Ensino Médio e promove reflexões sobre escolhas, propósito, cultura e identidade por meio da música. Ao longo dos encontros, os participantes analisam letras, discutem questões contemporâneas e compreendem como a música influencia a formação da identidade e da sociedade, desenvolvendo pensamento crítico, repertório cultural e expressão artística.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "1º Ano EM",
-        "2º Ano EM",
-        "3º Ano EM"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 17,
-    "registration_count": 14,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "3b8a600c-2245-4b92-94aa-b11ac9f92573",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Segunda"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "42372bfb-f53c-4f16-83f9-4ba73a5dace0",
     "name": "Musicalização",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -4321,6 +4248,79 @@
     "dias_semana": [
       "Terça",
       "Quinta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "947ab33d-bdc9-4da4-abc9-76d14bc21be6",
+    "name": "Musicalização",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Wilson, o After Musicalização é destinado aos estudantes do Ensino Médio e promove reflexões sobre escolhas, propósito, cultura e identidade por meio da música. Ao longo dos encontros, os participantes analisam letras, discutem questões contemporâneas e compreendem como a música influencia a formação da identidade e da sociedade, desenvolvendo pensamento crítico, repertório cultural e expressão artística.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "1º Ano EM",
+        "2º Ano EM",
+        "3º Ano EM"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 17,
+    "registration_count": 14,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "3b8a600c-2245-4b92-94aa-b11ac9f92573",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Segunda"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -4840,73 +4840,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "6d9bac74-1f1a-43f3-9d00-4f1e00ae777b",
-    "name": "Robótica",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pela professora Bruna, o After Robótica é destinado aos estudantes do Ensino Fundamental e Médio e proporciona experiências práticas na construção e programação de robôs. Durante as aulas, os participantes exploram sensores, motores, mecanismos e lógica de programação, desenvolvendo raciocínio lógico, criatividade, resolução de problemas e trabalho em equipe em um ambiente inovador e desafiador.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": null,
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 30,
-    "registration_count": 15,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "56943543-09d7-4de2-bde7-0290bcabed14",
-    "is_paid": 1,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Segunda",
-      "Terça"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "9f3cbb9c-2aa8-4e24-acd2-1acd4f7d4613",
     "name": "Robótica",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -4973,27 +4906,21 @@
     "vagas_por_ano": null
   },
   {
-    "id": "a3e9899f-6672-49bb-b9a3-be3e294f9316",
-    "name": "RPG",
+    "id": "6d9bac74-1f1a-43f3-9d00-4f1e00ae777b",
+    "name": "Robótica",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelos professores Alessandro e Raí, o After RPG é destinado aos estudantes do 6º e 7º ano e utiliza jogos de interpretação de personagens para desenvolver criatividade, pensamento estratégico, resolução de problemas, comunicação e trabalho em equipe. Durante as aventuras, os participantes constroem histórias colaborativas que fortalecem a imaginação, a autonomia e o protagonismo.",
+    "description": "Ministrado pela professora Bruna, o After Robótica é destinado aos estudantes do Ensino Fundamental e Médio e proporciona experiências práticas na construção e programação de robôs. Durante as aulas, os participantes exploram sensores, motores, mecanismos e lógica de programação, desenvolvendo raciocínio lógico, criatividade, resolução de problemas e trabalho em equipe em um ambiente inovador e desafiador.",
     "image_url": null,
     "start_date": "2026-07-30",
     "start_time": "08:00",
     "end_date": "2026-08-01",
     "end_time": "08:00",
     "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF"
-      ]
-    },
+    "restrictions": null,
     "password_protected": false,
     "password": null,
     "max_capacity": 30,
-    "registration_count": 30,
+    "registration_count": 15,
     "form_fields": [
       {
         "id": "field_name",
@@ -5032,13 +4959,13 @@
     ],
     "created_at": "2026-07-15T22:09:26.056094+00:00",
     "enable_autocomplete": true,
-    "subcategory_id": "1cfaf5fa-8bc4-4ddb-a867-d0bc9b342a5f",
-    "is_paid": 0,
+    "subcategory_id": "56943543-09d7-4de2-bde7-0290bcabed14",
+    "is_paid": 1,
     "restringir_duplicidade": 0,
     "restringir_dias": 1,
     "dias_semana": [
       "Segunda",
-      "Quarta"
+      "Terça"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -5115,6 +5042,79 @@
     "dias_semana": [
       "Quarta",
       "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "a3e9899f-6672-49bb-b9a3-be3e294f9316",
+    "name": "RPG",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelos professores Alessandro e Raí, o After RPG é destinado aos estudantes do 6º e 7º ano e utiliza jogos de interpretação de personagens para desenvolver criatividade, pensamento estratégico, resolução de problemas, comunicação e trabalho em equipe. Durante as aventuras, os participantes constroem histórias colaborativas que fortalecem a imaginação, a autonomia e o protagonismo.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 30,
+    "registration_count": 30,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "1cfaf5fa-8bc4-4ddb-a867-d0bc9b342a5f",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Segunda",
+      "Quarta"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -5339,6 +5339,80 @@
     "vagas_por_ano": null
   },
   {
+    "id": "0cd706a4-37f4-472c-b915-ac2184f6d0b2",
+    "name": "Taekwondo",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Gabriel, o After Taekwondo é destinado aos estudantes do Ensino Médio e proporciona o aprendizado das técnicas da modalidade em um ambiente que valoriza disciplina, respeito, autocontrole e superação. Durante as aulas, os participantes aprimoram condicionamento físico, agilidade, coordenação motora e concentração, fortalecendo também valores como perseverança e responsabilidade.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "1º Ano EM",
+        "2º Ano EM",
+        "3º Ano EM"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 2,
+    "registration_count": 2,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "f9f6b349-3baf-45e9-9b09-6086d090b397",
+    "is_paid": 1,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Terça",
+      "Quinta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
     "id": "0fd86c30-d805-4ef0-80f4-8ce05127317d",
     "name": "Taekwondo",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -5414,10 +5488,10 @@
     "vagas_por_ano": null
   },
   {
-    "id": "0cd706a4-37f4-472c-b915-ac2184f6d0b2",
-    "name": "Taekwondo",
+    "id": "5310f04b-c358-465f-82cc-cb55d6e4613b",
+    "name": "Teatro",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Gabriel, o After Taekwondo é destinado aos estudantes do Ensino Médio e proporciona o aprendizado das técnicas da modalidade em um ambiente que valoriza disciplina, respeito, autocontrole e superação. Durante as aulas, os participantes aprimoram condicionamento físico, agilidade, coordenação motora e concentração, fortalecendo também valores como perseverança e responsabilidade.",
+    "description": "Ministrado pela professora Natália, o After Teatro é destinado aos estudantes do 8º e 9º ano e promove o desenvolvimento da expressão artística por meio de jogos dramáticos, improvisações e montagem de cenas. Os participantes desenvolvem criatividade, comunicação, expressão corporal, trabalho em equipe e segurança para falar e atuar em público, vivenciando diferentes linguagens do teatro.",
     "image_url": null,
     "start_date": "2026-07-30",
     "start_time": "08:00",
@@ -5427,15 +5501,14 @@
     "restrictions": {
       "type": "years",
       "values": [
-        "1º Ano EM",
-        "2º Ano EM",
-        "3º Ano EM"
+        "8º Ano EF",
+        "9º Ano EF"
       ]
     },
     "password_protected": false,
     "password": null,
-    "max_capacity": 2,
-    "registration_count": 2,
+    "max_capacity": 6,
+    "registration_count": 4,
     "form_fields": [
       {
         "id": "field_name",
@@ -5474,13 +5547,12 @@
     ],
     "created_at": "2026-07-15T22:09:26.056094+00:00",
     "enable_autocomplete": true,
-    "subcategory_id": "f9f6b349-3baf-45e9-9b09-6086d090b397",
-    "is_paid": 1,
+    "subcategory_id": "b1847e69-31e4-4c62-9a9f-552c6a4d29cd",
+    "is_paid": 0,
     "restringir_duplicidade": 0,
     "restringir_dias": 1,
     "dias_semana": [
-      "Terça",
-      "Quinta"
+      "Segunda"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",
@@ -5553,78 +5625,6 @@
     "restringir_dias": 1,
     "dias_semana": [
       "Sexta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
-    "id": "5310f04b-c358-465f-82cc-cb55d6e4613b",
-    "name": "Teatro",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pela professora Natália, o After Teatro é destinado aos estudantes do 8º e 9º ano e promove o desenvolvimento da expressão artística por meio de jogos dramáticos, improvisações e montagem de cenas. Os participantes desenvolvem criatividade, comunicação, expressão corporal, trabalho em equipe e segurança para falar e atuar em público, vivenciando diferentes linguagens do teatro.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "8º Ano EF",
-        "9º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 6,
-    "registration_count": 4,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "b1847e69-31e4-4c62-9a9f-552c6a4d29cd",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Segunda"
     ],
     "registration_open_at": null,
     "countdown_target_at": "10",

@@ -289,80 +289,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "88db4702-3614-47f6-844b-e83f09a6dc9f",
-    "name": "Muay Thai",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Gabriel, o After Muai Thay oferece aulas dinâmicas que combinam técnicas de golpes, movimentação e exercícios físicos em um ambiente seguro e motivador. A prática contribui para o desenvolvimento do condicionamento físico, da agilidade, da resistência, da disciplina e da autoconfiança, incentivando hábitos saudáveis, respeito e superação de desafios por meio da arte marcial.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF",
-        "8º Ano EF",
-        "9º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 1,
-    "registration_count": 1,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "f9f6b349-3baf-45e9-9b09-6086d090b397",
-    "is_paid": 1,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Sexta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "99b36a60-4c2d-4cf6-b0e3-2da5f52e5a8c",
     "name": "Futsal (Masculino)",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -3771,78 +3697,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "61637860-52a2-4581-b6e7-f5a23ec53bd1",
-    "name": "Cosmética",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pela professora Gabrielle, o After Cosmética é voltado ao estudo e à prática do desenvolvimento de produtos cosméticos. Durante as aulas, os estudantes conhecem diferentes matérias-primas, como ativos, emolientes, emulsificantes, conservantes e fragrâncias, compreendendo a função de cada componente em uma formulação. Ao final das atividades, os participantes levam para casa amostras dos produtos produzidos em laboratório, desenvolvendo raciocínio científico, precisão técnica e criatividade por meio da cosmetologia.",
-    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784222090982-wbggni.png",
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "8º Ano EF",
-        "9º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 20,
-    "registration_count": 20,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "fbcc6597-3863-422a-aecb-8d9a6ab00588",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Sexta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "53b3b78c-e67e-45b5-a611-733cd054004a",
     "name": "Geocraft",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -3913,51 +3767,6 @@
     "countdown_target_at": "10",
     "limitar_vagas_por_ano": 0,
     "vagas_por_ano": null
-  },
-  {
-    "id": "6e58ddd7-162e-43c3-80e5-ac47ce671b94",
-    "name": "Cosmética EM",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pela professora Gabrielle, o After Cosmética é voltado ao estudo e à prática do desenvolvimento de produtos cosméticos.",
-    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784222090982-wbggni.png",
-    "start_date": "2026-07-27",
-    "start_time": "10:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "1º Ano EM",
-        "2º Ano EM",
-        "3º Ano EM"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 20,
-    "registration_count": 20,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-30T16:49:54.308545+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "fbcc6597-3863-422a-aecb-8d9a6ab00588",
-    "is_paid": 0,
-    "restringir_duplicidade": 1,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Quarta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": null,
-    "limitar_vagas_por_ano": 1,
-    "vagas_por_ano": "{\"1º Ano EM\":7,\"2º Ano EM\":7,\"3º Ano EM\":6}"
   },
   {
     "id": "da4ddcdc-562d-479c-a222-e375599589d7",
@@ -4035,6 +3844,51 @@
     "vagas_por_ano": null
   },
   {
+    "id": "6e58ddd7-162e-43c3-80e5-ac47ce671b94",
+    "name": "Cosmética EM",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pela professora Gabrielle, o After Cosmética é voltado ao estudo e à prática do desenvolvimento de produtos cosméticos.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784222090982-wbggni.png",
+    "start_date": "2026-07-27",
+    "start_time": "10:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "1º Ano EM",
+        "2º Ano EM",
+        "3º Ano EM"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 20,
+    "registration_count": 0,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-30T16:49:54.308545+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "fbcc6597-3863-422a-aecb-8d9a6ab00588",
+    "is_paid": 0,
+    "restringir_duplicidade": 1,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Quarta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": null,
+    "limitar_vagas_por_ano": 1,
+    "vagas_por_ano": "{\"1º Ano EM\":7,\"2º Ano EM\":7,\"3º Ano EM\":6}"
+  },
+  {
     "id": "914ad071-cfe8-4d6a-b93e-daa1d474e8d6",
     "name": "Culinária  EM",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -4097,81 +3951,6 @@
     "enable_autocomplete": true,
     "subcategory_id": "e305afcc-f707-414e-bf80-2ae8e2aa42d8",
     "is_paid": 1,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Quarta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
-    "id": "0ada164d-05fb-4568-997b-fef6ae423f0e",
-    "name": "Dança Terapia",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Guto, o After Dança Terapia utiliza a dança como ferramenta para promover bem-estar físico, emocional e social. Por meio de movimentos, dinâmicas e atividades rítmicas, os estudantes desenvolvem consciência corporal, coordenação motora, autoestima, criatividade e expressão emocional, vivenciando momentos de integração, relaxamento e qualidade de vida.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "8º Ano EF",
-        "9º Ano EF",
-        "1º Ano EM",
-        "2º Ano EM",
-        "3º Ano EM"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 36,
-    "registration_count": 36,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "7d85bb7d-9f56-4752-9f4f-22bbbc90cf20",
-    "is_paid": 0,
     "restringir_duplicidade": 0,
     "restringir_dias": 1,
     "dias_semana": [
@@ -4401,78 +4180,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "591ccc58-9cfb-4999-9546-e3edca436d21",
-    "name": "Dança Terapia",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Guto, o After Dança Terapia utiliza a dança como ferramenta para promover bem-estar físico, emocional e social. Por meio de movimentos, dinâmicas e atividades rítmicas, os estudantes desenvolvem consciência corporal, coordenação motora, autoestima, criatividade e expressão emocional, vivenciando momentos de integração, relaxamento e qualidade de vida.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 36,
-    "registration_count": 35,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "7d85bb7d-9f56-4752-9f4f-22bbbc90cf20",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Sexta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "c7b53ac2-6dcf-4f45-b6f6-af27c6c9f379",
     "name": "Produção Audiovisual",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -4620,78 +4327,6 @@
     "vagas_por_ano": null
   },
   {
-    "id": "4c935643-4a10-4201-9c08-ae998d28f554",
-    "name": "Teatro",
-    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
-    "description": "Ministrado pelo professor Keni, o After Teatro é destinado aos estudantes do 6º e 7º ano e proporciona experiências por meio de jogos teatrais, improvisações e atividades de expressão corporal e vocal. As aulas estimulam criatividade, imaginação, comunicação, trabalho em equipe e autoconfiança, permitindo que os alunos desenvolvam sua expressão artística de forma divertida e colaborativa.",
-    "image_url": null,
-    "start_date": "2026-07-30",
-    "start_time": "08:00",
-    "end_date": "2026-08-01",
-    "end_time": "08:00",
-    "duration": null,
-    "restrictions": {
-      "type": "years",
-      "values": [
-        "6º Ano EF",
-        "7º Ano EF"
-      ]
-    },
-    "password_protected": false,
-    "password": null,
-    "max_capacity": 20,
-    "registration_count": 20,
-    "form_fields": [
-      {
-        "id": "field_name",
-        "type": "text",
-        "label": "Nome completo",
-        "required": true
-      },
-      {
-        "id": "field_grade",
-        "type": "select",
-        "label": "Série",
-        "options": [
-          "6º Ano EF",
-          "7º Ano EF",
-          "8º Ano EF",
-          "9º Ano EF",
-          "1º Ano EM",
-          "2º Ano EM",
-          "3º Ano EM"
-        ],
-        "required": true
-      },
-      {
-        "id": "field_class",
-        "type": "select",
-        "label": "Turma",
-        "options": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ],
-        "required": true
-      }
-    ],
-    "created_at": "2026-07-15T22:09:26.056094+00:00",
-    "enable_autocomplete": true,
-    "subcategory_id": "b1847e69-31e4-4c62-9a9f-552c6a4d29cd",
-    "is_paid": 0,
-    "restringir_duplicidade": 0,
-    "restringir_dias": 1,
-    "dias_semana": [
-      "Sexta"
-    ],
-    "registration_open_at": null,
-    "countdown_target_at": "10",
-    "limitar_vagas_por_ano": 0,
-    "vagas_por_ano": null
-  },
-  {
     "id": "2f0d3f57-9898-4fad-bf61-1d1b41ff28a4",
     "name": "Geocraft",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -4764,6 +4399,371 @@
     "vagas_por_ano": null
   },
   {
+    "id": "61637860-52a2-4581-b6e7-f5a23ec53bd1",
+    "name": "Cosmética",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pela professora Gabrielle, o After Cosmética é voltado ao estudo e à prática do desenvolvimento de produtos cosméticos. Durante as aulas, os estudantes conhecem diferentes matérias-primas, como ativos, emolientes, emulsificantes, conservantes e fragrâncias, compreendendo a função de cada componente em uma formulação. Ao final das atividades, os participantes levam para casa amostras dos produtos produzidos em laboratório, desenvolvendo raciocínio científico, precisão técnica e criatividade por meio da cosmetologia.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784222090982-wbggni.png",
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "8º Ano EF",
+        "9º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 20,
+    "registration_count": 0,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "fbcc6597-3863-422a-aecb-8d9a6ab00588",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "0ada164d-05fb-4568-997b-fef6ae423f0e",
+    "name": "Dança Terapia",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Guto, o After Dança Terapia utiliza a dança como ferramenta para promover bem-estar físico, emocional e social. Por meio de movimentos, dinâmicas e atividades rítmicas, os estudantes desenvolvem consciência corporal, coordenação motora, autoestima, criatividade e expressão emocional, vivenciando momentos de integração, relaxamento e qualidade de vida.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "8º Ano EF",
+        "9º Ano EF",
+        "1º Ano EM",
+        "2º Ano EM",
+        "3º Ano EM"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 36,
+    "registration_count": 0,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "7d85bb7d-9f56-4752-9f4f-22bbbc90cf20",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Quarta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "591ccc58-9cfb-4999-9546-e3edca436d21",
+    "name": "Dança Terapia",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Guto, o After Dança Terapia utiliza a dança como ferramenta para promover bem-estar físico, emocional e social. Por meio de movimentos, dinâmicas e atividades rítmicas, os estudantes desenvolvem consciência corporal, coordenação motora, autoestima, criatividade e expressão emocional, vivenciando momentos de integração, relaxamento e qualidade de vida.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 36,
+    "registration_count": 0,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "7d85bb7d-9f56-4752-9f4f-22bbbc90cf20",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "4c935643-4a10-4201-9c08-ae998d28f554",
+    "name": "Teatro",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Keni, o After Teatro é destinado aos estudantes do 6º e 7º ano e proporciona experiências por meio de jogos teatrais, improvisações e atividades de expressão corporal e vocal. As aulas estimulam criatividade, imaginação, comunicação, trabalho em equipe e autoconfiança, permitindo que os alunos desenvolvam sua expressão artística de forma divertida e colaborativa.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 20,
+    "registration_count": 0,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "b1847e69-31e4-4c62-9a9f-552c6a4d29cd",
+    "is_paid": 0,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
+    "id": "88db4702-3614-47f6-844b-e83f09a6dc9f",
+    "name": "Muay Thai",
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "description": "Ministrado pelo professor Gabriel, o After Muai Thay oferece aulas dinâmicas que combinam técnicas de golpes, movimentação e exercícios físicos em um ambiente seguro e motivador. A prática contribui para o desenvolvimento do condicionamento físico, da agilidade, da resistência, da disciplina e da autoconfiança, incentivando hábitos saudáveis, respeito e superação de desafios por meio da arte marcial.",
+    "image_url": null,
+    "start_date": "2026-07-30",
+    "start_time": "08:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": {
+      "type": "years",
+      "values": [
+        "6º Ano EF",
+        "7º Ano EF",
+        "8º Ano EF",
+        "9º Ano EF"
+      ]
+    },
+    "password_protected": false,
+    "password": null,
+    "max_capacity": 1,
+    "registration_count": 0,
+    "form_fields": [
+      {
+        "id": "field_name",
+        "type": "text",
+        "label": "Nome completo",
+        "required": true
+      },
+      {
+        "id": "field_grade",
+        "type": "select",
+        "label": "Série",
+        "options": [
+          "6º Ano EF",
+          "7º Ano EF",
+          "8º Ano EF",
+          "9º Ano EF",
+          "1º Ano EM",
+          "2º Ano EM",
+          "3º Ano EM"
+        ],
+        "required": true
+      },
+      {
+        "id": "field_class",
+        "type": "select",
+        "label": "Turma",
+        "options": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "required": true
+      }
+    ],
+    "created_at": "2026-07-15T22:09:26.056094+00:00",
+    "enable_autocomplete": true,
+    "subcategory_id": "f9f6b349-3baf-45e9-9b09-6086d090b397",
+    "is_paid": 1,
+    "restringir_duplicidade": 0,
+    "restringir_dias": 1,
+    "dias_semana": [
+      "Sexta"
+    ],
+    "registration_open_at": null,
+    "countdown_target_at": "10",
+    "limitar_vagas_por_ano": 0,
+    "vagas_por_ano": null
+  },
+  {
     "id": "9b5c83f9-8d07-4479-b98c-f4d055a3ac38",
     "name": "Tênis de Mesa",
     "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
@@ -4784,7 +4784,7 @@
     "password_protected": false,
     "password": null,
     "max_capacity": 10,
-    "registration_count": 10,
+    "registration_count": 0,
     "form_fields": [
       {
         "id": "field_name",
@@ -4857,7 +4857,7 @@
     "password_protected": false,
     "password": null,
     "max_capacity": 20,
-    "registration_count": 20,
+    "registration_count": 0,
     "form_fields": [
       {
         "id": "field_name",

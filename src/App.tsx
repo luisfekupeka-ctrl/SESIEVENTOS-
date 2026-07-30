@@ -15,6 +15,7 @@ import AdminStudents from './pages/AdminStudents';
 import AdminCollaborators from './pages/AdminCollaborators';
 import AdminResponsible from './pages/AdminResponsible';
 import AdminEventRegistrations from './pages/AdminEventRegistrations';
+import AdminAllRegistrations from './pages/AdminAllRegistrations';
 import AdminCalendar from './pages/AdminCalendar';
 import AdminManagement from './pages/AdminManagement';
 
@@ -63,6 +64,7 @@ export default function App() {
                   <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/admin/calendar" element={<ProtectedRoute><AdminCalendar /></ProtectedRoute>} />
                   <Route path="/admin/events" element={<ProtectedRoute><AdminEvents /></ProtectedRoute>} />
+                  <Route path="/admin/all-registrations" element={<ProtectedRoute><AdminAllRegistrations /></ProtectedRoute>} />
                   <Route path="/admin/events/:id/registrations" element={<ProtectedRoute><AdminEventRegistrations /></ProtectedRoute>} />
                   <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
                   <Route path="/admin/students" element={<ProtectedRoute><AdminStudents /></ProtectedRoute>} />

@@ -155,6 +155,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label={t('Dashboard')} active={location.pathname === '/admin'} onClick={toggleMobileMenu} />
                 <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label={t('Calendário')} active={location.pathname === '/admin/calendar'} onClick={toggleMobileMenu} />
                 <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label={t('Meus Eventos')} active={location.pathname === '/admin/events'} onClick={toggleMobileMenu} />
+                <AdminNavItem to="/admin/all-registrations" icon={<FileSpreadsheet size={18} />} label={t('Todas Inscrições')} active={location.pathname === '/admin/all-registrations'} onClick={toggleMobileMenu} />
                 <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label={t('Categorias')} active={location.pathname === '/admin/categories'} onClick={toggleMobileMenu} />
                 
                 <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">{t('Participantes')}</div>
@@ -189,6 +190,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <AdminNavItem to="/admin" icon={<LayoutDashboard size={18} />} label={t('Dashboard')} active={location.pathname === '/admin'} />
                 <AdminNavItem to="/admin/calendar" icon={<Calendar size={18} />} label={t('Calendário')} active={location.pathname === '/admin/calendar'} />
                 <AdminNavItem to="/admin/events" icon={<Plus size={18} />} label={t('Eventos')} active={location.pathname === '/admin/events'} />
+                <AdminNavItem to="/admin/all-registrations" icon={<FileSpreadsheet size={18} />} label={t('Todas Inscrições')} active={location.pathname === '/admin/all-registrations'} />
                 <AdminNavItem to="/admin/categories" icon={<Tags size={18} />} label={t('Categorias')} active={location.pathname === '/admin/categories'} />
                 <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-600 uppercase tracking-[0.2em]">{t('Participantes')}</div>
                 <AdminNavItem to="/admin/students" icon={<GraduationCap size={18} />} label={t('Alunos')} active={location.pathname === '/admin/students'} />

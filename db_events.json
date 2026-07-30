@@ -1986,5 +1986,33 @@
     "countdown_target_at": "10",
     "limitar_vagas_por_ano": 0,
     "vagas_por_ano": null
+  },
+  {
+    "id": "6e58ddd7-162e-43c3-80e5-ac47ce671b94",
+    "name": "Cosmética EM",
+    "description": "Ministrado pela professora Gabrielle, o After Cosmética é voltado ao estudo e à prática do desenvolvimento de produtos cosméticos.",
+    "image_url": "https://ecuifnclxvozwdbprnvy.supabase.co/storage/v1/object/public/events/1784222090982-wbggni.png",
+    "start_date": "2026-07-27",
+    "start_time": "10:00",
+    "end_date": "2026-08-01",
+    "end_time": "08:00",
+    "duration": null,
+    "restrictions": "{\"type\":\"years\",\"values\":[\"1º Ano EM\",\"2º Ano EM\",\"3º Ano EM\"]}",
+    "password_protected": 0,
+    "password": null,
+    "max_capacity": 20,
+    "registration_count": 0,
+    "form_fields": "[{\"id\":\"field_name\",\"type\":\"text\",\"label\":\"Nome completo\",\"required\":true}]",
+    "enable_autocomplete": 1,
+    "category_id": "f5774373-5f37-447a-8d6d-560a0f6d18e9",
+    "subcategory_id": "fbcc6597-3863-422a-aecb-8d9a6ab00588",
+    "is_paid": 0,
+    "restringir_duplicidade": 1,
+    "restringir_dias": 1,
+    "dias_semana": "[\"Quarta\"]",
+    "registration_open_at": null,
+    "countdown_target_at": null,
+    "limitar_vagas_por_ano": 1,
+    "vagas_por_ano": "{\"1º Ano EM\":7,\"2º Ano EM\":7,\"3º Ano EM\":6}"
   }
 ]

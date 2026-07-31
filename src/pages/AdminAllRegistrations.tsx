@@ -294,13 +294,18 @@ export default function AdminAllRegistrations() {
                           <span className="text-xs font-bold text-slate-400">{grade}{klass ? ` · ${klass}` : ''}</span>
                         </td>
                         <td className="py-3 px-4">
-                          <button
-                            onClick={() => navigate(`/admin/events/${reg.event_id}/registrations`)}
-                            className="inline-block bg-yellow-400/10 text-yellow-400 text-xs font-black px-2.5 py-1 rounded-lg border border-yellow-400/20 hover:bg-yellow-400/25 hover:border-yellow-400/50 transition-all cursor-pointer"
-                            title="Ver inscrições deste after"
-                          >
-                            {afterName}
-                          </button>
+                          <div className="flex flex-col gap-1">
+                            <button
+                              onClick={() => navigate(`/admin/events/${reg.event_id}/registrations`)}
+                              className="inline-block bg-yellow-400/10 text-yellow-400 text-xs font-black px-2.5 py-1 rounded-lg border border-yellow-400/20 hover:bg-yellow-400/25 hover:border-yellow-400/50 transition-all cursor-pointer text-left"
+                              title="Ver inscrições deste after"
+                            >
+                              {afterName}
+                            </button>
+                            {dias !== '—' && (
+                              <span className="text-xs font-bold text-slate-500">{dias}</span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3 px-4 hidden md:table-cell">
                           <span className="text-xs font-bold text-slate-400">{dias}</span>

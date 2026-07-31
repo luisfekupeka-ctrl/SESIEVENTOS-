@@ -28,6 +28,7 @@ export default function AdminDashboard() {
   const [events, setEvents] = useState<Event[]>([]);
   const [recentRegistrations, setRecentRegistrations] = useState<Registration[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [totalRealRegistrations, setTotalRealRegistrations] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [backgroundLoading, setBackgroundLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -46,10 +47,11 @@ export default function AdminDashboard() {
       }
       
       setError(null);
-      const [eventsRes, regsRes, studentsRes] = await Promise.all([
+      const [eventsRes, regsRes, studentsRes, countRes] = await Promise.all([
         supabase.from('events').select('*').order('name', { ascending: true }),
         supabase.from('registrations').select('*, students(*)').order('timestamp', { ascending: false }).limit(5),
-        supabase.from('students').select('*')
+        supabase.from('students').select('*'),
+        supabase.from('registrations').select('*', { count: 'exact', head: true })
       ]);
 
       if (eventsRes.error) throw eventsRes.error;
@@ -59,6 +61,7 @@ export default function AdminDashboard() {
       if (eventsRes.data) setEvents(eventsRes.data as Event[]);
       if (regsRes.data) setRecentRegistrations(regsRes.data as any);
       if (studentsRes.data) setStudents(studentsRes.data as Student[]);
+      setTotalRealRegistrations(countRes.count ?? 0);
     } catch (err: any) {
       console.error("Erro detalhado ao carregar dados do dashboard:", err);
       if (err.message && err.message.toLowerCase().includes('jwt')) {
@@ -107,11 +110,9 @@ export default function AdminDashboard() {
     );
   }
 
-  const totalRegistrations = (events || []).reduce((sum, event) => sum + (event?.registration_count || 0), 0);
-
   const stats = [
     { label: t('Eventos'), value: (events || []).length, icon: <Calendar size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
-    { label: t('Inscrições'), value: totalRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
+    { label: t('Inscrições'), value: totalRealRegistrations, icon: <TrendingUp size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
     { label: t('Alunos'), value: (students || []).filter(s => s?.type === 'student').length, icon: <GraduationCap size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
     { label: t('Colaboradores'), value: (students || []).filter(s => s?.type === 'collaborator').length, icon: <Users size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },
     { label: t('Responsáveis'), value: (students || []).filter(s => s?.type === 'responsible').length, icon: <School size={24} />, color: 'bg-yellow-400 shadow-yellow-400/20' },

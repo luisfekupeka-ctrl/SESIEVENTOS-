@@ -39,6 +39,16 @@ export default function AdminEventRegistrations() {
   const [participantTypeFilter, setParticipantTypeFilter] = useState('student');
   const [bulkParticipantType, setBulkParticipantType] = useState<'student' | 'collaborator' | 'responsible' | 'other'>('student');
 
+  // Reset modal filters when the add-student modal closes
+  useEffect(() => {
+    if (!isAddModalOpen) {
+      setStudentSearch('');
+      setFilterGrade('all');
+      setFilterClasses([]);
+      setParticipantTypeFilter('student');
+    }
+  }, [isAddModalOpen]);
+
   useEffect(() => {
     if (!id) return;
 
@@ -92,6 +102,7 @@ export default function AdminEventRegistrations() {
       supabase.removeChannel(regsChannel);
     };
   }, [id]);
+
 
   const fetchStudents = async () => {
     const { data } = await supabase.from('students').select('*').order('name');
@@ -249,7 +260,7 @@ export default function AdminEventRegistrations() {
 
       // 1. Get all students from DB for matching
       const { data: studentsFromDB } = await supabase.from('students').select('*');
-      if (studentsFromDB.length === 0) {
+      if (!studentsFromDB || studentsFromDB.length === 0) {
         setBatchFeedback('Erro: O banco de alunos está vazio. Por favor, importe os alunos na aba "Alunos" primeiro.');
         setIsAdding(false);
         return;

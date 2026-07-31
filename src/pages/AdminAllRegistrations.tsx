@@ -81,6 +81,18 @@ export default function AdminAllRegistrations() {
 
   useEffect(() => {
     fetchAll();
+
+    // Subscribe to realtime updates so the list auto-refreshes
+    const channel = supabase
+      .channel('all_registrations_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'registrations' }, () => {
+        fetchAll(true);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchAll]);
 
   // Filtered data

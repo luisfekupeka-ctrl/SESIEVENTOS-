@@ -249,8 +249,8 @@ export default function EventDetails() {
 
 
 
-    // ── Bloquear se nome não foi selecionado da lista de sugestões ────────
-    if (!studentSelectedFromList) {
+    // ── Bloquear se nome não foi selecionado da lista de sugestões (apenas para alunos) ────────
+    if (participantType === 'student' && !studentSelectedFromList) {
       setRestrictionError('Por favor, selecione seu nome da lista de sugestões. Digite pelo menos 2 letras e clique no seu nome quando aparecer.');
       return;
     }

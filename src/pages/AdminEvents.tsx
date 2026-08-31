@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
 import { Event, Category, FormField, EventTemplate } from '../types';
-import { Plus, Trash2, Edit2, X, Check, Calendar, Clock, FileText, ShieldCheck, List, ChevronDown, ChevronUp, Users, Lock, Copy, Bookmark, Sparkles, TrendingUp, AlertTriangle, QrCode, Download, UploadCloud, Loader2, CheckCircle2, Search } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Check, Calendar, Clock, FileText, ShieldCheck, List, ChevronDown, ChevronUp, Users, Lock, Copy, Bookmark, Sparkles, TrendingUp, AlertTriangle, QrCode, Download, UploadCloud, Loader2, CheckCircle2, Search, Eye, EyeOff } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
@@ -422,6 +422,24 @@ export default function AdminEvents() {
     });
   };
 
+  const handleToggleVisibility = async (event: Event) => {
+    try {
+      const newHiddenState = event.is_hidden === 1 ? 0 : 1;
+      const { error } = await supabase
+        .from('events')
+        .update({ is_hidden: newHiddenState })
+        .eq('id', event.id);
+        
+      if (error) throw error;
+      
+      setEvents(prev => prev.map(e => e.id === event.id ? { ...e, is_hidden: newHiddenState } : e));
+      setFeedback({ type: 'success', message: newHiddenState === 1 ? 'Evento ocultado com sucesso!' : 'Evento visível com sucesso!' });
+    } catch (err: any) {
+      console.error(err);
+      setFeedback({ type: 'error', message: 'Erro ao alterar visibilidade do evento.' });
+    }
+  };
+
   const addFormField = () => {
     const newField: FormField = {
       id: Math.random().toString(36).substr(2, 9),
@@ -809,6 +827,17 @@ export default function AdminEvents() {
                   title="Gerar QR Code"
                 >
                   <QrCode size={22} />
+                </button>
+                <button
+                  onClick={() => handleToggleVisibility(event)}
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all border shadow-sm ${
+                    event.is_hidden === 1
+                      ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20'
+                      : 'bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+                  }`}
+                  title={event.is_hidden === 1 ? "Mostrar a Todos" : "Ocultar Evento"}
+                >
+                  {event.is_hidden === 1 ? <EyeOff size={22} /> : <Eye size={22} />}
                 </button>
                 <button
                   onClick={() => handleOpenModal(event)}

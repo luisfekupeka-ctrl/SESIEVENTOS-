@@ -91,7 +91,11 @@ db.exec(`
     registration_open_at TEXT,
     countdown_target_at TEXT,
     limitar_vagas_por_ano INTEGER DEFAULT 0,
-    vagas_por_ano INTEGER DEFAULT NULL
+    vagas_por_ano INTEGER DEFAULT NULL,
+    is_hidden INTEGER DEFAULT 0,
+    limitar_vagas_genero INTEGER DEFAULT 0,
+    vagas_masculino INTEGER DEFAULT 0,
+    vagas_feminino INTEGER DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS registrations (
@@ -130,7 +134,11 @@ db.exec(`
     registration_open_at TEXT,
     countdown_target_at TEXT,
     limitar_vagas_por_ano INTEGER DEFAULT 0,
-    vagas_por_ano INTEGER DEFAULT NULL
+    vagas_por_ano INTEGER DEFAULT NULL,
+    is_hidden INTEGER DEFAULT 0,
+    limitar_vagas_genero INTEGER DEFAULT 0,
+    vagas_masculino INTEGER DEFAULT 0,
+    vagas_feminino INTEGER DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS system_settings (
@@ -789,6 +797,49 @@ function executeRegisterParticipant(req: any, res: any) {
               success: false, 
               error: `Infelizmente, o limite de ${gradeLimit} vagas para o ${matchedKey} já foi preenchido.` 
             });
+          }
+        }
+      }
+    }
+
+    // Check gender limit
+    if (event.limitar_vagas_genero === 1) {
+      let userGender = null;
+      for (const key of Object.keys(form_data || {})) {
+        const lowerKey = key.toLowerCase();
+        if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
+          userGender = String(form_data[key]).toLowerCase();
+          break;
+        }
+      }
+
+      if (userGender) {
+        let isMale = userGender.includes('masc') || userGender === 'm';
+        let isFemale = userGender.includes('fem') || userGender === 'f';
+
+        if (isMale || isFemale) {
+          const genderCount = eventRegistrations.filter(r => {
+            let rGender = null;
+            const rData = safeJsonParse(r.form_data) || {};
+            for (const key of Object.keys(rData)) {
+              const lowerKey = key.toLowerCase();
+              if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
+                rGender = String(rData[key]).toLowerCase();
+                break;
+              }
+            }
+            if (!rGender) return false;
+            
+            if (isMale) return rGender.includes('masc') || rGender === 'm';
+            if (isFemale) return rGender.includes('fem') || rGender === 'f';
+            return false;
+          }).length;
+
+          if (isMale && event.vagas_masculino > 0 && genderCount >= event.vagas_masculino) {
+            return res.status(400).json({ success: false, error: 'O limite de vagas para o sexo masculino já foi preenchido.' });
+          }
+          if (isFemale && event.vagas_feminino > 0 && genderCount >= event.vagas_feminino) {
+            return res.status(400).json({ success: false, error: 'O limite de vagas para o sexo feminino já foi preenchido.' });
           }
         }
       }

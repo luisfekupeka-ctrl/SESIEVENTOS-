@@ -62,7 +62,11 @@ export default function AdminEvents() {
     is_paid: 0,
     restringir_duplicidade: 0,
     limitar_vagas_por_ano: 0,
-    vagas_por_ano: undefined
+    vagas_por_ano: undefined,
+    is_hidden: 0,
+    limitar_vagas_genero: 0,
+    vagas_masculino: 0,
+    vagas_feminino: 0
   });
 
   const [backgroundLoading, setBackgroundLoading] = useState(false);
@@ -186,7 +190,11 @@ export default function AdminEvents() {
         vagas_por_ano: vagasPorAnoParsed,
         restringir_dias: event.restringir_dias || 0,
         registration_open_at: event.registration_open_at || '',
-        countdown_target_at: event.countdown_target_at || ''
+        countdown_target_at: event.countdown_target_at || '',
+        is_hidden: event.is_hidden || 0,
+        limitar_vagas_genero: event.limitar_vagas_genero || 0,
+        vagas_masculino: event.vagas_masculino || 0,
+        vagas_feminino: event.vagas_feminino || 0
       });
     } else {
       setEditingEvent(null);
@@ -214,7 +222,11 @@ export default function AdminEvents() {
         limitar_vagas_por_ano: 0,
         vagas_por_ano: undefined,
         registration_open_at: '',
-        countdown_target_at: ''
+        countdown_target_at: '',
+        is_hidden: 0,
+        limitar_vagas_genero: 0,
+        vagas_masculino: 0,
+        vagas_feminino: 0
       });
     }
     setIsModalOpen(true);
@@ -420,7 +432,7 @@ export default function AdminEvents() {
     setFormData(prev => ({ ...prev, form_fields: [...(prev.form_fields || []), newField] }));
   };
 
-  const addPresetField = (preset: 'grade' | 'class' | 'name' | 'surname') => {
+  const addPresetField = (preset: 'grade' | 'class' | 'name' | 'surname' | 'gender') => {
     let newField: FormField;
 
     if (preset === 'name' || preset === 'surname') {
@@ -429,6 +441,14 @@ export default function AdminEvents() {
         label: preset === 'name' ? 'Nome' : 'Sobrenome',
         type: 'text',
         required: true
+      };
+    } else if (preset === 'gender') {
+      newField = {
+        id: Math.random().toString(36).substr(2, 9),
+        label: 'Gênero',
+        type: 'select',
+        required: true,
+        options: ['Masculino', 'Feminino']
       };
     } else {
       newField = {
@@ -1025,6 +1045,32 @@ export default function AdminEvents() {
                     <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Vagas</label>
                     <input type="number" placeholder="0 = Ilimitado" className="w-full px-5 py-4 bg-slate-950/50 border border-slate-800 rounded-2xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all placeholder:text-slate-600 shadow-sm" value={formData.max_capacity || ''} onChange={(e) => setFormData({ ...formData, max_capacity: parseInt(e.target.value) || 0 })} />
                   </div>
+
+                  {/* Gender Limit Toggle */}
+                  <div className="space-y-4 md:col-span-2 p-6 bg-slate-950/50 border border-slate-800 rounded-3xl">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Limitar Vagas por Gênero</label>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, limitar_vagas_genero: formData.limitar_vagas_genero === 1 ? 0 : 1 })}
+                        className={`w-14 h-8 rounded-full transition-all relative ${formData.limitar_vagas_genero === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                      >
+                        <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.limitar_vagas_genero === 1 ? 'left-7' : 'left-1'}`}></div>
+                      </button>
+                    </div>
+                    {formData.limitar_vagas_genero === 1 && (
+                      <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-yellow-400 uppercase tracking-widest">Vagas (Masculino)</label>
+                          <input type="number" min="0" placeholder="0" className="w-full px-5 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all" value={formData.vagas_masculino || ''} onChange={(e) => setFormData({ ...formData, vagas_masculino: parseInt(e.target.value) || 0 })} />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-yellow-400 uppercase tracking-widest">Vagas (Feminino)</label>
+                          <input type="number" min="0" placeholder="0" className="w-full px-5 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all" value={formData.vagas_feminino || ''} onChange={(e) => setFormData({ ...formData, vagas_feminino: parseInt(e.target.value) || 0 })} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </section>
 
@@ -1038,6 +1084,19 @@ export default function AdminEvents() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-8">
+                  <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Ocultar Evento de Visitantes</label>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, is_hidden: formData.is_hidden === 1 ? 0 : 1 })}
+                        className={`w-14 h-8 rounded-full transition-all relative ${formData.is_hidden === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                      >
+                        <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.is_hidden === 1 ? 'left-7' : 'left-1'}`}></div>
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="p-6 bg-slate-950/50 border border-slate-800 rounded-3xl space-y-6">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Proteção por Senha</label>
@@ -1424,7 +1483,7 @@ export default function AdminEvents() {
                     <h3 className="text-2xl font-black text-white tracking-tight">Formulário de Inscrição</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {['name', 'surname', 'grade', 'class'].map(preset => (
+                    {['name', 'surname', 'grade', 'class', 'gender'].map(preset => (
                       <button key={preset} type="button" onClick={() => addPresetField(preset as any)} className="px-4 py-2 bg-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 hover:text-black transition-all border border-slate-700">
                         + {preset}
                       </button>

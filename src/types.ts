@@ -50,6 +50,10 @@ export interface Event {
   countdown_target_at?: string;
   limitar_vagas_por_ano?: number;
   vagas_por_ano?: Record<string, number> | string;
+  is_hidden?: number;
+  limitar_vagas_genero?: number;
+  vagas_masculino?: number;
+  vagas_feminino?: number;
 }
 
 export interface Student {

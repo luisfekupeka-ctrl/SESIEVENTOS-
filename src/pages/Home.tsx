@@ -129,7 +129,7 @@ export default function Home() {
       matchesDay = eventDays.includes(selectedDay);
     }
 
-    return matchesSearch && matchesCategory && matchesSubcategory && matchesYear && matchesDay;
+    return matchesSearch && matchesCategory && matchesSubcategory && matchesYear && matchesDay && event.is_hidden !== 1;
   });
 
   return (

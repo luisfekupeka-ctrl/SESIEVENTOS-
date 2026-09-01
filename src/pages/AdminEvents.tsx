@@ -774,9 +774,9 @@ export default function AdminEvents() {
             const hasGenderLimit = event.limitar_vagas_genero === 1 && (Number(event.vagas_masculino) > 0 || Number(event.vagas_feminino) > 0);
 
             return (
-              <div key={event.id} className="bg-slate-900/95 rounded-3xl border border-slate-800 shadow-xl hover:border-yellow-400/40 transition-all overflow-hidden flex flex-col md:flex-row group backdrop-blur-md">
-                {/* Left: Large Workshop Image */}
-                <div className="w-full md:w-80 lg:w-96 xl:w-[420px] aspect-[16/10] md:aspect-auto md:min-h-full bg-slate-950 relative overflow-hidden flex-shrink-0">
+              <div key={event.id} className="bg-slate-900/95 rounded-2xl border border-slate-800 shadow-xl hover:border-yellow-400/40 transition-all overflow-hidden flex flex-col md:flex-row group backdrop-blur-md">
+                {/* Left: Rectangular Workshop Cover Image */}
+                <div className="w-full md:w-64 lg:w-72 aspect-[16/10] md:aspect-auto md:min-h-full bg-slate-950 relative overflow-hidden flex-shrink-0">
                   <img 
                     src={event.image_url || getEventImage(event.name) || undefined} 
                     alt={event.name} 
@@ -786,78 +786,78 @@ export default function AdminEvents() {
                   <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950/80 via-transparent to-transparent"></div>
 
                   {/* Top Badges on Image */}
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-3 py-1 bg-yellow-400 text-black text-[11px] font-black uppercase tracking-wider rounded-xl shadow-md">
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="px-2.5 py-0.5 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md">
                         {categoryName}
                       </span>
-                      <span className={`px-2.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-xl shadow-md ${
+                      <span className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md ${
                         event.is_paid === 1 ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
                       }`}>
                         {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
                       </span>
                       {event.is_hidden === 1 && (
-                        <span className="px-2.5 py-1 bg-amber-500/90 text-black font-black text-[10px] uppercase tracking-wider rounded-xl shadow-md">
+                        <span className="px-2 py-0.5 bg-amber-500/90 text-black font-black text-[9px] uppercase tracking-wider rounded-lg shadow-md">
                           Oculto
                         </span>
                       )}
                     </div>
                     {event.password_protected && (
-                      <div className="w-8 h-8 bg-slate-950/90 backdrop-blur-md rounded-xl flex items-center justify-center text-yellow-400 border border-yellow-400/30 shadow-md">
-                        <Lock size={14} />
+                      <div className="w-7 h-7 bg-slate-950/90 backdrop-blur-md rounded-lg flex items-center justify-center text-yellow-400 border border-yellow-400/30 shadow-md">
+                        <Lock size={12} />
                       </div>
                     )}
                   </div>
 
                   {/* Bottom Badges on Image */}
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
+                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
                     {daysText ? (
-                      <span className="px-3.5 py-1.5 bg-slate-950/90 border border-slate-700/80 text-white text-[11px] font-black uppercase tracking-wider rounded-xl backdrop-blur-md flex items-center gap-2 shadow-lg">
-                        <Calendar size={13} className="text-yellow-400" />
+                      <span className="px-2.5 py-1 bg-slate-950/90 border border-slate-700/80 text-white text-[10px] font-black uppercase tracking-wider rounded-lg backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+                        <Calendar size={12} className="text-yellow-400" />
                         {daysText}
                       </span>
                     ) : <div />}
 
                     {isFull ? (
-                      <span className="px-3.5 py-1.5 bg-red-600 text-white text-[11px] font-black uppercase tracking-wider rounded-xl shadow-lg animate-pulse">
+                      <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-lg animate-pulse">
                         Lotado
                       </span>
                     ) : maxCap > 0 ? (
-                      <span className="px-3.5 py-1.5 bg-slate-950/90 border border-slate-700/80 text-yellow-400 text-[11px] font-black uppercase tracking-tight rounded-xl backdrop-blur-md shadow-lg">
+                      <span className="px-2.5 py-1 bg-slate-950/90 border border-slate-700/80 text-yellow-400 text-[10px] font-black uppercase tracking-tight rounded-lg backdrop-blur-md shadow-lg">
                         {remainingSpots} vagas
                       </span>
                     ) : null}
                   </div>
                 </div>
 
-                {/* Right: Spacious Information & Controls */}
-                <div className="p-6 md:p-8 flex-1 flex flex-col justify-between gap-6">
+                {/* Right: Rectangular Content & Complete Info */}
+                <div className="p-5 md:p-6 flex-1 flex flex-col justify-between gap-4">
                   <div>
-                    {/* Header Title */}
-                    <div className="mb-4">
-                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-yellow-400 group-hover:text-yellow-300 transition-colors tracking-tight leading-tight mb-2">
+                    {/* Header Title & Description (No cutoffs) */}
+                    <div className="mb-3">
+                      <h3 className="text-xl md:text-2xl font-black text-yellow-400 group-hover:text-yellow-300 transition-colors tracking-tight leading-tight mb-1.5">
                         {event.name}
                       </h3>
                       {event.description && (
-                        <p className="text-slate-300 text-sm font-medium line-clamp-2 leading-relaxed">
+                        <p className="text-slate-300 text-xs font-medium leading-relaxed">
                           {event.description}
                         </p>
                       )}
                     </div>
 
-                    {/* Vagas Progress Bar (Full Width & Spacious) */}
-                    <div className="p-4 bg-slate-950/70 border border-slate-800 rounded-2xl mb-4">
-                      <div className="flex items-center justify-between text-xs font-black mb-2">
-                        <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[11px]">
-                          <Users size={15} className="text-yellow-400" />
+                    {/* Vagas Progress Bar */}
+                    <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl mb-3">
+                      <div className="flex items-center justify-between text-xs font-black mb-1.5">
+                        <span className="text-slate-400 flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                          <Users size={13} className="text-yellow-400" />
                           Vagas Preenchidas:
                         </span>
-                        <span className={`text-sm font-black ${isFull ? 'text-red-400' : 'text-white'}`}>
+                        <span className={`text-xs font-black ${isFull ? 'text-red-400' : 'text-white'}`}>
                           {regCount} {maxCap > 0 ? `/ ${maxCap}` : ''} {maxCap > 0 && `(${fillPercent}%)`}
                         </span>
                       </div>
                       {maxCap > 0 && (
-                        <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full transition-all duration-500 ${
                               isFull ? 'bg-red-500' : fillPercent >= 80 ? 'bg-amber-400' : 'bg-emerald-400'
@@ -868,26 +868,26 @@ export default function AdminEvents() {
                       )}
                     </div>
 
-                    {/* Organized Info Grid (Spacious 2/3 columns) */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs font-bold">
+                    {/* Organized Info Grid (Complete text, no truncate) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs font-bold">
                       {/* Público */}
-                      <div className="p-3.5 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center flex-shrink-0">
-                          <ShieldCheck size={18} />
+                      <div className="p-2.5 bg-slate-950/50 border border-slate-800/80 rounded-xl flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center flex-shrink-0">
+                          <ShieldCheck size={16} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Público Permitido</span>
+                          <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Público Permitido</span>
                           <span className="text-slate-200 font-black text-xs leading-snug block break-words">{yearsLabel}</span>
                         </div>
                       </div>
 
                       {/* Horário */}
-                      <div className="p-3.5 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-yellow-400/10 text-yellow-400 flex items-center justify-center flex-shrink-0">
-                          <Clock size={18} />
+                      <div className="p-2.5 bg-slate-950/50 border border-slate-800/80 rounded-xl flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-yellow-400/10 text-yellow-400 flex items-center justify-center flex-shrink-0">
+                          <Clock size={16} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Horário</span>
+                          <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Horário</span>
                           <span className="text-slate-200 font-black text-xs leading-snug block">
                             {event.start_time ? `${event.start_time}${event.end_time ? ` às ${event.end_time}` : ''}` : safeFormatDate(event.start_date, 'dd/MM/yyyy')}
                           </span>
@@ -895,12 +895,12 @@ export default function AdminEvents() {
                       </div>
 
                       {/* Prazo de Inscrição */}
-                      <div className="p-3.5 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center flex-shrink-0">
-                          <Calendar size={18} />
+                      <div className="p-2.5 bg-slate-950/50 border border-slate-800/80 rounded-xl flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center flex-shrink-0">
+                          <Calendar size={16} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Inscrições até</span>
+                          <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Inscrições até</span>
                           <span className="text-slate-200 font-black text-xs leading-snug block">
                             {event.end_date ? `${safeFormatDate(event.end_date, 'dd/MM/yyyy')}${event.end_time ? ` às ${event.end_time}` : ''}` : 'Sem limite'}
                           </span>
@@ -909,12 +909,12 @@ export default function AdminEvents() {
 
                       {/* Divisão de Gênero */}
                       {hasGenderLimit && (
-                        <div className="p-3.5 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center gap-3 text-purple-300 sm:col-span-2 lg:col-span-3">
-                          <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0">
-                            <Users size={18} />
+                        <div className="p-2.5 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center gap-2.5 text-purple-300 sm:col-span-2 lg:col-span-3">
+                          <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0">
+                            <Users size={16} />
                           </div>
                           <div className="min-w-0 flex-1 flex flex-wrap items-center justify-between gap-2">
-                            <span className="text-[11px] font-black uppercase tracking-wider">Divisão de Gênero:</span>
+                            <span className="text-[10px] font-black uppercase tracking-wider">Divisão de Gênero:</span>
                             <span className="text-white font-black text-xs">
                               {Number(event.vagas_masculino) > 0 && `👦 Masc: ${event.vagas_masculino} vagas`}
                               {Number(event.vagas_masculino) > 0 && Number(event.vagas_feminino) > 0 && ' • '}
@@ -926,12 +926,12 @@ export default function AdminEvents() {
 
                       {/* Cotas por Série */}
                       {yearLimitsFormatted && (
-                        <div className="p-3.5 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center gap-3 text-blue-300 sm:col-span-2 lg:col-span-3">
-                          <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
-                            <ShieldCheck size={18} />
+                        <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center gap-2.5 text-blue-300 sm:col-span-2 lg:col-span-3">
+                          <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+                            <ShieldCheck size={16} />
                           </div>
                           <div className="min-w-0 flex-1 flex flex-wrap items-center justify-between gap-2">
-                            <span className="text-[11px] font-black uppercase tracking-wider">Cotas por Série:</span>
+                            <span className="text-[10px] font-black uppercase tracking-wider">Cotas por Série:</span>
                             <span className="text-white font-black text-xs break-words">
                               {yearLimitsFormatted}
                             </span>
@@ -942,64 +942,64 @@ export default function AdminEvents() {
                   </div>
 
                   {/* Bottom: Action Bar */}
-                  <div className="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                  <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5">
                     <Link
                       to={`/admin/events/${event.id}/registrations`}
-                      className="py-3 px-6 bg-yellow-400 text-black hover:bg-yellow-300 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-yellow-400/20 hover:scale-[1.02]"
+                      className="py-2.5 px-4 bg-yellow-400 text-black hover:bg-yellow-300 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-yellow-400/20 hover:scale-[1.02]"
                       title="Ver Lista de Inscritos"
                     >
-                      <Users size={16} />
+                      <Users size={15} />
                       <span>{regCount} Inscritos Confirmados</span>
                     </Link>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <button
                         onClick={() => handleSaveAsTemplate(event)}
-                        className="h-10 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 rounded-xl flex items-center gap-2 transition-all border border-slate-700 text-xs font-bold"
+                        className="h-9 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 rounded-xl flex items-center gap-1.5 transition-all border border-slate-700 text-xs font-bold"
                         title="Salvar como Modelo"
                       >
-                        <Bookmark size={15} />
+                        <Bookmark size={14} />
                         <span>Modelo</span>
                       </button>
                       <button
                         onClick={() => handleClone(event)}
-                        className="h-10 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl flex items-center gap-2 transition-all border border-slate-700 text-xs font-bold"
+                        className="h-9 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl flex items-center gap-1.5 transition-all border border-slate-700 text-xs font-bold"
                         title="Duplicar Evento"
                       >
-                        <Copy size={15} />
+                        <Copy size={14} />
                         <span>Clonar</span>
                       </button>
                       <button
                         onClick={() => setQrEvent(event)}
-                        className="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                        className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
                         title="Gerar QR Code"
                       >
-                        <QrCode size={16} />
+                        <QrCode size={15} />
                       </button>
                       <button
                         onClick={() => handleToggleVisibility(event)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all border ${
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all border ${
                           event.is_hidden === 1
                             ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20'
                             : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
                         }`}
                         title={event.is_hidden === 1 ? "Mostrar a Todos" : "Ocultar Evento"}
                       >
-                        {event.is_hidden === 1 ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {event.is_hidden === 1 ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                       <button
                         onClick={() => handleOpenModal(event)}
-                        className="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                        className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
                         title="Editar Evento"
                       >
-                        <Edit2 size={16} />
+                        <Edit2 size={15} />
                       </button>
                       <button
                         onClick={() => handleDelete(event.id)}
-                        className="w-10 h-10 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20"
+                        className="w-9 h-9 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20"
                         title="Excluir Evento"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </div>

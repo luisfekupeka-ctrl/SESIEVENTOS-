@@ -707,156 +707,286 @@ export default function AdminEvents() {
 
             return matchesSearch && matchesCategory && matchesYear && matchesDay;
           })
-          .map(event => (
-          <div key={event.id} className="bg-slate-900/40 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden hover:border-yellow-400/30 transition-all flex flex-col group backdrop-blur-sm">
-            <div className="w-full h-48 md:h-56 bg-slate-950 relative overflow-hidden">
-              <img src={event.image_url || getEventImage(event.name) || undefined} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-70 group-hover:opacity-100" referrerPolicy="no-referrer" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent"></div>
-              <div className="absolute bottom-4 left-6">
-                <span className="bg-yellow-400/10 text-yellow-400 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-[0.2em] border border-yellow-400/20 backdrop-blur-md">
-                  {categories.find(c => c.id === event.category_id)?.name || 'Sem Categoria'}
-                </span>
-              </div>
-            </div>
-            <div className="p-6 md:p-8 flex-grow flex flex-col justify-between">
-              <div>
-                <div className="flex flex-wrap items-center gap-3 mb-4 min-h-[1.5rem]">
-                  {event.password_protected && (
-                    <div className="flex items-center gap-2 px-2.5 py-1 bg-amber-500/10 text-amber-600 font-black text-[10px] uppercase tracking-widest rounded-lg border border-amber-500/10">
-                      <Lock size={12} /> Protegido
-                    </div>
-                  )}
-                  {(() => {
-                    const restrictions = event.restrictions as any;
-                    if (restrictions?.type && restrictions.type !== 'all') {
-                      const typeLabels: Record<string, string> = {
-                        years: 'Anos',
-                        classes: 'Turmas',
-                        participant_types: 'Tipos',
-                        collaborators: 'Colaboradores'
-                      };
-                      return (
-                        <div className="flex items-center gap-2 px-2.5 py-1 bg-yellow-400/10 text-yellow-400 font-black text-[10px] uppercase tracking-widest rounded-lg border border-yellow-400/10">
-                          <ShieldCheck size={12} /> {typeLabels[restrictions.type] || 'Restrito'}
-                        </div>
-                      );
-                    }
-                    return (
-                      <div className="flex items-center gap-2 px-2.5 py-1 bg-slate-800 text-slate-300 font-black text-[10px] uppercase tracking-widest rounded-lg border border-slate-700">
-                        <Users size={12} /> Público
-                      </div>
-                    );
-                  })()}
-                  {event.limitar_vagas_por_ano === 1 && event.vagas_por_ano && (
-                    <div className="flex items-center gap-2 px-2.5 py-1 bg-blue-500/10 text-blue-400 font-black text-[10px] uppercase tracking-widest rounded-lg border border-blue-500/10">
-                      <Users size={12} /> Limites: {(() => {
-                        try {
-                          const limits = typeof event.vagas_por_ano === 'string'
-                            ? JSON.parse(event.vagas_por_ano)
-                            : event.vagas_por_ano;
-                          const entries = Object.entries(limits || {});
-                          if (entries.length === 0) return 'Ilimitado';
-                          return entries
-                            .map(([grade, val]) => `${grade.split(' ')[0]}: ${val}`)
-                            .join(', ');
-                        } catch {
-                          return 'Configurado';
-                        }
-                      })()}
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-xl font-black text-white mb-6 group-hover:text-yellow-400 transition-colors tracking-tight leading-tight line-clamp-2">{event.name}</h3>
+          .map(event => {
+            const regCount = event.registration_count || 0;
+            const maxCap = event.max_capacity || 0;
+            const isFull = maxCap > 0 && regCount >= maxCap;
+            const fillPercent = maxCap > 0 ? Math.min(100, Math.round((regCount / maxCap) * 100)) : 0;
+            const categoryName = categories.find(c => c.id === event.category_id)?.name || 'Sem Categoria';
 
-                <div className="grid grid-cols-1 gap-4 text-sm font-bold">
-                  <div className="flex items-center gap-3 text-slate-300">
-                    <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-yellow-400">
-                      <Calendar size={16} />
+            // Format Days
+            let daysText: string | null = null;
+            if (event.restringir_dias === 1 && event.dias_semana) {
+              let list: string[] = [];
+              if (Array.isArray(event.dias_semana)) list = event.dias_semana;
+              else if (typeof event.dias_semana === 'string') {
+                try { list = JSON.parse(event.dias_semana); } catch { list = []; }
+              }
+              if (list.length > 0) daysText = list.join(', ');
+            } else if (event.start_date) {
+              try {
+                const ptDays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                const [y, m, d] = event.start_date.split('-').map(Number);
+                const date = new Date(y, m - 1, d);
+                daysText = ptDays[date.getDay()];
+              } catch {}
+            }
+
+            // Format Year Restrictions
+            let yearsLabel = 'Público Livre';
+            const restrictions = event.restrictions as any;
+            if (restrictions?.type && restrictions.type !== 'all') {
+              if (restrictions.type === 'years' && Array.isArray(restrictions.values) && restrictions.values.length > 0) {
+                const ef2Years = ['6º Ano EF', '7º Ano EF', '8º Ano EF', '9º Ano EF'];
+                const emYears = ['1º Ano EM', '2º Ano EM', '3º Ano EM'];
+                const hasAllEF2 = ef2Years.every((y: string) => restrictions.values.includes(y));
+                const hasAllEM = emYears.every((y: string) => restrictions.values.includes(y));
+                if (hasAllEF2 && restrictions.values.length === ef2Years.length) yearsLabel = 'Fund. 2 (6º ao 9º)';
+                else if (hasAllEM && restrictions.values.length === emYears.length) yearsLabel = 'Ensino Médio (1º ao 3º)';
+                else yearsLabel = restrictions.values.map((v: string) => v.replace(' Ano EF', '° EF').replace(' Ano EM', '° EM').replace('º', '°')).join(', ');
+              } else if (restrictions.type === 'classes') {
+                yearsLabel = `Turmas: ${restrictions.values?.join(', ')}`;
+              } else if (restrictions.type === 'collaborators') {
+                yearsLabel = 'Apenas Colaboradores';
+              } else {
+                yearsLabel = 'Restrito';
+              }
+            }
+
+            // Format Year Limits
+            let yearLimitsFormatted = '';
+            if (event.limitar_vagas_por_ano === 1 && event.vagas_por_ano) {
+              try {
+                const limits = typeof event.vagas_por_ano === 'string' ? JSON.parse(event.vagas_por_ano) : event.vagas_por_ano;
+                const entries = Object.entries(limits || {});
+                if (entries.length > 0) {
+                  yearLimitsFormatted = entries.map(([grade, val]) => `${grade.replace(' Ano', '').replace(' EF', '').replace(' EM', ' EM')}: ${val}`).join(' • ');
+                }
+              } catch {}
+            }
+
+            const hasGenderLimit = event.limitar_vagas_genero === 1 && (Number(event.vagas_masculino) > 0 || Number(event.vagas_feminino) > 0);
+
+            return (
+              <div key={event.id} className="bg-slate-900/90 rounded-[2rem] border border-slate-800 shadow-xl overflow-hidden hover:border-yellow-400/30 transition-all flex flex-col group backdrop-blur-md hover:shadow-[0_20px_50px_rgba(234,179,8,0.1)]">
+                {/* Image Header */}
+                <div className="w-full aspect-[16/10] bg-slate-950 relative overflow-hidden">
+                  <img 
+                    src={event.image_url || getEventImage(event.name) || undefined} 
+                    alt={event.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100" 
+                    referrerPolicy="no-referrer" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+
+                  {/* Top Badges */}
+                  <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 z-10">
+                    <div className="flex flex-wrap items-center gap-1.5 max-w-[80%]">
+                      <span className="px-2.5 py-1 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md">
+                        {categoryName}
+                      </span>
+                      <span className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md ${
+                        event.is_paid === 1 ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'
+                      }`}>
+                        {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
+                      </span>
+                      {event.is_hidden === 1 && (
+                        <span className="px-2 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-black uppercase tracking-wider rounded-lg">
+                          Oculto
+                        </span>
+                      )}
                     </div>
-                    <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
-                      Início: {safeFormatDate(event.start_date, 'dd/MM/yyyy')} às {event.start_time || '--:--'}
-                    </span>
-                  </div>
-                  {event.end_date && (
-                    <div className="flex items-center gap-3 text-slate-300">
-                      <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-red-400">
-                        <Clock size={16} />
+                    {event.password_protected && (
+                      <div className="w-7 h-7 bg-slate-950/80 backdrop-blur-md rounded-lg flex items-center justify-center text-yellow-400 border border-yellow-400/30 shadow-md">
+                        <Lock size={12} />
                       </div>
-                      <span className="uppercase tracking-widest text-[10px] font-bold text-slate-300">
-                        Limite: {safeFormatDate(event.end_date, 'dd/MM/yyyy')} às {event.end_time || '--:--'}
+                    )}
+                  </div>
+
+                  {/* Day badge at bottom of image */}
+                  {daysText && (
+                    <div className="absolute bottom-3 left-3.5 z-10">
+                      <span className="px-3 py-1 bg-slate-950/90 border border-slate-700/80 text-white text-[11px] font-black uppercase tracking-wider rounded-xl backdrop-blur-md flex items-center gap-1.5 shadow-lg">
+                        <Calendar size={12} className="text-yellow-400" />
+                        {daysText}
                       </span>
                     </div>
                   )}
-                  <div className="flex items-center gap-3 text-slate-300">
-                    <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-slate-400">
-                      <Users size={16} />
+
+                  {/* Esgotado badge */}
+                  {isFull && (
+                    <div className="absolute bottom-3 right-3.5 z-10">
+                      <span className="px-2.5 py-1 bg-red-600/90 text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md">
+                        Lotado
+                      </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-white text-xs font-black">{event.registration_count || 0}</span>
-                      <span className="text-[10px] text-slate-300 uppercase tracking-widest font-bold">Inscritos</span>
+                  )}
+                </div>
+
+                {/* Body Content */}
+                <div className="p-5 flex-grow flex flex-col justify-between gap-4">
+                  <div>
+                    {/* Title */}
+                    <h3 className="text-lg font-black text-white mb-2 group-hover:text-yellow-400 transition-colors tracking-tight leading-snug line-clamp-1">
+                      {event.name}
+                    </h3>
+
+                    {/* Vagas Progress Bar */}
+                    <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 mb-3">
+                      <div className="flex items-center justify-between text-[11px] font-black mb-1.5">
+                        <span className="text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                          <Users size={13} className="text-yellow-400" />
+                          Vagas Preenchidas
+                        </span>
+                        <span className={isFull ? 'text-red-400' : 'text-white'}>
+                          {regCount} {maxCap > 0 ? `/ ${maxCap}` : ''} {maxCap > 0 && `(${fillPercent}%)`}
+                        </span>
+                      </div>
+                      {maxCap > 0 && (
+                        <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              isFull ? 'bg-red-500' : fillPercent >= 80 ? 'bg-amber-400' : 'bg-emerald-400'
+                            }`} 
+                            style={{ width: `${fillPercent}%` }}
+                          ></div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 2-Column Info Grid */}
+                    <div className="grid grid-cols-2 gap-2 text-[11px] font-bold">
+                      {/* Público */}
+                      <div className="p-2.5 bg-slate-950/40 border border-slate-800/70 rounded-xl flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center flex-shrink-0">
+                          <ShieldCheck size={13} />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Público</span>
+                          <span className="text-slate-200 truncate block font-black text-[10px]">{yearsLabel}</span>
+                        </div>
+                      </div>
+
+                      {/* Início / Horário */}
+                      <div className="p-2.5 bg-slate-950/40 border border-slate-800/70 rounded-xl flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-yellow-400/10 text-yellow-400 flex items-center justify-center flex-shrink-0">
+                          <Clock size={13} />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Horário</span>
+                          <span className="text-slate-200 truncate block font-black text-[10px]">
+                            {event.start_time || safeFormatDate(event.start_date, 'dd/MM')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Gênero */}
+                      {hasGenderLimit && (
+                        <div className="col-span-2 p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-between text-[10px] font-black text-purple-300">
+                          <span className="flex items-center gap-1.5 uppercase tracking-wider">
+                            <Users size={12} className="text-purple-400" />
+                            Gênero:
+                          </span>
+                          <span className="text-white">
+                            {Number(event.vagas_masculino) > 0 && `Masc: ${event.vagas_masculino}`}
+                            {Number(event.vagas_masculino) > 0 && Number(event.vagas_feminino) > 0 && ' | '}
+                            {Number(event.vagas_feminino) > 0 && `Fem: ${event.vagas_feminino}`}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Cotas por Ano */}
+                      {yearLimitsFormatted && (
+                        <div className="col-span-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-between text-[10px] font-black text-blue-300">
+                          <span className="flex items-center gap-1.5 uppercase tracking-wider">
+                            <ShieldCheck size={12} className="text-blue-400" />
+                            Cotas:
+                          </span>
+                          <span className="text-white truncate max-w-[70%]">
+                            {yearLimitsFormatted}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Limite de Inscrição */}
+                      {event.end_date && (
+                        <div className="col-span-2 px-2.5 py-1.5 bg-slate-950/30 border border-slate-800/50 rounded-lg flex items-center justify-between text-[10px] font-bold text-slate-400">
+                          <span className="flex items-center gap-1.5">
+                            <Clock size={11} className="text-red-400" />
+                            Inscrições até:
+                          </span>
+                          <span className="text-slate-300 font-black">
+                            {safeFormatDate(event.end_date, 'dd/MM/yyyy')} {event.end_time ? `às ${event.end_time}` : ''}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions Dock */}
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-1.5">
+                    <Link
+                      to={`/admin/events/${event.id}/registrations`}
+                      className="flex-1 py-2 px-2.5 bg-yellow-400/10 hover:bg-yellow-400 text-yellow-400 hover:text-black font-black text-[10px] uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 border border-yellow-400/20"
+                      title="Ver Lista de Inscritos"
+                    >
+                      <Users size={14} />
+                      <span>{regCount} Inscritos</span>
+                    </Link>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleSaveAsTemplate(event)}
+                        className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                        title="Salvar como Modelo"
+                      >
+                        <Bookmark size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleClone(event)}
+                        className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                        title="Duplicar Evento"
+                      >
+                        <Copy size={14} />
+                      </button>
+                      <button
+                        onClick={() => setQrEvent(event)}
+                        className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                        title="Gerar QR Code"
+                      >
+                        <QrCode size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleToggleVisibility(event)}
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all border ${
+                          event.is_hidden === 1
+                            ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20'
+                            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
+                        }`}
+                        title={event.is_hidden === 1 ? "Mostrar a Todos" : "Ocultar Evento"}
+                      >
+                        {event.is_hidden === 1 ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                      <button
+                        onClick={() => handleOpenModal(event)}
+                        className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                        title="Editar Evento"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(event.id)}
+                        className="w-8 h-8 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20"
+                        title="Excluir Evento"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-10 flex flex-wrap items-center justify-end gap-2 md:gap-3 pt-6 border-t border-slate-800">
-                <Link
-                  to={`/admin/events/${event.id}/registrations`}
-                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
-                  title="Ver Inscritos"
-                >
-                  <Users size={22} />
-                </Link>
-                <button
-                  onClick={() => handleSaveAsTemplate(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-green-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
-                  title="Salvar como Modelo"
-                >
-                  <Bookmark size={22} />
-                </button>
-                <button
-                  onClick={() => handleClone(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-amber-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
-                  title="Duplicar Evento"
-                >
-                  <Copy size={22} />
-                </button>
-                <button
-                  onClick={() => setQrEvent(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-indigo-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
-                  title="Gerar QR Code"
-                >
-                  <QrCode size={22} />
-                </button>
-                <button
-                  onClick={() => handleToggleVisibility(event)}
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all border shadow-sm ${
-                    event.is_hidden === 1
-                      ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20'
-                      : 'bg-slate-800 text-slate-300 hover:text-white border-slate-700'
-                  }`}
-                  title={event.is_hidden === 1 ? "Mostrar a Todos" : "Ocultar Evento"}
-                >
-                  {event.is_hidden === 1 ? <EyeOff size={22} /> : <Eye size={22} />}
-                </button>
-                <button
-                  onClick={() => handleOpenModal(event)}
-                  className="w-12 h-12 bg-slate-800 text-slate-300 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-700 shadow-sm"
-                  title="Editar Evento"
-                >
-                  <Edit2 size={20} />
-                </button>
-                <button
-                  onClick={() => handleDelete(event.id)}
-                  className="w-12 h-12 bg-red-500/5 text-slate-300 hover:text-red-500 rounded-2xl flex items-center justify-center transition-all border border-red-500/10"
-                  title="Excluir"
-                >
-                  <Trash2 size={22} />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+            );
+          })}
 
         {events.length === 0 && (
           <div className="col-span-full py-20 text-center bg-slate-900/40 rounded-[3rem] border-2 border-dashed border-slate-800">

@@ -207,7 +207,8 @@ for (const query of eventTemplateMigrations) {
 const studentMigrations = [
   "ALTER TABLE students ADD COLUMN surname TEXT DEFAULT '';",
   "ALTER TABLE students ADD COLUMN class TEXT;",
-  "ALTER TABLE students ADD COLUMN type TEXT DEFAULT 'student';"
+  "ALTER TABLE students ADD COLUMN type TEXT DEFAULT 'student';",
+  "ALTER TABLE students ADD COLUMN gender TEXT;"
 ];
 
 for (const query of studentMigrations) {
@@ -805,11 +806,21 @@ function executeRegisterParticipant(req: any, res: any) {
     // Check gender limit
     if (event.limitar_vagas_genero === 1) {
       let userGender = null;
-      for (const key of Object.keys(form_data || {})) {
-        const lowerKey = key.toLowerCase();
-        if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
-          userGender = String(form_data[key]).toLowerCase();
-          break;
+      let matchedStudentObj = null;
+      if (matchedStudentId) {
+        matchedStudentObj = db.prepare("SELECT * FROM students WHERE id = ?").get(matchedStudentId) as any;
+      }
+      
+      if (matchedStudentObj && matchedStudentObj.gender) {
+        userGender = matchedStudentObj.gender.toLowerCase();
+      } else {
+        // Fallback to form_data if no student gender is found
+        for (const key of Object.keys(form_data || {})) {
+          const lowerKey = key.toLowerCase();
+          if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
+            userGender = String(form_data[key]).toLowerCase();
+            break;
+          }
         }
       }
 
@@ -818,14 +829,23 @@ function executeRegisterParticipant(req: any, res: any) {
         let isFemale = userGender.includes('fem') || userGender === 'f';
 
         if (isMale || isFemale) {
-          const genderCount = eventRegistrations.filter(r => {
-            let rGender = null;
-            const rData = safeJsonParse(r.form_data) || {};
-            for (const key of Object.keys(rData)) {
-              const lowerKey = key.toLowerCase();
-              if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
-                rGender = String(rData[key]).toLowerCase();
-                break;
+          const allRegs = db.prepare(`
+            SELECT r.*, s.gender as student_gender
+            FROM registrations r
+            LEFT JOIN students s ON r.student_id = s.id
+            WHERE r.event_id = ? AND r.status = 'approved'
+          `).all(eventId) as any[];
+
+          const genderCount = allRegs.filter(r => {
+            let rGender = r.student_gender ? r.student_gender.toLowerCase() : null;
+            if (!rGender) {
+              const rData = safeJsonParse(r.form_data) || {};
+              for (const key of Object.keys(rData)) {
+                const lowerKey = key.toLowerCase();
+                if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
+                  rGender = String(rData[key]).toLowerCase();
+                  break;
+                }
               }
             }
             if (!rGender) return false;

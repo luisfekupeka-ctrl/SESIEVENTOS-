@@ -63,6 +63,7 @@ export interface Student {
   class: string;
   grade: string;
   type: 'student' | 'collaborator' | 'responsible' | 'other';
+  gender?: 'masculino' | 'feminino' | string;
 }
 
 export interface Registration {

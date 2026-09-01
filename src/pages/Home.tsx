@@ -263,7 +263,7 @@ export default function Home() {
             <p className="text-yellow-500 font-black tracking-widest uppercase text-sm">Carregando eventos...</p>
           </div>
         ) : filteredEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
             {filteredEvents.map((event, index) => (
               <motion.div
                 key={event.id}

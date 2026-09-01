@@ -841,63 +841,70 @@ export default function AdminEvents() {
                       {event.name}
                     </h3>
 
-                    {/* Vagas Progress Bar */}
-                    <div className="bg-slate-950/70 border border-slate-800 rounded-2xl p-3.5 mb-3.5">
-                      <div className="flex items-center justify-between text-xs font-black mb-2">
-                        <span className="text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
-                          <Users size={14} className="text-yellow-400" />
-                          Vagas Preenchidas
-                        </span>
-                        <span className={isFull ? 'text-red-400' : 'text-white'}>
-                          {regCount} {maxCap > 0 ? `/ ${maxCap}` : ''} {maxCap > 0 && `(${fillPercent}%)`}
-                        </span>
+                    {/* Vertical Structured Info List */}
+                    <div className="space-y-2.5 text-xs font-bold">
+                      {/* 1. Vagas Preenchidas (com barra) */}
+                      <div className="p-3.5 bg-slate-950/70 border border-slate-800 rounded-2xl">
+                        <div className="flex items-center justify-between text-xs font-black mb-2">
+                          <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[11px]">
+                            <Users size={14} className="text-yellow-400" />
+                            Vagas Preenchidas:
+                          </span>
+                          <span className={`font-black ${isFull ? 'text-red-400' : 'text-white'}`}>
+                            {regCount} {maxCap > 0 ? `/ ${maxCap}` : ''} {maxCap > 0 && `(${fillPercent}%)`}
+                          </span>
+                        </div>
+                        {maxCap > 0 && (
+                          <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                isFull ? 'bg-red-500' : fillPercent >= 80 ? 'bg-amber-400' : 'bg-emerald-400'
+                              }`} 
+                              style={{ width: `${fillPercent}%` }}
+                            ></div>
+                          </div>
+                        )}
                       </div>
-                      {maxCap > 0 && (
-                        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              isFull ? 'bg-red-500' : fillPercent >= 80 ? 'bg-amber-400' : 'bg-emerald-400'
-                            }`} 
-                            style={{ width: `${fillPercent}%` }}
-                          ></div>
+
+                      {/* 2. Público / Séries */}
+                      <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center justify-between gap-3">
+                        <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
+                          <ShieldCheck size={14} className="text-sky-400" />
+                          Público:
+                        </span>
+                        <span className="text-slate-200 font-black text-xs text-right break-words">{yearsLabel}</span>
+                      </div>
+
+                      {/* 3. Dias da Semana (se houver) */}
+                      {daysText && (
+                        <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center justify-between gap-3">
+                          <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
+                            <Calendar size={14} className="text-yellow-400" />
+                            Dias da Semana:
+                          </span>
+                          <span className="text-slate-200 font-black text-xs text-right">{daysText}</span>
                         </div>
                       )}
-                    </div>
 
-                    {/* Structured Info Grid */}
-                    <div className="grid grid-cols-2 gap-2.5 text-xs font-bold">
-                      {/* Público */}
-                      <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-start gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <ShieldCheck size={15} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Público</span>
-                          <span className="text-slate-200 font-black text-xs leading-tight block break-words">{yearsLabel}</span>
-                        </div>
+                      {/* 4. Horário do Evento */}
+                      <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center justify-between gap-3">
+                        <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
+                          <Clock size={14} className="text-amber-400" />
+                          Horário:
+                        </span>
+                        <span className="text-slate-200 font-black text-xs text-right">
+                          {event.start_time ? `${event.start_time}${event.end_time ? ` às ${event.end_time}` : ''}` : safeFormatDate(event.start_date, 'dd/MM/yyyy')}
+                        </span>
                       </div>
 
-                      {/* Início / Horário */}
-                      <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-start gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-yellow-400/10 text-yellow-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Clock size={15} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Horário</span>
-                          <span className="text-slate-200 font-black text-xs leading-tight block">
-                            {event.start_time ? `${event.start_time}${event.end_time ? ` às ${event.end_time}` : ''}` : safeFormatDate(event.start_date, 'dd/MM/yyyy')}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Gênero (se configurado) */}
+                      {/* 5. Gênero (se configurado) */}
                       {hasGenderLimit && (
-                        <div className="col-span-2 p-3 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-between text-xs font-black text-purple-300">
-                          <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
-                            <Users size={13} className="text-purple-400" />
+                        <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-between gap-3 text-purple-300">
+                          <span className="flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
+                            <Users size={14} className="text-purple-400" />
                             Divisão de Gênero:
                           </span>
-                          <span className="text-white font-black text-xs">
+                          <span className="text-white font-black text-xs text-right">
                             {Number(event.vagas_masculino) > 0 && `Masc: ${event.vagas_masculino}`}
                             {Number(event.vagas_masculino) > 0 && Number(event.vagas_feminino) > 0 && ' • '}
                             {Number(event.vagas_feminino) > 0 && `Fem: ${event.vagas_feminino}`}
@@ -905,27 +912,27 @@ export default function AdminEvents() {
                         </div>
                       )}
 
-                      {/* Cotas por Ano (se configurado) */}
+                      {/* 6. Cotas por Série (se configurado) */}
                       {yearLimitsFormatted && (
-                        <div className="col-span-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-between text-xs font-black text-blue-300">
-                          <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
-                            <ShieldCheck size={13} className="text-blue-400" />
+                        <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-between gap-3 text-blue-300">
+                          <span className="flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
+                            <ShieldCheck size={14} className="text-blue-400" />
                             Cotas por Série:
                           </span>
-                          <span className="text-white font-black text-xs break-words">
+                          <span className="text-white font-black text-xs text-right break-words">
                             {yearLimitsFormatted}
                           </span>
                         </div>
                       )}
 
-                      {/* Limite de Inscrição */}
+                      {/* 7. Limite de Inscrição */}
                       {event.end_date && (
-                        <div className="col-span-2 p-3 bg-slate-950/40 border border-slate-800/60 rounded-2xl flex items-center justify-between text-xs font-bold text-slate-400">
-                          <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider">
-                            <Clock size={13} className="text-red-400" />
+                        <div className="p-3 bg-slate-950/40 border border-slate-800/60 rounded-2xl flex items-center justify-between gap-3 text-slate-400">
+                          <span className="flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
+                            <Clock size={14} className="text-red-400" />
                             Inscrições até:
                           </span>
-                          <span className="text-slate-200 font-black text-xs">
+                          <span className="text-slate-200 font-black text-xs text-right">
                             {safeFormatDate(event.end_date, 'dd/MM/yyyy')} {event.end_time ? `às ${event.end_time}` : ''}
                           </span>
                         </div>

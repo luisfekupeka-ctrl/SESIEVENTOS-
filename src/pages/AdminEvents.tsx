@@ -664,7 +664,7 @@ export default function AdminEvents() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <div className="flex flex-col gap-4">
         {(events || [])
           .filter(event => {
             if (!event) return false;
@@ -774,231 +774,176 @@ export default function AdminEvents() {
             const hasGenderLimit = event.limitar_vagas_genero === 1 && (Number(event.vagas_masculino) > 0 || Number(event.vagas_feminino) > 0);
 
             return (
-              <div key={event.id} className="bg-slate-900/90 rounded-[2.2rem] border border-slate-800 shadow-xl overflow-hidden hover:border-yellow-400/40 transition-all flex flex-col group backdrop-blur-md hover:shadow-[0_20px_50px_rgba(234,179,8,0.12)] hover:-translate-y-1">
-                {/* Image Header */}
-                <div className="w-full aspect-[16/10] bg-slate-950 relative overflow-hidden">
-                  <img 
-                    src={event.image_url || getEventImage(event.name) || undefined} 
-                    alt={event.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100" 
-                    referrerPolicy="no-referrer" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-
-                  {/* Top Badges */}
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
-                    <div className="flex flex-wrap items-center gap-2 max-w-[80%]">
-                      <span className="px-3 py-1 bg-yellow-400 text-black text-[11px] font-black uppercase tracking-wider rounded-xl shadow-md">
-                        {categoryName}
-                      </span>
-                      <span className={`px-3 py-1 text-[11px] font-black uppercase tracking-wider rounded-xl shadow-md ${
-                        event.is_paid === 1 ? 'bg-red-500 text-white shadow-red-500/25' : 'bg-emerald-500 text-white shadow-emerald-500/25'
-                      }`}>
-                        {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
-                      </span>
-                      {event.is_hidden === 1 && (
-                        <span className="px-2.5 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider rounded-xl">
-                          Oculto
-                        </span>
-                      )}
-                    </div>
+              <div key={event.id} className="bg-slate-900/90 rounded-2xl border border-slate-800 p-4 md:p-5 shadow-lg hover:border-yellow-400/40 transition-all flex flex-col xl:flex-row items-start xl:items-center justify-between gap-5 group backdrop-blur-md">
+                {/* Left: Thumbnail & Main Info */}
+                <div className="flex items-center gap-4 min-w-0 flex-1 w-full xl:w-auto">
+                  {/* Thumbnail */}
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-slate-950 overflow-hidden relative flex-shrink-0 border border-slate-800">
+                    <img 
+                      src={event.image_url || getEventImage(event.name) || undefined} 
+                      alt={event.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90 group-hover:opacity-100"
+                      referrerPolicy="no-referrer"
+                    />
                     {event.password_protected && (
-                      <div className="w-8 h-8 bg-slate-950/80 backdrop-blur-md rounded-xl flex items-center justify-center text-yellow-400 border border-yellow-400/30 shadow-md">
-                        <Lock size={14} />
+                      <div className="absolute top-1.5 right-1.5 w-6 h-6 bg-slate-950/80 rounded-lg flex items-center justify-center text-yellow-400 border border-yellow-400/30">
+                        <Lock size={12} />
                       </div>
                     )}
                   </div>
 
-                  {/* Day badge at bottom of image */}
-                  {daysText && (
-                    <div className="absolute bottom-3.5 left-4 z-10">
-                      <span className="px-3.5 py-1.5 bg-slate-950/90 border border-slate-700/80 text-white text-[11px] font-black uppercase tracking-wider rounded-xl backdrop-blur-md flex items-center gap-2 shadow-lg">
-                        <Calendar size={13} className="text-yellow-400" />
-                        {daysText}
+                  {/* Title & Badges */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <span className="px-2.5 py-0.5 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-wider rounded-lg shadow-sm">
+                        {categoryName}
                       </span>
+                      <span className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-lg ${
+                        event.is_paid === 1 ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      }`}>
+                        {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
+                      </span>
+                      {event.is_hidden === 1 && (
+                        <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-black uppercase tracking-wider rounded-lg">
+                          Oculto
+                        </span>
+                      )}
+                      {isFull && (
+                        <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg">
+                          Lotado
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  {/* Esgotado / Vagas badge */}
-                  <div className="absolute bottom-3.5 right-4 z-10">
-                    {isFull ? (
-                      <span className="px-3 py-1 bg-red-600 text-white text-[11px] font-black uppercase tracking-wider rounded-xl shadow-md animate-pulse">
-                        Lotado
-                      </span>
-                    ) : maxCap > 0 ? (
-                      <span className="px-3 py-1 bg-slate-950/90 border border-slate-700/80 text-yellow-400 text-[11px] font-black uppercase tracking-tight rounded-xl backdrop-blur-md shadow-md">
-                        {remainingSpots} vagas
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
-                {/* Body Content */}
-                <div className="p-6 md:p-7 flex-grow flex flex-col justify-between gap-5">
-                  <div>
-                    {/* Title */}
-                    <h3 className="text-xl md:text-2xl font-black text-yellow-400 mb-3 group-hover:text-yellow-300 transition-colors tracking-tight leading-snug line-clamp-2">
+                    <h3 className="text-lg md:text-xl font-black text-white group-hover:text-yellow-400 transition-colors tracking-tight leading-snug line-clamp-1 mb-1">
                       {event.name}
                     </h3>
 
-                    {/* Vertical Structured Info List */}
-                    <div className="space-y-2.5 text-xs font-bold">
-                      {/* 1. Vagas Preenchidas (com barra) */}
-                      <div className="p-3.5 bg-slate-950/70 border border-slate-800 rounded-2xl">
-                        <div className="flex items-center justify-between text-xs font-black mb-2">
-                          <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[11px]">
-                            <Users size={14} className="text-yellow-400" />
-                            Vagas Preenchidas:
-                          </span>
-                          <span className={`font-black ${isFull ? 'text-red-400' : 'text-white'}`}>
-                            {regCount} {maxCap > 0 ? `/ ${maxCap}` : ''} {maxCap > 0 && `(${fillPercent}%)`}
-                          </span>
-                        </div>
-                        {maxCap > 0 && (
-                          <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-500 ${
-                                isFull ? 'bg-red-500' : fillPercent >= 80 ? 'bg-amber-400' : 'bg-emerald-400'
-                              }`} 
-                              style={{ width: `${fillPercent}%` }}
-                            ></div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 2. Público / Séries */}
-                      <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center justify-between gap-3">
-                        <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
-                          <ShieldCheck size={14} className="text-sky-400" />
-                          Público:
-                        </span>
-                        <span className="text-slate-200 font-black text-xs text-right break-words">{yearsLabel}</span>
-                      </div>
-
-                      {/* 3. Dias da Semana (se houver) */}
-                      {daysText && (
-                        <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center justify-between gap-3">
-                          <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
-                            <Calendar size={14} className="text-yellow-400" />
-                            Dias da Semana:
-                          </span>
-                          <span className="text-slate-200 font-black text-xs text-right">{daysText}</span>
-                        </div>
-                      )}
-
-                      {/* 4. Horário do Evento */}
-                      <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center justify-between gap-3">
-                        <span className="text-slate-400 flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
-                          <Clock size={14} className="text-amber-400" />
-                          Horário:
-                        </span>
-                        <span className="text-slate-200 font-black text-xs text-right">
-                          {event.start_time ? `${event.start_time}${event.end_time ? ` às ${event.end_time}` : ''}` : safeFormatDate(event.start_date, 'dd/MM/yyyy')}
-                        </span>
-                      </div>
-
-                      {/* 5. Gênero (se configurado) */}
-                      {hasGenderLimit && (
-                        <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-between gap-3 text-purple-300">
-                          <span className="flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
-                            <Users size={14} className="text-purple-400" />
-                            Divisão de Gênero:
-                          </span>
-                          <span className="text-white font-black text-xs text-right">
-                            {Number(event.vagas_masculino) > 0 && `Masc: ${event.vagas_masculino}`}
-                            {Number(event.vagas_masculino) > 0 && Number(event.vagas_feminino) > 0 && ' • '}
-                            {Number(event.vagas_feminino) > 0 && `Fem: ${event.vagas_feminino}`}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* 6. Cotas por Série (se configurado) */}
-                      {yearLimitsFormatted && (
-                        <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-between gap-3 text-blue-300">
-                          <span className="flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
-                            <ShieldCheck size={14} className="text-blue-400" />
-                            Cotas por Série:
-                          </span>
-                          <span className="text-white font-black text-xs text-right break-words">
-                            {yearLimitsFormatted}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* 7. Limite de Inscrição */}
+                    {/* Quick specs in one clean line */}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 font-bold">
+                      <span className="flex items-center gap-1.5 text-slate-300">
+                        <ShieldCheck size={14} className="text-sky-400" />
+                        {yearsLabel}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-slate-300">
+                        <Clock size={14} className="text-yellow-400" />
+                        {event.start_time ? `${event.start_time}${event.end_time ? ` às ${event.end_time}` : ''}` : safeFormatDate(event.start_date, 'dd/MM/yyyy')}
+                        {daysText ? ` (${daysText})` : ''}
+                      </span>
                       {event.end_date && (
-                        <div className="p-3 bg-slate-950/40 border border-slate-800/60 rounded-2xl flex items-center justify-between gap-3 text-slate-400">
-                          <span className="flex items-center gap-2 uppercase tracking-wider text-[10px] flex-shrink-0">
-                            <Clock size={14} className="text-red-400" />
-                            Inscrições até:
-                          </span>
-                          <span className="text-slate-200 font-black text-xs text-right">
-                            {safeFormatDate(event.end_date, 'dd/MM/yyyy')} {event.end_time ? `às ${event.end_time}` : ''}
-                          </span>
-                        </div>
+                        <span className="flex items-center gap-1.5 text-slate-400">
+                          <span className="text-red-400">Inscrições até:</span>
+                          {safeFormatDate(event.end_date, 'dd/MM/yyyy')} {event.end_time ? `às ${event.end_time}` : ''}
+                        </span>
                       )}
                     </div>
                   </div>
+                </div>
 
-                  {/* Actions Dock */}
-                  <div className="pt-4 border-t border-slate-800/80 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
-                    <Link
-                      to={`/admin/events/${event.id}/registrations`}
-                      className="py-2.5 px-3.5 bg-yellow-400 text-black hover:bg-yellow-300 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-yellow-400/20 flex-shrink-0"
-                      title="Ver Lista de Inscritos"
-                    >
-                      <Users size={16} />
-                      <span>{regCount} Inscritos</span>
-                    </Link>
-
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <button
-                        onClick={() => handleSaveAsTemplate(event)}
-                        className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
-                        title="Salvar como Modelo"
-                      >
-                        <Bookmark size={15} />
-                      </button>
-                      <button
-                        onClick={() => handleClone(event)}
-                        className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
-                        title="Duplicar Evento"
-                      >
-                        <Copy size={15} />
-                      </button>
-                      <button
-                        onClick={() => setQrEvent(event)}
-                        className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
-                        title="Gerar QR Code"
-                      >
-                        <QrCode size={15} />
-                      </button>
-                      <button
-                        onClick={() => handleToggleVisibility(event)}
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all border ${
-                          event.is_hidden === 1
-                            ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20'
-                            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
-                        }`}
-                        title={event.is_hidden === 1 ? "Mostrar a Todos" : "Ocultar Evento"}
-                      >
-                        {event.is_hidden === 1 ? <EyeOff size={15} /> : <Eye size={15} />}
-                      </button>
-                      <button
-                        onClick={() => handleOpenModal(event)}
-                        className="w-9 h-9 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
-                        title="Editar Evento"
-                      >
-                        <Edit2 size={15} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(event.id)}
-                        className="w-9 h-9 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20"
-                        title="Excluir Evento"
-                      >
-                        <Trash2 size={15} />
-                      </button>
+                {/* Center: Vagas & Cotas Chips */}
+                <div className="w-full xl:w-80 flex flex-col gap-2 flex-shrink-0">
+                  {/* Vagas Bar */}
+                  <div className="p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-xl">
+                    <div className="flex items-center justify-between text-xs font-black mb-1.5">
+                      <span className="text-slate-400 flex items-center gap-1.5 text-[10px] uppercase tracking-wider">
+                        <Users size={13} className="text-yellow-400" />
+                        Vagas:
+                      </span>
+                      <span className={`text-xs ${isFull ? 'text-red-400 font-black' : 'text-white'}`}>
+                        {regCount} {maxCap > 0 ? `/ ${maxCap}` : ''} {maxCap > 0 && `(${fillPercent}%)`}
+                      </span>
                     </div>
+                    {maxCap > 0 && (
+                      <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            isFull ? 'bg-red-500' : fillPercent >= 80 ? 'bg-amber-400' : 'bg-emerald-400'
+                          }`} 
+                          style={{ width: `${fillPercent}%` }}
+                        ></div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Gênero e/ou Cotas */}
+                  {(hasGenderLimit || yearLimitsFormatted) && (
+                    <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
+                      {hasGenderLimit && (
+                        <span className="px-2 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-300 rounded-lg flex items-center gap-1">
+                          <Users size={11} className="text-purple-400" />
+                          {Number(event.vagas_masculino) > 0 && `M: ${event.vagas_masculino}`}
+                          {Number(event.vagas_masculino) > 0 && Number(event.vagas_feminino) > 0 && ' • '}
+                          {Number(event.vagas_feminino) > 0 && `F: ${event.vagas_feminino}`}
+                        </span>
+                      )}
+                      {yearLimitsFormatted && (
+                        <span className="px-2 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-300 rounded-lg flex items-center gap-1 truncate max-w-full">
+                          <ShieldCheck size={11} className="text-blue-400" />
+                          {yearLimitsFormatted}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Right: Actions */}
+                <div className="flex items-center justify-between xl:justify-end gap-2 w-full xl:w-auto pt-3 xl:pt-0 border-t xl:border-t-0 border-slate-800/80 flex-shrink-0">
+                  <Link
+                    to={`/admin/events/${event.id}/registrations`}
+                    className="py-2.5 px-3.5 bg-yellow-400 text-black hover:bg-yellow-300 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-md shadow-yellow-400/20"
+                    title="Ver Lista de Inscritos"
+                  >
+                    <Users size={14} />
+                    <span>{regCount} Inscritos</span>
+                  </Link>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleSaveAsTemplate(event)}
+                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      title="Salvar como Modelo"
+                    >
+                      <Bookmark size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleClone(event)}
+                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      title="Duplicar Evento"
+                    >
+                      <Copy size={14} />
+                    </button>
+                    <button
+                      onClick={() => setQrEvent(event)}
+                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      title="Gerar QR Code"
+                    >
+                      <QrCode size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleToggleVisibility(event)}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all border ${
+                        event.is_hidden === 1
+                          ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20'
+                          : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
+                      }`}
+                      title={event.is_hidden === 1 ? "Mostrar a Todos" : "Ocultar Evento"}
+                    >
+                      {event.is_hidden === 1 ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
+                    <button
+                      onClick={() => handleOpenModal(event)}
+                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      title="Editar Evento"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(event.id)}
+                      className="w-8 h-8 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20"
+                      title="Excluir Evento"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
               </div>

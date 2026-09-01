@@ -774,87 +774,77 @@ export default function AdminEvents() {
             const hasGenderLimit = event.limitar_vagas_genero === 1 && (Number(event.vagas_masculino) > 0 || Number(event.vagas_feminino) > 0);
 
             return (
-              <div key={event.id} className="bg-slate-900/90 rounded-2xl border border-slate-800 p-4 md:p-5 shadow-lg hover:border-yellow-400/40 transition-all flex flex-col xl:flex-row items-start xl:items-center justify-between gap-5 group backdrop-blur-md">
-                {/* Left: Thumbnail & Main Info */}
-                <div className="flex items-center gap-4 min-w-0 flex-1 w-full xl:w-auto">
-                  {/* Thumbnail */}
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-slate-950 overflow-hidden relative flex-shrink-0 border border-slate-800">
+              <div key={event.id} className="bg-slate-900/95 rounded-3xl border border-slate-800 shadow-xl hover:border-yellow-400/40 transition-all overflow-hidden p-6 md:p-7 flex flex-col gap-6 group backdrop-blur-md">
+                {/* Top: Header Row (Image Thumbnail + Event Name + Badges) */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                  {/* Image Thumbnail */}
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-slate-950 overflow-hidden relative flex-shrink-0 border border-slate-800 shadow-md">
                     <img 
                       src={event.image_url || getEventImage(event.name) || undefined} 
                       alt={event.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-90 group-hover:opacity-100"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       referrerPolicy="no-referrer"
                     />
                     {event.password_protected && (
-                      <div className="absolute top-1.5 right-1.5 w-6 h-6 bg-slate-950/80 rounded-lg flex items-center justify-center text-yellow-400 border border-yellow-400/30">
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-slate-950/90 rounded-lg flex items-center justify-center text-yellow-400 border border-yellow-400/30">
                         <Lock size={12} />
                       </div>
                     )}
                   </div>
 
                   {/* Title & Badges */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                      <span className="px-2.5 py-0.5 bg-yellow-400 text-black text-[10px] font-black uppercase tracking-wider rounded-lg shadow-sm">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="px-3 py-1 bg-yellow-400 text-black text-[11px] font-black uppercase tracking-wider rounded-xl shadow-sm">
                         {categoryName}
                       </span>
-                      <span className={`px-2 py-0.5 text-[10px] font-black uppercase tracking-wider rounded-lg ${
+                      <span className={`px-2.5 py-1 text-[11px] font-black uppercase tracking-wider rounded-xl ${
                         event.is_paid === 1 ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                       }`}>
                         {event.is_paid === 1 ? 'Pago' : 'Gratuito'}
                       </span>
                       {event.is_hidden === 1 && (
-                        <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[9px] font-black uppercase tracking-wider rounded-lg">
+                        <span className="px-2.5 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider rounded-xl">
                           Oculto
                         </span>
                       )}
-                      {isFull && (
-                        <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-lg">
+                      {isFull ? (
+                        <span className="px-2.5 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider rounded-xl shadow-sm">
                           Lotado
                         </span>
-                      )}
+                      ) : maxCap > 0 ? (
+                        <span className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-yellow-400 text-[10px] font-black uppercase tracking-wider rounded-xl">
+                          {remainingSpots} vagas restantes
+                        </span>
+                      ) : null}
                     </div>
 
-                    <h3 className="text-lg md:text-xl font-black text-white group-hover:text-yellow-400 transition-colors tracking-tight leading-snug line-clamp-1 mb-1">
+                    <h3 className="text-2xl sm:text-3xl font-black text-yellow-400 group-hover:text-yellow-300 transition-colors tracking-tight leading-tight">
                       {event.name}
                     </h3>
-
-                    {/* Quick specs in one clean line */}
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 font-bold">
-                      <span className="flex items-center gap-1.5 text-slate-300">
-                        <ShieldCheck size={14} className="text-sky-400" />
-                        {yearsLabel}
-                      </span>
-                      <span className="flex items-center gap-1.5 text-slate-300">
-                        <Clock size={14} className="text-yellow-400" />
-                        {event.start_time ? `${event.start_time}${event.end_time ? ` às ${event.end_time}` : ''}` : safeFormatDate(event.start_date, 'dd/MM/yyyy')}
-                        {daysText ? ` (${daysText})` : ''}
-                      </span>
-                      {event.end_date && (
-                        <span className="flex items-center gap-1.5 text-slate-400">
-                          <span className="text-red-400">Inscrições até:</span>
-                          {safeFormatDate(event.end_date, 'dd/MM/yyyy')} {event.end_time ? `às ${event.end_time}` : ''}
-                        </span>
-                      )}
-                    </div>
+                    {event.description && (
+                      <p className="text-slate-400 text-xs font-semibold line-clamp-1 mt-1">
+                        {event.description}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {/* Center: Vagas & Cotas Chips */}
-                <div className="w-full xl:w-80 flex flex-col gap-2 flex-shrink-0">
-                  {/* Vagas Bar */}
-                  <div className="p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-xl">
-                    <div className="flex items-center justify-between text-xs font-black mb-1.5">
-                      <span className="text-slate-400 flex items-center gap-1.5 text-[10px] uppercase tracking-wider">
-                        <Users size={13} className="text-yellow-400" />
+                {/* Middle: Clean Ordered Grid of Information Blocks */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                  {/* 1. Vagas Box */}
+                  <div className="p-4 bg-slate-950/70 border border-slate-800 rounded-2xl flex flex-col justify-between gap-2">
+                    <div className="flex items-center justify-between text-xs font-black">
+                      <span className="text-slate-400 flex items-center gap-1.5 uppercase text-[10px] tracking-wider">
+                        <Users size={14} className="text-yellow-400" />
                         Vagas:
                       </span>
-                      <span className={`text-xs ${isFull ? 'text-red-400 font-black' : 'text-white'}`}>
+                      <span className={isFull ? 'text-red-400 font-black' : 'text-white'}>
                         {regCount} {maxCap > 0 ? `/ ${maxCap}` : ''} {maxCap > 0 && `(${fillPercent}%)`}
                       </span>
                     </div>
                     {maxCap > 0 && (
-                      <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                      <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                         <div 
                           className={`h-full rounded-full transition-all duration-500 ${
                             isFull ? 'bg-red-500' : fillPercent >= 80 ? 'bg-amber-400' : 'bg-emerald-400'
@@ -865,84 +855,136 @@ export default function AdminEvents() {
                     )}
                   </div>
 
-                  {/* Gênero e/ou Cotas */}
-                  {(hasGenderLimit || yearLimitsFormatted) && (
-                    <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
-                      {hasGenderLimit && (
-                        <span className="px-2 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-300 rounded-lg flex items-center gap-1">
-                          <Users size={11} className="text-purple-400" />
-                          {Number(event.vagas_masculino) > 0 && `M: ${event.vagas_masculino}`}
-                          {Number(event.vagas_masculino) > 0 && Number(event.vagas_feminino) > 0 && ' • '}
-                          {Number(event.vagas_feminino) > 0 && `F: ${event.vagas_feminino}`}
-                        </span>
-                      )}
-                      {yearLimitsFormatted && (
-                        <span className="px-2 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-300 rounded-lg flex items-center gap-1 truncate max-w-full">
-                          <ShieldCheck size={11} className="text-blue-400" />
-                          {yearLimitsFormatted}
-                        </span>
-                      )}
+                  {/* 2. Público / Séries */}
+                  <div className="p-4 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center flex-shrink-0">
+                      <ShieldCheck size={18} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Público Permitido</span>
+                      <span className="text-slate-200 font-black text-xs block truncate" title={yearsLabel}>
+                        {yearsLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 3. Horário & Dias */}
+                  <div className="p-4 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-yellow-400/10 text-yellow-400 flex items-center justify-center flex-shrink-0">
+                      <Clock size={18} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Horário & Dias</span>
+                      <span className="text-slate-200 font-black text-xs block truncate">
+                        {event.start_time ? `${event.start_time}${event.end_time ? ` às ${event.end_time}` : ''}` : safeFormatDate(event.start_date, 'dd/MM/yyyy')}
+                        {daysText ? ` (${daysText})` : ''}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 4. Inscrições até */}
+                  <div className="p-4 bg-slate-950/50 border border-slate-800/80 rounded-2xl flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center flex-shrink-0">
+                      <Calendar size={18} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">Prazo de Inscrição</span>
+                      <span className="text-slate-200 font-black text-xs block truncate">
+                        {event.end_date ? `${safeFormatDate(event.end_date, 'dd/MM/yyyy')}${event.end_time ? ` às ${event.end_time}` : ''}` : 'Sem limite definido'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 5. Gênero (se houver) */}
+                  {hasGenderLimit && (
+                    <div className="p-3.5 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-between gap-3 text-purple-300 md:col-span-2 lg:col-span-2">
+                      <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-wider">
+                        <Users size={15} className="text-purple-400" />
+                        Divisão de Vagas por Gênero:
+                      </span>
+                      <span className="text-white font-black text-xs">
+                        {Number(event.vagas_masculino) > 0 && `👦 Masc: ${event.vagas_masculino} vagas`}
+                        {Number(event.vagas_masculino) > 0 && Number(event.vagas_feminino) > 0 && ' • '}
+                        {Number(event.vagas_feminino) > 0 && `👧 Fem: ${event.vagas_feminino} vagas`}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* 6. Cotas por Série (se houver) */}
+                  {yearLimitsFormatted && (
+                    <div className={`p-3.5 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-between gap-3 text-blue-300 ${
+                      hasGenderLimit ? 'md:col-span-2 lg:col-span-2' : 'col-span-full'
+                    }`}>
+                      <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-wider flex-shrink-0">
+                        <ShieldCheck size={15} className="text-blue-400" />
+                        Cotas por Série:
+                      </span>
+                      <span className="text-white font-black text-xs truncate" title={yearLimitsFormatted}>
+                        {yearLimitsFormatted}
+                      </span>
                     </div>
                   )}
                 </div>
 
-                {/* Right: Actions */}
-                <div className="flex items-center justify-between xl:justify-end gap-2 w-full xl:w-auto pt-3 xl:pt-0 border-t xl:border-t-0 border-slate-800/80 flex-shrink-0">
+                {/* Bottom: Action Bar Dock */}
+                <div className="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
                   <Link
                     to={`/admin/events/${event.id}/registrations`}
-                    className="py-2.5 px-3.5 bg-yellow-400 text-black hover:bg-yellow-300 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-md shadow-yellow-400/20"
+                    className="py-3 px-6 bg-yellow-400 text-black hover:bg-yellow-300 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-yellow-400/20 hover:scale-[1.02]"
                     title="Ver Lista de Inscritos"
                   >
-                    <Users size={14} />
-                    <span>{regCount} Inscritos</span>
+                    <Users size={16} />
+                    <span>{regCount} Inscritos Confirmados</span>
                   </Link>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <button
                       onClick={() => handleSaveAsTemplate(event)}
-                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      className="h-10 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 rounded-xl flex items-center gap-2 transition-all border border-slate-700 text-xs font-bold"
                       title="Salvar como Modelo"
                     >
-                      <Bookmark size={14} />
+                      <Bookmark size={15} />
+                      <span>Modelo</span>
                     </button>
                     <button
                       onClick={() => handleClone(event)}
-                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      className="h-10 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 rounded-xl flex items-center gap-2 transition-all border border-slate-700 text-xs font-bold"
                       title="Duplicar Evento"
                     >
-                      <Copy size={14} />
+                      <Copy size={15} />
+                      <span>Clonar</span>
                     </button>
                     <button
                       onClick={() => setQrEvent(event)}
-                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      className="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-indigo-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
                       title="Gerar QR Code"
                     >
-                      <QrCode size={14} />
+                      <QrCode size={16} />
                     </button>
                     <button
                       onClick={() => handleToggleVisibility(event)}
-                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all border ${
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all border ${
                         event.is_hidden === 1
                           ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border-amber-500/20'
                           : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700'
                       }`}
                       title={event.is_hidden === 1 ? "Mostrar a Todos" : "Ocultar Evento"}
                     >
-                      {event.is_hidden === 1 ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {event.is_hidden === 1 ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                     <button
                       onClick={() => handleOpenModal(event)}
-                      className="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
+                      className="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-yellow-400 rounded-xl flex items-center justify-center transition-all border border-slate-700"
                       title="Editar Evento"
                     >
-                      <Edit2 size={14} />
+                      <Edit2 size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(event.id)}
-                      className="w-8 h-8 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20"
+                      className="w-10 h-10 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20"
                       title="Excluir Evento"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>

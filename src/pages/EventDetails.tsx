@@ -965,6 +965,32 @@ export default function EventDetails() {
                         </div>
                       )}
  
+                      {event.limitar_vagas_genero === 1 && (Number(event.vagas_masculino) > 0 || Number(event.vagas_feminino) > 0) && (
+                        <div className="p-5 bg-purple-500/10 border-2 border-purple-500/20 rounded-2xl text-purple-400 text-sm font-bold space-y-2">
+                          <div className="flex items-center gap-3">
+                            <Users size={18} className="text-purple-400" />
+                            <span className="uppercase tracking-wider font-black text-xs">Vagas por Gênero</span>
+                          </div>
+                          <div className="space-y-1.5 leading-relaxed text-xs text-slate-300">
+                            <p>Este evento possui vagas separadas por gênero:</p>
+                            <div className="grid grid-cols-2 gap-2 pt-1 text-[12px] font-black">
+                              {Number(event.vagas_masculino) > 0 && (
+                                <div className="p-2.5 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center justify-between text-blue-300">
+                                  <span>Masculino:</span>
+                                  <span className="text-white">{event.vagas_masculino} vagas</span>
+                                </div>
+                              )}
+                              {Number(event.vagas_feminino) > 0 && (
+                                <div className="p-2.5 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center justify-between text-pink-300">
+                                  <span>Feminino:</span>
+                                  <span className="text-white">{event.vagas_feminino} vagas</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+ 
                       {error && (
                         <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-2xl text-red-400 text-sm font-bold flex items-center gap-3">
                           <AlertTriangle size={18} /> {error}

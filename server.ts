@@ -885,7 +885,7 @@ function executeRegisterParticipant(req: any, res: any) {
     res.json({ success: true, registrationId: regId });
   } catch (err: any) {
     console.error("Registration validation error:", err);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: 'Não foi possível concluir a inscrição no momento. Por favor, tente novamente em instantes.' });
   }
 }
 

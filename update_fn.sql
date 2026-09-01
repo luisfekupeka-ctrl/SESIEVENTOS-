@@ -6,6 +6,7 @@ AS $function$
 DECLARE
   v_student_id UUID;
   v_db_student_grade TEXT;
+  v_db_student_gender TEXT;
   v_effective_grade TEXT;
   v_existing_id UUID;
   v_registration_count INTEGER;
@@ -35,15 +36,19 @@ DECLARE
   v_display_mode JSONB;
 BEGIN
   -- 0. Verificar Modo Exibição / Contagem Regressiva em system_settings
-  SELECT value::jsonb INTO v_display_mode FROM system_settings WHERE key = 'display_mode';
-  IF v_display_mode IS NOT NULL THEN
-    IF (v_display_mode->>'enabled')::boolean = true THEN
-      RETURN jsonb_build_object('success', false, 'error', 'Inscrições temporariamente bloqueadas (Modo de Exibição Ativo).');
+  BEGIN
+    SELECT value::jsonb INTO v_display_mode FROM system_settings WHERE key = 'display_mode';
+    IF v_display_mode IS NOT NULL THEN
+      IF (v_display_mode->>'enabled')::boolean = true THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Inscrições temporariamente bloqueadas (Modo de Exibição Ativo).');
+      END IF;
+      IF (v_display_mode->>'unlock_target_at') IS NOT NULL AND NOW() < (v_display_mode->>'unlock_target_at')::timestamptz THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Inscrições bloqueadas. Aguarde o término da contagem regressiva para liberação.');
+      END IF;
     END IF;
-    IF (v_display_mode->>'unlock_target_at') IS NOT NULL AND NOW() < (v_display_mode->>'unlock_target_at')::timestamptz THEN
-      RETURN jsonb_build_object('success', false, 'error', 'Inscrições bloqueadas. Aguarde o término da contagem regressiva para liberação.');
-    END IF;
-  END IF;
+  EXCEPTION WHEN OTHERS THEN
+    -- ignorar erro de parsing de settings se não existir
+  END;
 
   -- Fetch Event details
   SELECT name, max_capacity, registration_count, restrictions, category_id, subcategory_id, restringir_duplicidade, COALESCE(limitar_vagas_por_ano, 0), vagas_por_ano::jsonb, COALESCE(enable_autocomplete, true), COALESCE(limitar_vagas_genero, 0), COALESCE(vagas_masculino, 0), COALESCE(vagas_feminino, 0)
@@ -55,7 +60,7 @@ BEGIN
   END IF;
 
   -- 1. Buscar aluno existente no sistema
-  SELECT id, grade INTO v_student_id, v_db_student_grade FROM students 
+  SELECT id, grade, gender INTO v_student_id, v_db_student_grade, v_db_student_gender FROM students 
   WHERE LOWER(TRIM(REGEXP_REPLACE(name || ' ' || COALESCE(surname, ''), '\s+', ' ', 'g'))) = LOWER(TRIM(REGEXP_REPLACE(p_student_name || ' ' || COALESCE(p_student_surname, ''), '\s+', ' ', 'g')))
      OR LOWER(TRIM(name)) = LOWER(TRIM(REGEXP_REPLACE(p_student_name || ' ' || COALESCE(p_student_surname, ''), '\s+', ' ', 'g')))
      OR (LOWER(TRIM(name)) = LOWER(TRIM(p_student_name)) AND LOWER(TRIM(COALESCE(surname, ''))) = LOWER(TRIM(COALESCE(p_student_surname, ''))))
@@ -63,11 +68,13 @@ BEGIN
   FOR UPDATE;
 
   IF v_student_id IS NOT NULL THEN
-    IF v_db_student_grade IS NOT NULL AND v_db_student_grade != '' THEN
+    IF v_db_student_grade IS NOT NULL AND v_db_student_grade != '' AND v_db_student_grade != '-' THEN
       v_effective_grade := v_db_student_grade;
     ELSE
       v_effective_grade := p_student_grade;
-      UPDATE students SET grade = p_student_grade WHERE id = v_student_id;
+      IF p_student_grade IS NOT NULL AND p_student_grade != '' AND p_student_grade != '-' THEN
+        UPDATE students SET grade = p_student_grade WHERE id = v_student_id;
+      END IF;
     END IF;
   ELSE
     IF v_enable_autocomplete = true THEN
@@ -115,41 +122,61 @@ BEGIN
   END IF;
 
   -- 3.5 Limite de vagas por gênero
-  IF v_limitar_vagas_genero = 1 AND p_form_data IS NOT NULL THEN
-    v_user_gender := (
-      SELECT LOWER(value::text)
-      FROM jsonb_each(p_form_data)
-      WHERE LOWER(key) LIKE '%gênero%' OR LOWER(key) LIKE '%genero%' OR LOWER(key) LIKE '%sexo%'
-      LIMIT 1
-    );
+  IF v_limitar_vagas_genero = 1 THEN
+    -- Priorizar gênero cadastrado no banco do aluno
+    IF v_db_student_gender IS NOT NULL AND TRIM(v_db_student_gender) != '' THEN
+      v_user_gender := LOWER(TRIM(v_db_student_gender));
+    ELSE
+      -- Fallback para p_form_data
+      IF p_form_data IS NOT NULL THEN
+        SELECT LOWER(TRIM(value::text)) INTO v_user_gender
+        FROM jsonb_each(p_form_data)
+        WHERE LOWER(key) LIKE '%gênero%' OR LOWER(key) LIKE '%genero%' OR LOWER(key) LIKE '%sexo%'
+        LIMIT 1;
+      END IF;
+    END IF;
 
     IF v_user_gender IS NOT NULL THEN
-      IF v_user_gender LIKE '%masc%' OR v_user_gender = '"m"' THEN
+      IF v_user_gender LIKE '%masc%' OR v_user_gender = '"m"' OR v_user_gender = 'm' OR v_user_gender = 'masculino' THEN
         IF v_vagas_masculino > 0 THEN
           SELECT COUNT(*) INTO v_gender_count
           FROM registrations r
+          LEFT JOIN students s ON r.student_id = s.id
           WHERE r.event_id = p_event_id AND r.status = 'approved'
             AND (
-              SELECT LOWER(value::text)
-              FROM jsonb_each(r.form_data)
-              WHERE LOWER(key) LIKE '%gênero%' OR LOWER(key) LIKE '%genero%' OR LOWER(key) LIKE '%sexo%'
-              LIMIT 1
-            ) SIMILAR TO '%(masc|"m")%';
+              LOWER(TRIM(COALESCE(s.gender, ''))) LIKE '%masc%'
+              OR LOWER(TRIM(COALESCE(s.gender, ''))) = 'm'
+              OR (
+                (s.gender IS NULL OR s.gender = '') AND
+                EXISTS (
+                  SELECT 1 FROM jsonb_each(r.form_data)
+                  WHERE (LOWER(key) LIKE '%gênero%' OR LOWER(key) LIKE '%genero%' OR LOWER(key) LIKE '%sexo%')
+                    AND (LOWER(value::text) LIKE '%masc%' OR LOWER(value::text) = '"m"')
+                )
+              )
+            );
           IF v_gender_count >= v_vagas_masculino THEN
             RETURN jsonb_build_object('success', false, 'error', 'Infelizmente, o limite de vagas para o sexo masculino já foi preenchido.');
           END IF;
         END IF;
-      ELSIF v_user_gender LIKE '%fem%' OR v_user_gender = '"f"' THEN
+      ELSIF v_user_gender LIKE '%fem%' OR v_user_gender = '"f"' OR v_user_gender = 'f' OR v_user_gender = 'feminino' THEN
         IF v_vagas_feminino > 0 THEN
           SELECT COUNT(*) INTO v_gender_count
           FROM registrations r
+          LEFT JOIN students s ON r.student_id = s.id
           WHERE r.event_id = p_event_id AND r.status = 'approved'
             AND (
-              SELECT LOWER(value::text)
-              FROM jsonb_each(r.form_data)
-              WHERE LOWER(key) LIKE '%gênero%' OR LOWER(key) LIKE '%genero%' OR LOWER(key) LIKE '%sexo%'
-              LIMIT 1
-            ) SIMILAR TO '%(fem|"f")%';
+              LOWER(TRIM(COALESCE(s.gender, ''))) LIKE '%fem%'
+              OR LOWER(TRIM(COALESCE(s.gender, ''))) = 'f'
+              OR (
+                (s.gender IS NULL OR s.gender = '') AND
+                EXISTS (
+                  SELECT 1 FROM jsonb_each(r.form_data)
+                  WHERE (LOWER(key) LIKE '%gênero%' OR LOWER(key) LIKE '%genero%' OR LOWER(key) LIKE '%sexo%')
+                    AND (LOWER(value::text) LIKE '%fem%' OR LOWER(value::text) = '"f"')
+                )
+              )
+            );
           IF v_gender_count >= v_vagas_feminino THEN
             RETURN jsonb_build_object('success', false, 'error', 'Infelizmente, o limite de vagas para o sexo feminino já foi preenchido.');
           END IF;
@@ -160,7 +187,7 @@ BEGIN
 
   -- 4. Capacidade máxima do evento
   IF v_max_capacity IS NOT NULL AND v_max_capacity > 0 AND v_registration_count >= v_max_capacity THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Evento lotado');
+    RETURN jsonb_build_object('success', false, 'error', 'Desculpe, o evento já está lotado.');
   END IF;
 
   -- 5. Restringir duplicidade em eventos da MESMA MODALIDADE
@@ -190,8 +217,8 @@ BEGIN
   END IF;
 
   -- Insert registration
-  INSERT INTO registrations (event_id, student_id, form_data, timestamp)
-  VALUES (p_event_id, v_student_id, p_form_data, NOW());
+  INSERT INTO registrations (event_id, student_id, form_data, timestamp, status)
+  VALUES (p_event_id, v_student_id, p_form_data, NOW(), COALESCE(p_form_data->>'status', 'approved'));
 
   -- Update count
   UPDATE events SET registration_count = COALESCE(registration_count, 0) + 1
@@ -200,6 +227,6 @@ BEGIN
   RETURN jsonb_build_object('success', true, 'student_id', v_student_id);
 EXCEPTION
   WHEN OTHERS THEN
-    RETURN jsonb_build_object('success', false, 'error', SQLERRM);
+    RETURN jsonb_build_object('success', false, 'error', 'Não foi possível concluir a inscrição no momento. Por favor, tente novamente em instantes.');
 END;
 $function$;

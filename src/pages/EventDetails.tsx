@@ -256,10 +256,25 @@ export default function EventDetails() {
 
 
 
-    // ── Bloquear se nome não foi selecionado da lista de sugestões (apenas para alunos) ────────
+    // ── Validação e auto-detecção de aluno cadastrado ────────
     if (participantType === 'student' && !studentSelectedFromList) {
-      setRestrictionError('Por favor, selecione seu nome da lista de sugestões. Digite pelo menos 2 letras e clique no seu nome quando aparecer.');
-      return;
+      const norm = (str: string) => (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+      const typedFullName = norm(`${finalFirstName} ${finalLastName}`);
+      const matched = allStudents.find(s => {
+        const dbFullName = norm(`${s.name || ''} ${s.surname || ''}`);
+        const dbShortName = norm(s.name || '');
+        return dbFullName === typedFullName || dbShortName === typedFullName;
+      });
+
+      if (matched) {
+        setStudentSelectedFromList(true);
+        setSelectedStudentId(matched.id);
+        setSelectedStudentGender(matched.gender || null);
+        if (matched.grade) setSelectedStudentGrade(matched.grade);
+      } else {
+        setRestrictionError('Por favor, selecione seu nome da lista de sugestões. Digite seu nome e clique sobre ele.');
+        return;
+      }
     }
 
     if (event.password_protected && event.password !== eventPassword) {
@@ -761,7 +776,7 @@ export default function EventDetails() {
                           {(() => {
                             const fieldKey = field.label.toLowerCase();
                             const commonClasses = "w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold placeholder:text-slate-600 shadow-inner";
-                            const isNameField = fieldKey === 'nome' || fieldKey === 'nome completo';
+                            const isNameField = fieldKey.includes('nome') || fieldKey.includes('aluno') || fieldKey.includes('participante');
                             
                             if (isNameField) {
                               return (

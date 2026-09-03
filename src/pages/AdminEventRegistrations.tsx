@@ -71,14 +71,17 @@ export default function AdminEventRegistrations() {
 
         if (regsData) {
           const sortedRegs = (regsData as any[]).sort((a, b) => {
-            const nameA = `${a.students?.name || ''} ${a.students?.surname || ''}`.toLowerCase().trim();
-            const nameB = `${b.students?.name || ''} ${b.students?.surname || ''}`.toLowerCase().trim();
+            const getFullName = (r: any) => {
+              if (r.students?.name || r.students?.surname) {
+                return `${r.students.name || ''} ${r.students.surname || ''}`.trim().toLowerCase();
+              }
+              const fd = typeof r.form_data === 'string'
+                ? (() => { try { return JSON.parse(r.form_data); } catch { return {}; } })()
+                : (r.form_data || {});
+              return (fd['nome completo'] || fd['nome'] || fd['Nome Completo'] || fd['Nome'] || fd['name'] || fd['Name'] || fd['aluno'] || '').toString().toLowerCase().trim();
+            };
             
-            // Fallback for form_data if student is missing
-            const fallbackA = (a.form_data?.nome || a.form_data?.['nome completo'] || '').toString().toLowerCase();
-            const fallbackB = (b.form_data?.nome || b.form_data?.['nome completo'] || '').toString().toLowerCase();
-            
-            return (nameA || fallbackA).localeCompare(nameB || fallbackB);
+            return getFullName(a).localeCompare(getFullName(b));
           });
           setRegistrations(sortedRegs);
         }
@@ -600,11 +603,60 @@ export default function AdminEventRegistrations() {
     }
   };
 
+  const getEffectiveFields = () => {
+    if (Array.isArray(event?.form_fields) && event.form_fields.length > 0) {
+      return event.form_fields;
+    }
+    if (typeof event?.form_fields === 'string') {
+      try {
+        const parsed = JSON.parse(event.form_fields);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return [
+      { id: 'field_name', type: 'text', label: 'Nome Completo', required: true },
+      { id: 'field_grade', type: 'select', label: 'Série', required: true },
+      { id: 'field_class', type: 'select', label: 'Turma', required: true }
+    ];
+  };
+
+  const getFieldValue = (reg: any, field: any) => {
+    const label = (field.label || '').toLowerCase();
+    const student = (reg as any).students;
+    const fd = typeof reg.form_data === 'string'
+      ? (() => { try { return JSON.parse(reg.form_data); } catch { return {}; } })()
+      : (reg.form_data || {});
+
+    if (label.includes('nome')) {
+      if (student && (student.name || student.surname)) {
+        return `${student.name || ''} ${student.surname || ''}`.trim();
+      }
+      return fd['nome completo'] || fd['nome'] || fd['Nome Completo'] || fd['Nome'] || fd['name'] || fd['Name'] || fd['aluno'] || fd['Aluno'] || fd[field.label] || fd[label] || '-';
+    }
+
+    if (label.includes('série') || label.includes('serie') || label.includes('ano')) {
+      if (student && student.grade) return student.grade;
+      return fd['série'] || fd['serie'] || fd['ano'] || fd['Série'] || fd['Ano'] || fd['grade'] || fd['Grade'] || fd[field.label] || fd[label] || '-';
+    }
+
+    if (label.includes('turma')) {
+      if (student && student.class) return student.class;
+      return fd['turma'] || fd['Turma'] || fd['class'] || fd['Class'] || fd[field.label] || fd[label] || '-';
+    }
+
+    if (label.includes('sexo') || label.includes('gênero') || label.includes('genero')) {
+      if (student && student.gender) return student.gender;
+      return fd['sexo'] || fd['Sexo'] || fd['gênero'] || fd['genero'] || fd['Gênero'] || fd['gender'] || fd[field.label] || fd[label] || '-';
+    }
+
+    return fd[field.label] || fd[label] || '-';
+  };
+
   const exportToExcel = () => {
     if (!event || registrations.length === 0) return;
     if (profile?.status !== 'approved') return;
     try {
-      const formFields = (event.form_fields as any[]) || [];
+      const formFields = getEffectiveFields();
       const data = registrations.map(reg => {
         let formattedDate = '-';
         try {
@@ -619,19 +671,8 @@ export default function AdminEventRegistrations() {
           'Data Inscrição': formattedDate
         };
         
-        const formData = reg.form_data || {};
         formFields.forEach(field => {
-          const label = field.label.toLowerCase();
-          const student = (reg as any).students;
-          let value = formData[label] || formData[field.label] || '-';
-          
-          if (student) {
-            if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
-            else if (label.includes('série') || label.includes('ano')) value = student.grade || value;
-            else if (label.includes('turma')) value = student.class || value;
-          }
-          
-          row[field.label] = value;
+          row[field.label] = getFieldValue(reg, field);
         });
         
         return row;
@@ -654,7 +695,7 @@ export default function AdminEventRegistrations() {
       const pdfDoc = new jsPDF();
       pdfDoc.text(`Lista de Inscritos: ${event.name}`, 14, 15);
       
-      const formFields = (event.form_fields as any[]) || [];
+      const formFields = getEffectiveFields();
       const head = [['Data', ...formFields.map(f => f.label)]];
       const body = registrations.map(reg => {
         let formattedDate = '-';
@@ -666,21 +707,9 @@ export default function AdminEventRegistrations() {
           console.error("Erro ao formatar data para PDF:", e);
         }
 
-        const formData = reg.form_data || {};
         return [
           formattedDate,
-          ...formFields.map(f => {
-            const label = f.label.toLowerCase();
-            const student = (reg as any).students;
-            let value = formData[label] || formData[f.label] || '-';
-            
-            if (student) {
-              if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
-              else if (label.includes('série') || label.includes('ano')) value = student.grade || value;
-              else if (label.includes('turma')) value = student.class || value;
-            }
-            return value;
-          })
+          ...formFields.map(f => getFieldValue(reg, f))
         ];
       });
 
@@ -703,8 +732,8 @@ export default function AdminEventRegistrations() {
   const copyToClipboard = () => {
     if (!event) return;
     
-    const headers = ['Data Inscrição'];
-    event.form_fields.forEach(field => headers.push(field.label));
+    const formFields = getEffectiveFields();
+    const headers = ['Data Inscrição', ...formFields.map(f => f.label)];
     
     const rows = registrations.map(reg => {
       let formattedDate = '-';
@@ -717,21 +746,9 @@ export default function AdminEventRegistrations() {
       }
 
       const row = [
-        formattedDate
+        formattedDate,
+        ...formFields.map(f => getFieldValue(reg, f))
       ];
-      
-      event.form_fields.forEach(field => {
-        const label = field.label.toLowerCase();
-        const student = (reg as any).students;
-        let value = reg.form_data[label] || reg.form_data[field.label] || '-';
-        
-        if (student) {
-          if (label.includes('nome')) value = `${student.name} ${student.surname || ''}`.trim();
-          else if (label.includes('série') || label.includes('ano')) value = student.grade || value;
-          else if (label.includes('turma')) value = student.class || value;
-        }
-        row.push(value);
-      });
       
       return row.join('\t');
     });
@@ -749,98 +766,111 @@ export default function AdminEventRegistrations() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="w-12 h-12 text-yellow-400 animate-spin mb-4" />
-        <p className="text-slate-300 font-black uppercase tracking-widest text-sm">Carregando inscrições...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="w-12 h-12 text-yellow-400 animate-spin shadow-[0_0_15px_rgba(234,179,8,0.3)]" />
+        <p className="text-slate-400 font-black uppercase tracking-widest text-sm">Carregando inscrições...</p>
       </div>
     );
   }
 
-  if (!event) return <div className="p-20 text-center text-red-500 font-bold bg-[#020617]">Evento não encontrado.</div>;
+  if (!event) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-slate-400 font-black text-xl uppercase tracking-widest">Evento não encontrado.</p>
+        <button
+          onClick={() => navigate('/admin/events')}
+          className="mt-6 px-8 py-3 bg-yellow-400 text-black font-black uppercase tracking-widest rounded-xl text-xs hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20"
+        >
+          Voltar para Eventos
+        </button>
+      </div>
+    );
+  }
+
+  const effectiveFields = getEffectiveFields();
 
   return (
-    <div className="space-y-10 bg-[#020617]">
+    <div className="space-y-10">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/admin/events')} className="w-14 h-14 bg-slate-900 text-slate-400 hover:text-yellow-400 rounded-2xl flex items-center justify-center transition-all border border-slate-800 shadow-lg">
-            <ChevronLeft size={28} />
+        <div>
+          <button
+            onClick={() => navigate('/admin/events')}
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white font-black text-xs uppercase tracking-widest transition-colors mb-4"
+          >
+            <ChevronLeft size={16} /> Voltar para Eventos
           </button>
-          <div>
-            <h1 className="text-3xl font-black text-white line-clamp-1 tracking-tight">{event.name}</h1>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Lista de Inscritos • <span className="text-yellow-400">{registrations.length}</span> Participantes</p>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center text-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.15)]">
+              <Users size={24} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-white tracking-tight">{event.name}</h1>
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">
+                {registrations.length} de {event.max_capacity || '∞'} Participantes Inscritos
+              </p>
+            </div>
           </div>
         </div>
-        
-        <div className="flex flex-wrap items-center gap-3 md:gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => {
-                fetchStudents();
-                setIsAddModalOpen(true);
-              }}
-              disabled={profile?.status !== 'approved'}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-300 transition-all shadow-lg shadow-yellow-400/20 disabled:opacity-50"
-            >
-              <Users size={16} /> Adicionar Aluno
-            </button>
-            <button
-              onClick={copyToClipboard}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg"
-            >
-              {copied ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
-              {copied ? 'Copiado!' : 'Copiar Dados'}
-            </button>
-          </div>
 
-          <div className="flex items-center gap-2 bg-slate-900/50 p-1.5 rounded-[1.25rem] border border-slate-800/50">
-            <button
-              onClick={exportToExcel}
-              disabled={profile?.status !== 'approved'}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500/10 border border-green-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-green-500 hover:bg-green-500 hover:text-white transition-all disabled:opacity-50"
-            >
-              <FileSpreadsheet size={16} /> Excel
-            </button>
-            <button
-              onClick={exportToPDF}
-              disabled={profile?.status !== 'approved'}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
-            >
-              <FileText size={16} /> PDF
-            </button>
-          </div>
+        {/* Actions */}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            disabled={profile?.status !== 'approved'}
+            className="px-6 py-4 bg-yellow-400 text-black hover:bg-yellow-300 font-black text-xs uppercase tracking-widest rounded-2xl flex items-center gap-2 transition-all shadow-lg shadow-yellow-400/10 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <Plus size={16} /> Adicionar Aluno
+          </button>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => {
-                fetchStudents();
-                setIsBulkModalOpen(true);
-              }}
-              disabled={profile?.status !== 'approved'}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-white hover:bg-slate-800 transition-all shadow-lg disabled:opacity-50"
-            >
-              <Plus size={16} /> Colar Lista
-            </button>
-            <label className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-lg cursor-pointer disabled:opacity-50">
-              <Download size={16} /> Importar Excel
-              <input
-                type="file"
-                accept=".xlsx, .xls"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImportExcel(file);
-                }}
-                disabled={profile?.status !== 'approved' || isAdding}
-              />
-            </label>
+          <button
+            onClick={() => {
+              setIsBulkModalOpen(true);
+              setBulkStep('input');
+              setBulkResults([]);
+              setBulkText('');
+              setBatchFeedback(null);
+            }}
+            disabled={profile?.status !== 'approved'}
+            className="px-6 py-4 bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center gap-2 transition-all shadow-lg shadow-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <Users size={16} /> Colar Lista em Massa
+          </button>
+
+          <button
+            onClick={copyToClipboard}
+            className="px-6 py-4 bg-slate-900 border border-slate-800 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:border-yellow-400/50 flex items-center gap-2 transition-all shadow-lg"
+          >
+            {copied ? <CheckCircle2 size={16} className="text-green-500" /> : <Copy size={16} />}
+            {copied ? 'Copiado!' : 'Copiar'}
+          </button>
+
+          <button
+            onClick={exportToExcel}
+            disabled={profile?.status !== 'approved' || registrations.length === 0}
+            className="px-6 py-4 bg-slate-900 border border-slate-800 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:border-yellow-400/50 flex items-center gap-2 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FileSpreadsheet size={16} className="text-green-500" /> Excel
+          </button>
+
+          <button
+            onClick={exportToPDF}
+            disabled={profile?.status !== 'approved' || registrations.length === 0}
+            className="px-6 py-4 bg-slate-900 border border-slate-800 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:border-yellow-400/50 flex items-center gap-2 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FileText size={16} className="text-red-500" /> PDF
+          </button>
+
+          {registrations.length > 0 && (
             <button
               onClick={() => setIsDeleteAllModalOpen(true)}
               disabled={profile?.status !== 'approved'}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg shadow-red-500/5 disabled:opacity-50"
+              className="px-6 py-4 bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center gap-2 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              title="Remover todos os alunos deste evento"
             >
-              <Trash2 size={16} /> Limpar Tudo
+              <Trash2 size={16} /> Limpar Todos
             </button>
-          </div>
+          )}
         </div>
       </div>
 
@@ -859,7 +889,7 @@ export default function AdminEventRegistrations() {
             <thead>
               <tr className="bg-slate-950/50 border-b border-slate-800">
                 <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Data</th>
-                {event.form_fields.map(field => (
+                {effectiveFields.map(field => (
                   <th key={field.id} className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{field.label}</th>
                 ))}
                 <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
@@ -869,27 +899,14 @@ export default function AdminEventRegistrations() {
             <tbody className="divide-y divide-slate-800">
               {registrations.map(reg => {
                 const regStatus = (reg as any).status || reg.form_data?.status || 'approved';
-                const student = (reg as any).students;
                 
                 return (
                   <tr key={reg.id} className="hover:bg-slate-800/30 transition-colors group">
                     <td className="px-6 md:px-10 py-6 text-xs text-slate-400 font-bold whitespace-nowrap uppercase tracking-widest">
                       {formatRegDate(reg.timestamp)}
                     </td>
-                    {event.form_fields.map(field => {
-                      const label = field.label.toLowerCase();
-                      let value = reg.form_data[label] || reg.form_data[field.label] || '-';
-                      
-                      // Interceptar campos conhecidos para usar dados canônicos do banco
-                      if (student) {
-                        if (label.includes('nome')) {
-                          value = `${student.name} ${student.surname || ''}`.trim();
-                        } else if (label.includes('série') || label.includes('ano')) {
-                          value = student.grade || value;
-                        } else if (label.includes('turma')) {
-                          value = student.class || value;
-                        }
-                      }
+                    {effectiveFields.map(field => {
+                      const value = getFieldValue(reg, field);
 
                       return (
                         <td key={field.id} className="px-6 md:px-10 py-6 text-sm text-white font-bold truncate max-w-[250px]">

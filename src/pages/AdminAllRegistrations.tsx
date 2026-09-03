@@ -95,17 +95,41 @@ export default function AdminAllRegistrations() {
     };
   }, [fetchAll]);
 
+  const getRegName = (reg: Registration) => {
+    if (reg.students && (reg.students.name || reg.students.surname)) {
+      return `${reg.students.name || ''} ${reg.students.surname || ''}`.trim();
+    }
+    const fd = typeof reg.form_data === 'string'
+      ? (() => { try { return JSON.parse(reg.form_data); } catch { return {}; } })()
+      : (reg.form_data || {});
+    return fd['nome completo'] || fd['nome'] || fd['Nome Completo'] || fd['Nome'] || fd['name'] || fd['Name'] || fd['aluno'] || fd['Aluno'] || '—';
+  };
+
+  const getRegGrade = (reg: Registration) => {
+    if (reg.students && reg.students.grade) return reg.students.grade;
+    const fd = typeof reg.form_data === 'string'
+      ? (() => { try { return JSON.parse(reg.form_data); } catch { return {}; } })()
+      : (reg.form_data || {});
+    return fd['série'] || fd['serie'] || fd['ano'] || fd['Série'] || fd['Ano'] || fd['grade'] || fd['Grade'] || '—';
+  };
+
+  const getRegClass = (reg: Registration) => {
+    if (reg.students && reg.students.class) return reg.students.class;
+    const fd = typeof reg.form_data === 'string'
+      ? (() => { try { return JSON.parse(reg.form_data); } catch { return {}; } })()
+      : (reg.form_data || {});
+    return fd['turma'] || fd['Turma'] || fd['class'] || fd['Class'] || '';
+  };
+
   // Filtered data
   const filtered = registrations.filter(reg => {
-    const studentName = `${reg.students?.name || ''} ${reg.students?.surname || ''}`.toLowerCase();
-    const formName = (reg.form_data?.nome || reg.form_data?.['nome completo'] || '').toString().toLowerCase();
+    const studentName = getRegName(reg).toLowerCase();
     const eventName = (reg.events?.name || '').toLowerCase();
-    const grade = (reg.students?.grade || '').toLowerCase();
+    const grade = getRegGrade(reg).toLowerCase();
     const search = searchTerm.toLowerCase();
 
     const matchesSearch = !searchTerm ||
       studentName.includes(search) ||
-      formName.includes(search) ||
       eventName.includes(search) ||
       grade.includes(search);
 
@@ -126,9 +150,9 @@ export default function AdminAllRegistrations() {
   const handleExport = () => {
     const rows = filtered.map((reg, idx) => ({
       '#': idx + 1,
-      'Aluno': `${reg.students?.name || ''} ${reg.students?.surname || ''}`.trim() || (reg.form_data?.nome || reg.form_data?.['nome completo'] || '—'),
-      'Ano/Série': reg.students?.grade || '—',
-      'Turma': reg.students?.class || '—',
+      'Aluno': getRegName(reg),
+      'Ano/Série': getRegGrade(reg),
+      'Turma': getRegClass(reg) || '—',
       'After': reg.events?.name || '—',
       'Dia(s)': Array.isArray(reg.events?.dias_semana) ? reg.events!.dias_semana!.join(', ') : '—',
       'Data/Hora Inscrição': reg.timestamp ? new Date(reg.timestamp).toLocaleString('pt-BR') : '—',
@@ -263,12 +287,9 @@ export default function AdminAllRegistrations() {
                 </thead>
                 <tbody>
                   {paginated.map((reg, idx) => {
-                    const studentName = `${reg.students?.name || ''} ${reg.students?.surname || ''}`.trim()
-                      || reg.form_data?.nome
-                      || reg.form_data?.['nome completo']
-                      || '—';
-                    const grade = reg.students?.grade || '—';
-                    const klass = reg.students?.class || '';
+                    const studentName = getRegName(reg);
+                    const grade = getRegGrade(reg);
+                    const klass = getRegClass(reg);
                     const afterName = reg.events?.name || '—';
                     const dias = Array.isArray(reg.events?.dias_semana)
                       ? reg.events!.dias_semana!.join(', ')

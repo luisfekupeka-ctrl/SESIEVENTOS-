@@ -803,89 +803,116 @@ function executeRegisterParticipant(req: any, res: any) {
       }
     }
 
-    // Check gender limit
-    if (event.limitar_vagas_genero === 1) {
-      let userGender = null;
-      let matchedStudentObj = null;
-      if (matchedStudentId) {
-        matchedStudentObj = db.prepare("SELECT * FROM students WHERE id = ?").get(matchedStudentId) as any;
+    // Atomic transaction for concurrency safety in mass registrations
+    const registerTx = db.transaction(() => {
+      // Re-fetch event inside transaction lock
+      const freshEvent = db.prepare("SELECT * FROM events WHERE id = ?").get(eventId) as any;
+      if (!freshEvent) {
+        throw { status: 404, message: 'Evento não encontrado.' };
       }
-      
-      if (matchedStudentObj && matchedStudentObj.gender) {
-        userGender = matchedStudentObj.gender.toLowerCase();
-      } else {
-        // Fallback to form_data if no student gender is found
-        for (const key of Object.keys(form_data || {})) {
-          const lowerKey = key.toLowerCase();
-          if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
-            userGender = String(form_data[key]).toLowerCase();
-            break;
+
+      // Check current active approved registrations count
+      const activeCountRow = db.prepare("SELECT count(*) as total FROM registrations WHERE event_id = ? AND status = 'approved'").get(eventId) as any;
+      const currentActiveCount = activeCountRow?.total || 0;
+
+      // Check total capacity limit
+      if (freshEvent.max_capacity > 0 && currentActiveCount >= freshEvent.max_capacity) {
+        throw { status: 400, message: 'Desculpe, o evento já está lotado.' };
+      }
+
+      // Check gender limit
+      if (freshEvent.limitar_vagas_genero === 1) {
+        let userGender = null;
+        let matchedStudentObj = null;
+        if (matchedStudentId) {
+          matchedStudentObj = db.prepare("SELECT * FROM students WHERE id = ?").get(matchedStudentId) as any;
+        }
+        
+        if (matchedStudentObj && matchedStudentObj.gender) {
+          userGender = matchedStudentObj.gender.toLowerCase();
+        } else {
+          // Fallback to form_data if no student gender is found
+          for (const key of Object.keys(form_data || {})) {
+            const lowerKey = key.toLowerCase();
+            if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
+              userGender = String(form_data[key]).toLowerCase();
+              break;
+            }
           }
         }
-      }
 
-      if (userGender) {
-        let isMale = userGender.includes('masc') || userGender === 'm';
-        let isFemale = userGender.includes('fem') || userGender === 'f';
+        if (userGender) {
+          let isMale = userGender.includes('masc') || userGender === 'm';
+          let isFemale = userGender.includes('fem') || userGender === 'f';
 
-        if (isMale || isFemale) {
-          const allRegs = db.prepare(`
-            SELECT r.*, s.gender as student_gender
-            FROM registrations r
-            LEFT JOIN students s ON r.student_id = s.id
-            WHERE r.event_id = ? AND r.status = 'approved'
-          `).all(eventId) as any[];
+          if (isMale || isFemale) {
+            const allRegs = db.prepare(`
+              SELECT r.*, s.gender as student_gender
+              FROM registrations r
+              LEFT JOIN students s ON r.student_id = s.id
+              WHERE r.event_id = ? AND r.status = 'approved'
+            `).all(eventId) as any[];
 
-          const genderCount = allRegs.filter(r => {
-            let rGender = r.student_gender ? r.student_gender.toLowerCase() : null;
-            if (!rGender) {
-              const rData = safeJsonParse(r.form_data) || {};
-              for (const key of Object.keys(rData)) {
-                const lowerKey = key.toLowerCase();
-                if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
-                  rGender = String(rData[key]).toLowerCase();
-                  break;
+            const genderCount = allRegs.filter(r => {
+              let rGender = r.student_gender ? r.student_gender.toLowerCase() : null;
+              if (!rGender) {
+                const rData = safeJsonParse(r.form_data) || {};
+                for (const key of Object.keys(rData)) {
+                  const lowerKey = key.toLowerCase();
+                  if (lowerKey.includes('gênero') || lowerKey.includes('genero') || lowerKey.includes('sexo')) {
+                    rGender = String(rData[key]).toLowerCase();
+                    break;
+                  }
                 }
               }
-            }
-            if (!rGender) return false;
-            
-            if (isMale) return rGender.includes('masc') || rGender === 'm';
-            if (isFemale) return rGender.includes('fem') || rGender === 'f';
-            return false;
-          }).length;
+              if (!rGender) return false;
+              
+              if (isMale) return rGender.includes('masc') || rGender === 'm';
+              if (isFemale) return rGender.includes('fem') || rGender === 'f';
+              return false;
+            }).length;
 
-          if (isMale && event.vagas_masculino > 0 && genderCount >= event.vagas_masculino) {
-            return res.status(400).json({ success: false, error: 'O limite de vagas para o sexo masculino já foi preenchido.' });
-          }
-          if (isFemale && event.vagas_feminino > 0 && genderCount >= event.vagas_feminino) {
-            return res.status(400).json({ success: false, error: 'O limite de vagas para o sexo feminino já foi preenchido.' });
+            if (isMale && freshEvent.vagas_masculino > 0 && genderCount >= freshEvent.vagas_masculino) {
+              throw { status: 400, message: 'Infelizmente, o limite de vagas para o sexo masculino já foi preenchido.' };
+            }
+            if (isFemale && freshEvent.vagas_feminino > 0 && genderCount >= freshEvent.vagas_feminino) {
+              throw { status: 400, message: 'Infelizmente, o limite de vagas para o sexo feminino já foi preenchido.' };
+            }
           }
         }
       }
-    }
 
-    // Check capacity limit
-    if (event.max_capacity > 0 && event.registration_count >= event.max_capacity) {
-      return res.status(400).json({ success: false, error: 'Desculpe, o evento já está lotado.' });
-    }
+      // Check duplicate registration
+      if (matchedStudentId) {
+        const existingReg = db.prepare("SELECT id FROM registrations WHERE event_id = ? AND student_id = ? AND status = 'approved'").get(eventId, matchedStudentId);
+        if (existingReg) {
+          throw { status: 400, message: 'Este aluno já está inscrito neste evento!' };
+        }
+      }
 
-    // 5. Insert registration
-    const regId = crypto.randomUUID();
-    const status = form_data?.status || 'approved';
-    
-    db.prepare(`
-      INSERT INTO registrations (id, event_id, student_id, form_data, status)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(regId, eventId, matchedStudentId || null, JSON.stringify(form_data), status);
+      // 5. Insert registration
+      const regId = crypto.randomUUID();
+      const status = form_data?.status || 'approved';
+      
+      db.prepare(`
+        INSERT INTO registrations (id, event_id, student_id, form_data, status)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(regId, eventId, matchedStudentId || null, JSON.stringify(form_data), status);
 
-    // 6. Increment registration count
-    db.prepare("UPDATE events SET registration_count = registration_count + 1 WHERE id = ?").run(eventId);
+      // 6. Keep exact registration_count in sync
+      db.prepare("UPDATE events SET registration_count = (SELECT count(*) FROM registrations WHERE event_id = ? AND status = 'approved') WHERE id = ?").run(eventId, eventId);
 
-    res.json({ success: true, registrationId: regId });
+      return regId;
+    });
+
+    const regId = registerTx();
+    return res.json({ success: true, registrationId: regId });
   } catch (err: any) {
+    if (err && err.status && err.message) {
+      return res.status(err.status).json({ success: false, error: err.message });
+    }
     console.error("Registration validation error:", err);
-    res.status(500).json({ success: false, error: 'Não foi possível concluir a inscrição no momento. Por favor, tente novamente em instantes.' });
+    return res.status(500).json({ success: false, error: err.message || 'Não foi possível concluir a inscrição no momento. Por favor, tente novamente em instantes.' });
   }
 }
 

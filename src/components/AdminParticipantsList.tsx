@@ -30,6 +30,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
     surname: '',
     class: '',
     grade: '',
+    gender: '',
     type: type
   });
 
@@ -275,7 +276,7 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
       setFormData(participant);
     } else {
       setEditingParticipant(null);
-      setFormData({ name: '', surname: '', class: '', grade: '', type: type });
+      setFormData({ name: '', surname: '', class: '', grade: '', gender: '', type: type });
     }
     setIsModalOpen(true);
   };
@@ -469,7 +470,10 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
               <tr className="bg-slate-950/50 border-b border-slate-800">
                 <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Identificação</th>
                 {type === 'student' && (
-                  <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Série/Turma</th>
+                  <>
+                    <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sexo</th>
+                    <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Série/Turma</th>
+                  </>
                 )}
                 <th className="px-6 md:px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Controle</th>
               </tr>
@@ -486,12 +490,33 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
                     </div>
                   </td>
                   {type === 'student' && (
-                    <td className="px-6 md:px-10 py-6">
-                      <div className="flex flex-col">
-                        <span className="text-base font-black text-white">{participant.grade}</span>
-                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{participant.class}</span>
-                      </div>
-                    </td>
+                    <>
+                      <td className="px-6 md:px-10 py-6">
+                        {participant.gender?.toLowerCase() === 'feminino' ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-pink-500/10 border border-pink-500/30 text-pink-400 rounded-lg text-xs font-black">
+                            <span className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+                            Feminino
+                          </span>
+                        ) : participant.gender?.toLowerCase() === 'masculino' ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 rounded-lg text-xs font-black">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                            Masculino
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-3 py-1 bg-slate-950 border border-slate-800 text-slate-500 rounded-lg text-xs font-bold">
+                            -
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 md:px-10 py-6">
+                        <div className="flex flex-col">
+                          <span className="text-base font-black text-white">{participant.grade}</span>
+                          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            {participant.class ? `Turma ${participant.class}` : '-'}
+                          </span>
+                        </div>
+                      </td>
+                    </>
                   )}
                   <td className="px-6 md:px-10 py-6 text-right">
                     <div className="flex items-center justify-end gap-3">
@@ -559,36 +584,50 @@ export const AdminParticipantsList: React.FC<AdminParticipantsListProps> = ({ ty
               </div>
 
               {type === 'student' && (
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Série</label>
-                    <select
-                      required
-                      className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
-                      value={formData.grade}
-                      onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                    >
-                      <option value="" className="bg-slate-900">Selecione...</option>
-                      {GRADES.map(grade => (
-                        <option key={grade} value={grade} className="bg-slate-900">{grade}</option>
-                      ))}
-                    </select>
+                <>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Série</label>
+                      <select
+                        required
+                        className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
+                        value={formData.grade}
+                        onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
+                      >
+                        <option value="" className="bg-slate-900">Selecione...</option>
+                        {GRADES.map(grade => (
+                          <option key={grade} value={grade} className="bg-slate-900">{grade}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Turma</label>
+                      <select
+                        className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
+                        value={formData.class}
+                        onChange={(e) => setFormData({ ...formData, class: e.target.value })}
+                      >
+                        <option value="" className="bg-slate-900">Selecione...</option>
+                        {CLASSES.map(cls => (
+                          <option key={cls} value={cls} className="bg-slate-900">{cls}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Turma</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Sexo / Gênero</label>
                     <select
-                      required
                       className="w-full px-5 py-4 bg-slate-950 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 transition-all text-white font-bold appearance-none shadow-inner"
-                      value={formData.class}
-                      onChange={(e) => setFormData({ ...formData, class: e.target.value })}
+                      value={formData.gender || ''}
+                      onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                     >
-                      <option value="" className="bg-slate-900">Selecione...</option>
-                      {CLASSES.map(cls => (
-                        <option key={cls} value={cls} className="bg-slate-900">{cls}</option>
-                      ))}
+                      <option value="" className="bg-slate-900">Não informado</option>
+                      <option value="Masculino" className="bg-slate-900">Masculino</option>
+                      <option value="Feminino" className="bg-slate-900">Feminino</option>
+                      <option value="Outro" className="bg-slate-900">Outro</option>
                     </select>
                   </div>
-                </div>
+                </>
               )}
 
               <div className="pt-8 flex flex-col md:flex-row justify-end gap-4 md:gap-5">

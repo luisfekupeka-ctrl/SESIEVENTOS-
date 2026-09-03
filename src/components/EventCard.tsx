@@ -126,9 +126,18 @@ export const EventCard: React.FC<EventCardProps> = ({ event, category }) => {
 
           {/* Vagas Badge */}
           {maxCap > 0 && !isFull && (
-            <span className="px-3 py-1 bg-slate-950/90 border border-slate-700/60 text-yellow-400 text-[10px] font-black uppercase tracking-tight rounded-xl backdrop-blur-md">
-              {remainingSpots} vagas
-            </span>
+            <div className="flex flex-col items-end gap-1">
+              <span className="px-3 py-1 bg-slate-950/90 border border-slate-700/60 text-yellow-400 text-[10px] font-black uppercase tracking-tight rounded-xl backdrop-blur-md">
+                {remainingSpots} vagas
+              </span>
+              {event.limitar_vagas_genero === 1 && (
+                <span className="px-2 py-0.5 bg-slate-950/90 border border-slate-800 text-[9px] font-black rounded-lg backdrop-blur-md flex items-center gap-1.5">
+                  <span className="text-blue-400">M:{event.vagas_masculino || 0}</span>
+                  <span className="text-slate-600">|</span>
+                  <span className="text-pink-400">F:{event.vagas_feminino || 0}</span>
+                </span>
+              )}
+            </div>
           )}
         </div>
 

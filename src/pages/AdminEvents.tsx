@@ -266,6 +266,20 @@ export default function AdminEvents() {
         }
       }
 
+      if (formData.limitar_vagas_genero === 1) {
+        const masc = Number(formData.vagas_masculino) || 0;
+        const fem = Number(formData.vagas_feminino) || 0;
+        const totalGenero = masc + fem;
+        const totalCapacity = Number(formData.max_capacity) || 0;
+
+        if (totalCapacity > 0 && totalGenero !== totalCapacity) {
+          throw new Error(`A quantidade total de vagas (${totalCapacity}) precisa coincidir exatamente com a soma das vagas por sexo (${totalGenero}: ${masc} Masculino + ${fem} Feminino).`);
+        }
+        if (totalCapacity === 0 && totalGenero > 0) {
+          formData.max_capacity = totalGenero;
+        }
+      }
+
       let finalImageUrl = formData.image_url;
 
       if (selectedImageFile) {
@@ -1221,27 +1235,117 @@ export default function AdminEvents() {
                   </div>
 
                   {/* Gender Limit Toggle */}
-                  <div className="space-y-4 md:col-span-2 p-6 bg-slate-950/50 border border-slate-800 rounded-3xl">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-black text-slate-300 uppercase tracking-widest">Limitar Vagas por Gênero</label>
+                  <div className="space-y-4 md:col-span-2 lg:col-span-5 p-6 md:p-8 bg-slate-950/60 border border-slate-800 rounded-3xl shadow-inner">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <label className="text-xs font-black text-slate-200 uppercase tracking-widest block">Limitar Vagas por Gênero / Sexo</label>
+                        <p className="text-[11px] font-bold text-slate-500 mt-0.5">Define cotas específicas para alunos do sexo Masculino e Feminino.</p>
+                      </div>
                       <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, limitar_vagas_genero: formData.limitar_vagas_genero === 1 ? 0 : 1 })}
-                        className={`w-14 h-8 rounded-full transition-all relative ${formData.limitar_vagas_genero === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
+                        onClick={() => {
+                          const nextState = formData.limitar_vagas_genero === 1 ? 0 : 1;
+                          const masc = Number(formData.vagas_masculino) || 0;
+                          const fem = Number(formData.vagas_feminino) || 0;
+                          const sum = masc + fem;
+                          setFormData({
+                            ...formData,
+                            limitar_vagas_genero: nextState,
+                            ...(nextState === 1 && sum > 0 && formData.max_capacity === 0 ? { max_capacity: sum } : {})
+                          });
+                        }}
+                        className={`w-14 h-8 rounded-full transition-all relative flex-shrink-0 ${formData.limitar_vagas_genero === 1 ? 'bg-yellow-400' : 'bg-slate-800'}`}
                       >
                         <div className={`absolute top-1 w-6 h-6 bg-white shadow-sm rounded-full transition-all ${formData.limitar_vagas_genero === 1 ? 'left-7' : 'left-1'}`}></div>
                       </button>
                     </div>
+
                     {formData.limitar_vagas_genero === 1 && (
-                      <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-yellow-400 uppercase tracking-widest">Vagas (Masculino)</label>
-                          <input type="number" min="0" placeholder="0" className="w-full px-5 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all" value={formData.vagas_masculino || ''} onChange={(e) => setFormData({ ...formData, vagas_masculino: parseInt(e.target.value) || 0 })} />
+                      <div className="space-y-4 pt-4 border-t border-slate-800/80 animate-in fade-in slide-in-from-top-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {/* Masculino */}
+                          <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl space-y-2">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-black text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                                Vagas (Masculino)
+                              </label>
+                            </div>
+                            <input
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              className="w-full px-5 py-3.5 bg-slate-900 border border-slate-800 rounded-xl text-white font-black text-lg focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all shadow-inner"
+                              value={formData.vagas_masculino || ''}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 0;
+                                setFormData(prev => ({ ...prev, vagas_masculino: val }));
+                              }}
+                            />
+                          </div>
+
+                          {/* Feminino */}
+                          <div className="p-4 bg-pink-500/10 border border-pink-500/20 rounded-2xl space-y-2">
+                            <div className="flex items-center justify-between">
+                              <label className="text-xs font-black text-pink-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-pink-400"></span>
+                                Vagas (Feminino)
+                              </label>
+                            </div>
+                            <input
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              className="w-full px-5 py-3.5 bg-slate-900 border border-slate-800 rounded-xl text-white font-black text-lg focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition-all shadow-inner"
+                              value={formData.vagas_feminino || ''}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value) || 0;
+                                setFormData(prev => ({ ...prev, vagas_feminino: val }));
+                              }}
+                            />
+                          </div>
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-yellow-400 uppercase tracking-widest">Vagas (Feminino)</label>
-                          <input type="number" min="0" placeholder="0" className="w-full px-5 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white font-bold focus:outline-none focus:border-yellow-400 transition-all" value={formData.vagas_feminino || ''} onChange={(e) => setFormData({ ...formData, vagas_feminino: parseInt(e.target.value) || 0 })} />
-                        </div>
+
+                        {/* Coincidence feedback bar */}
+                        {(() => {
+                          const masc = Number(formData.vagas_masculino) || 0;
+                          const fem = Number(formData.vagas_feminino) || 0;
+                          const totalGenero = masc + fem;
+                          const totalCap = Number(formData.max_capacity) || 0;
+                          const matches = totalCap > 0 && totalGenero === totalCap;
+
+                          return (
+                            <div className={`p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border ${
+                              matches
+                                ? 'bg-green-500/10 border-green-500/30 text-green-400'
+                                : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                            }`}>
+                              <div className="flex items-center gap-2.5 text-xs font-black">
+                                {matches ? (
+                                  <>
+                                    <CheckCircle2 size={18} className="text-green-400 shrink-0" />
+                                    <span>Vagas coincidem perfeitamente: <strong>{totalGenero} total</strong> ({masc} Masc. + {fem} Fem.) = {totalCap} vagas do evento.</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <AlertTriangle size={18} className="text-amber-400 shrink-0" />
+                                    <span>A soma por sexo ({totalGenero} vagas: {masc} Masc. + {fem} Fem.) não coincide com a Capacidade Total ({totalCap} vagas).</span>
+                                  </>
+                                )}
+                              </div>
+
+                              {!matches && (
+                                <button
+                                  type="button"
+                                  onClick={() => setFormData(prev => ({ ...prev, max_capacity: totalGenero }))}
+                                  className="px-4 py-2 bg-yellow-400 text-black rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-yellow-300 transition-all shadow-md shrink-0"
+                                >
+                                  Sincronizar Total ({totalGenero} vagas)
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>

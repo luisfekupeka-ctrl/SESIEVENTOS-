@@ -34,6 +34,7 @@ export default function EventDetails() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedStudentGrade, setSelectedStudentGrade] = useState<string>('');
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [selectedStudentGender, setSelectedStudentGender] = useState<string | null>(null);
   const [studentSelectedFromList, setStudentSelectedFromList] = useState(false);
   const [paymentAccepted, setPaymentAccepted] = useState(false);
   const [eventParticipants, setEventParticipants] = useState<any[]>([]);
@@ -365,7 +366,28 @@ export default function EventDetails() {
                          selectedStudentGrade && 
                          !restrictions.values?.includes(selectedStudentGrade);
 
-  const isSubmitDisabled = isRegistering || (event.is_paid === 1 && !paymentAccepted) || isGradeInvalid;
+  const maleRegistered = eventParticipants.filter(p => {
+    const g = (p.students?.gender || p.form_data?.['gênero'] || p.form_data?.['genero'] || p.form_data?.['sexo'] || '').toLowerCase();
+    return g.includes('masc') || g === 'm';
+  }).length;
+
+  const femaleRegistered = eventParticipants.filter(p => {
+    const g = (p.students?.gender || p.form_data?.['gênero'] || p.form_data?.['genero'] || p.form_data?.['sexo'] || '').toLowerCase();
+    return g.includes('fem') || g === 'f';
+  }).length;
+
+  const maleSpotsLeft = event.limitar_vagas_genero === 1 && (event.vagas_masculino || 0) > 0 ? Math.max(0, (event.vagas_masculino || 0) - maleRegistered) : null;
+  const femaleSpotsLeft = event.limitar_vagas_genero === 1 && (event.vagas_feminino || 0) > 0 ? Math.max(0, (event.vagas_feminino || 0) - femaleRegistered) : null;
+
+  const isSelectedStudentMale = selectedStudentGender?.toLowerCase().includes('masc') || selectedStudentGender?.toLowerCase() === 'm';
+  const isSelectedStudentFemale = selectedStudentGender?.toLowerCase().includes('fem') || selectedStudentGender?.toLowerCase() === 'f';
+
+  const isGenderFull = event.limitar_vagas_genero === 1 && participantType === 'student' && (
+    (isSelectedStudentMale && maleSpotsLeft !== null && maleSpotsLeft <= 0) ||
+    (isSelectedStudentFemale && femaleSpotsLeft !== null && femaleSpotsLeft <= 0)
+  );
+
+  const isSubmitDisabled = isRegistering || (event.is_paid === 1 && !paymentAccepted) || isGradeInvalid || (isGenderFull && profile?.role !== 'admin' && profile?.role !== 'master');
 
   return (
     <div className="pb-20 bg-[#020617] text-white">
@@ -545,17 +567,42 @@ export default function EventDetails() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-800 shadow-2xl flex items-start gap-6 group hover:border-yellow-400/30 transition-all"
+                className="bg-slate-900/40 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-800 shadow-2xl flex flex-col justify-between gap-5 group hover:border-yellow-400/30 transition-all"
               >
-                <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center shadow-lg border border-yellow-400/10 group-hover:scale-110 transition-transform">
-                  <Users size={32} />
+                <div className="flex items-start gap-6">
+                  <div className="w-16 h-16 bg-yellow-400/10 text-yellow-400 rounded-2xl flex items-center justify-center shadow-lg border border-yellow-400/10 group-hover:scale-110 transition-transform shrink-0">
+                    <Users size={32} />
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black text-yellow-400/60 uppercase tracking-[0.2em] mb-2">Vagas Disponíveis</h4>
+                    <p className="text-3xl font-black text-white tracking-tight">
+                      {event.max_capacity > 0 ? `${Math.max(0, event.max_capacity - (event.registration_count || 0))} / ${event.max_capacity}` : 'Ilimitadas'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-black text-yellow-400/60 uppercase tracking-[0.2em] mb-2">Vagas Disponíveis</h4>
-                  <p className="text-3xl font-black text-white tracking-tight">
-                    {event.max_capacity - (event.registration_count || 0)} / {event.max_capacity}
-                  </p>
-                </div>
+
+                {event.limitar_vagas_genero === 1 && (
+                  <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-800">
+                    <div className="p-3.5 bg-blue-500/10 border border-blue-500/20 rounded-2xl">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-wider">Masculino</p>
+                      </div>
+                      <p className="text-base font-black text-white">
+                        {event.vagas_masculino ? `${Math.max(0, event.vagas_masculino - maleRegistered)} de ${event.vagas_masculino}` : '-'}
+                      </p>
+                    </div>
+                    <div className="p-3.5 bg-pink-500/10 border border-pink-500/20 rounded-2xl">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="w-2 h-2 rounded-full bg-pink-400"></span>
+                        <p className="text-[10px] font-black text-pink-400 uppercase tracking-wider">Feminino</p>
+                      </div>
+                      <p className="text-base font-black text-white">
+                        {event.vagas_feminino ? `${Math.max(0, event.vagas_feminino - femaleRegistered)} de ${event.vagas_feminino}` : '-'}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             </section>
           </div>
@@ -732,6 +779,7 @@ export default function EventDetails() {
                                       // Reset: user is typing manually, not selected from list
                                       setStudentSelectedFromList(false);
                                       setSelectedStudentId(null);
+                                      setSelectedStudentGender(null);
                                       
                                       if (val.length >= 2) {
                                         const norm = (str: string) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -788,6 +836,7 @@ export default function EventDetails() {
                                             
                                             setFormData(newFormData);
                                             setSelectedStudentId(student.id);
+                                            setSelectedStudentGender(student.gender || null);
                                             setStudentSelectedFromList(true);
                                             setShowSuggestions(false);
                                           }}
@@ -913,6 +962,18 @@ export default function EventDetails() {
                         <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-2xl text-red-400 text-sm font-bold flex items-center gap-3">
                           <AlertTriangle size={18} />
                           Este aluno pertence ao ano escolar "{selectedStudentGrade}", mas o evento é restrito aos anos: {restrictions.values?.join(', ')}
+                        </div>
+                      )}
+
+                      {isGenderFull && (
+                        <div className="p-4 bg-red-500/10 border-2 border-red-500/30 rounded-2xl text-red-400 text-xs font-bold flex items-start gap-3 animate-in fade-in">
+                          <AlertTriangle size={18} className="shrink-0 mt-0.5 text-red-400" />
+                          <div>
+                            <p className="font-black uppercase tracking-wider mb-0.5">Vagas Esgotadas para este Gênero</p>
+                            <p className="leading-relaxed">
+                              Infelizmente, as vagas destinadas ao sexo <strong>{isSelectedStudentMale ? 'Masculino' : 'Feminino'}</strong> já foram totalmente preenchidas para este evento.
+                            </p>
+                          </div>
                         </div>
                       )}
 
